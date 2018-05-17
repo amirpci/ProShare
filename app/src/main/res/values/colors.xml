@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#F7F7F7</color>
+    <color name="colorPrimaryDark">#4972AD</color>
+    <color name="colorAccent">#E0E0E0</color>
+    <color name="abu">#EDEDED</color>
+    <color name="abuTua">#C9C9C9</color>
+    <color name="abuLebihTua">#ADADAD</color>
+    <color name="biruMuda">#B5CFF2</color>
+    <color name="biruLaut">#4972AD</color>
+    <color name="hitam">#000000</color>
+
+    <!-- Main App Colors -->
+    <color name="blue">#4972AD</color>
+    <color name="grey">#C9C9C9</color>
+    <color name="ligt_grey">#EDEDED</color>
+    <color name="primary_white">#F7F7F7</color>
+
 </resources>

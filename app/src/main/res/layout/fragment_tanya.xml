@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent">
+
+        <LinearLayout
+            android:animateLayoutChanges="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/tanya_related_q"
+                android:animateLayoutChanges="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="90dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/shape_rounded_rectangle"
+                    android:padding="7dp"
+                    android:text="Your related question"
+                    android:textColor="@color/hitam"
+                    android:textSize="22sp" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/abu">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="40dp"
+                        android:src="@drawable/obj_gambar"
+                        android:tint="@color/colorAccent" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:background="@color/abu"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="10dp"
+                        android:text="How to gain inspiration?"
+                        android:textColor="@color/hitam"
+                        android:textSize="22sp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingBottom="10dp">
+
+                        <ImageView
+                            android:id="@+id/tanya_orang"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginTop="10dp"
+                            android:src="@drawable/tab_orang" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="5dp"
+                            android:layout_toRightOf="@id/tanya_orang"
+                            android:text="123"
+                            android:textSize="12sp" />
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="20dp"
+                            android:src="@drawable/obj_tambah_lingkaran"
+                            android:tint="@color/blue" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginRight="15dp"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/tanya_rate1"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/obj_bintang"
+                        android:tint="@color/blue" />
+
+                    <ImageView
+                        android:id="@+id/tanya_rate2"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="5dp"
+                        android:src="@drawable/obj_bintang"
+                        android:tint="@color/blue" />
+
+                    <ImageView
+                        android:id="@+id/tanya_rate3"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="5dp"
+                        android:src="@drawable/obj_bintang"
+                        android:tint="@color/blue" />
+
+                    <ImageView
+                        android:id="@+id/tanya_rate4"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="5dp"
+                        android:src="@drawable/obj_bintang"
+                        android:tint="@color/abuLebihTua" />
+
+                    <ImageView
+                        android:id="@+id/tanya_rate5"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="5dp"
+                        android:src="@drawable/obj_bintang"
+                        android:tint="@color/abuLebihTua" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:animateLayoutChanges="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/shape_search_box"
+                android:padding="15dp">
+
+                <EditText
+                    android:id="@+id/tanya_search"
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/tanya_cari_icon"
+                    android:background="@color/abu"
+                    android:hint="search your question"
+                    android:textAlignment="textEnd"
+                    android:textSize="22sp" />
+
+                <ImageView
+                    android:id="@+id/tanya_cari_icon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="5dp"
+                    android:padding="5dp"
+                    android:src="@drawable/obj_search"
+                    android:tint="@color/abuLebihTua" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/tanya_add_question"
+                android:animateLayoutChanges="true"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/shape_rounded_rectangle"
+                    android:padding="7dp"
+                    android:text="Add new question"
+                    android:textColor="@color/hitam"
+                    android:textSize="22sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:background="@color/abu"
+                    android:orientation="vertical">
+                    <!-- untuk upload photo -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="150dp"
+                        android:layout_marginLeft="40dp"
+                        android:layout_marginRight="40dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/shape_stroke"
+                        android:padding="5dp">
+
+                        <ImageView
+                            android:id="@+id/tanya_add_photo"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="20dp"
+                            android:clickable="true"
+                            android:src="@drawable/obj_add_img"
+                            android:tint="@color/colorAccent" />
+
+                        <ProgressBar
+                            android:id="@+id/tanya_upPhoto_loading"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:layout_centerInParent="true"
+                            android:indeterminate="true"
+                            android:visibility="gone" />
+
+                        <ImageView
+                            android:id="@+id/tanya_uploaded_photo"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:visibility="gone"/>
+                    </RelativeLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="5dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="File name : " />
+
+                        <TextView
+                            android:id="@+id/tanya_file_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="-" />
+                    </LinearLayout>
+
+                    <EditText
+                        android:id="@+id/tanya_desc"
+                        android:layout_width="match_parent"
+                        android:layout_height="100dp"
+                        android:layout_margin="20dp"
+                        android:background="@drawable/shape_stroke"
+                        android:backgroundTint="@color/primary_white"
+                        android:hint="type your question here!"
+                        android:inputType="text"
+                        android:padding="20dp" />
+                </LinearLayout>
+                <Button
+                    android:id="@+id/tanya_addQuestion_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Add now"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@color/primary_white"
+                android:id="@+id/tanya_progress">
+                <TextView
+                    android:layout_margin="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="test: keyword : &quot;ada&quot; untuk hasil ada related,\n keyword lainnya untuk menambahkan pertanyaan baru "/>
+                <ProgressBar
+                    android:layout_marginTop="10dp"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:indeterminate="true"
+                    android:layout_gravity="center_horizontal"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
