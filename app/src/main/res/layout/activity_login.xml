@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context="amir_alif.m.atif.worker.Login_Register.Login">
+    tools:context="sidev17.siits.proshare.proshare1.Login_Register.Login">
 
     <LinearLayout
         android:paddingTop="10dp"

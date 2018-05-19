@@ -33,8 +33,9 @@ public class Register extends AppCompatActivity {
     private FirebaseAuth authUser;
     private DatabaseReference db;
     private ProgressDialog progress;
-    private Spinner Sp;
-    private String Special;
+    private Spinner PilihanBidang, PilihanNegara;
+    private String Special, Negara;
+    private static final String[] negara = {"Indonesia", "United States", "United Kingdom", "Japan"};
     private static final String[] specialization = {"Safety Engineering", "Civil Engineering", "Constructional", "Enviromental Engineering","Materials Science","More Options"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,22 +46,27 @@ public class Register extends AppCompatActivity {
         authUser = FirebaseAuth.getInstance();
         Nama = (EditText)findViewById(R.id.nama_reg);
         Email = (EditText)findViewById(R.id.email_reg);
-        Country = (EditText)findViewById(R.id.country_reg);
+        //Country = (EditText)findViewById(R.id.country_reg);
         specialized = (EditText)findViewById(R.id.specialized);
         Password = (EditText)findViewById(R.id.pass_reg);
         Re_password = (EditText)findViewById(R.id.retypepass_reg);
         expert = (Switch)findViewById(R.id.expert_switch);
         Register = (Button)findViewById(R.id.btn_register);
-        Sp = (Spinner)findViewById(R.id.specialization_option);
+        PilihanBidang = (Spinner)findViewById(R.id.specialization_option);
+        PilihanNegara = (Spinner)findViewById(R.id.pil_negara);
         Sp_Q = (TextView)findViewById(R.id.sp_Q);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(Register.this,
+        ArrayAdapter<String> spPilihanBidang = new ArrayAdapter<String>(Register.this,
                 android.R.layout.simple_spinner_item,specialization);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        Sp.setAdapter(adapter);
+        spPilihanBidang.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        PilihanBidang.setAdapter(spPilihanBidang);
+        ArrayAdapter<String> spPilihanNegara = new ArrayAdapter<String>(Register.this,
+                android.R.layout.simple_spinner_item,negara);
+        spPilihanNegara.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        PilihanNegara.setAdapter(spPilihanNegara);
         specialized.setVisibility(View.GONE);
-        Sp.setVisibility(View.GONE);
+        PilihanBidang.setVisibility(View.GONE);
         Sp_Q.setVisibility(View.GONE);
-        Sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        PilihanBidang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(position==specialization.length-1){
@@ -76,16 +82,27 @@ public class Register extends AppCompatActivity {
 
             }
         });
+        PilihanNegara.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Negara = negara[position];
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         expert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked){
-                    Sp.setVisibility(View.VISIBLE);
+                    PilihanBidang.setVisibility(View.VISIBLE);
                     Sp_Q.setVisibility(View.VISIBLE);
                 }else{
                     specialized.setVisibility(View.GONE);
-                    Sp.setVisibility(View.GONE);
+                    PilihanBidang.setVisibility(View.GONE);
                     Sp_Q.setVisibility(View.GONE);
                 }
             }
@@ -102,14 +119,14 @@ public class Register extends AppCompatActivity {
     public void Register(){
         final String Nama_ = Nama.getText().toString().trim();
         final String Email_ = Email.getText().toString().trim();
-        final String Country_ = Country.getText().toString().trim();
+       //final String Country_ = Country.getText().toString().trim();
         final String Pass = Password.getText().toString().trim();
         final String Re_Pass = Re_password.getText().toString().trim();
         final String Specialization_ = Special;
         final String Specialization = specialized.getText().toString().trim();
         char[] cekEmail = Email_.toCharArray();
 
-        if(Nama_.matches("") || Email_.matches("") || Country_.matches("") || Pass.matches("") || Re_Pass.matches("")){
+        if(Nama_.matches("") || Email_.matches("") || Negara.matches("") || Pass.matches("") || Re_Pass.matches("")){
             Toast.makeText(Register.this, "Fill the blank!", Toast.LENGTH_LONG).show();
         }else if(!cekEmail(cekEmail)){
             Toast.makeText(Register.this, "Wrong email format!", Toast.LENGTH_LONG).show();
@@ -131,7 +148,7 @@ public class Register extends AppCompatActivity {
                         DatabaseReference idRef =  db.child(id_user);
                         idRef.child("Nama").setValue(Nama_);
                         idRef.child("Email").setValue(Email_);
-                        idRef.child("Wa").setValue(Country_);
+                        idRef.child("Negara").setValue(Negara);
                         if(expert.isChecked()){
                             if(specialized.getVisibility()==View.VISIBLE) {
                                 idRef.child("Specialization").setValue(Specialization);

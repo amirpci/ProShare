@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="amir_alif.m.atif.worker.Login_Register.Register">
+    tools:context="sidev17.siits.proshare.proshare1.Login_Register.Register">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -35,7 +35,22 @@
             android:inputType="textEmailAddress"
             android:padding="5dp" />
 
-        <EditText
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Country      : "
+                android:textSize="17sp"/>
+            <Spinner
+                android:id="@+id/pil_negara"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+            </Spinner>
+        </LinearLayout>
+        <!-- <EditText
             android:id="@+id/country_reg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -43,7 +58,7 @@
             android:ems="10"
             android:hint="Country"
             android:inputType="text"
-            android:padding="5dp" />
+            android:padding="5dp" /> -->
 
         <EditText
             android:id="@+id/pass_reg"
