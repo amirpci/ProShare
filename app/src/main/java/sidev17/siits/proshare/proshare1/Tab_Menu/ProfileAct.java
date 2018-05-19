@@ -4,7 +4,9 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,9 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.cloud.translate.Translate;
+import com.google.cloud.translate.TranslateOptions;
+import com.google.cloud.translate.Translation;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,10 +33,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.util.Map;
 
+//import co.oriens.yandex_translate_android_api.TranslatorBackgroundTask;
 import sidev17.siits.proshare.proshare1.Login_Register.Login;
 import sidev17.siits.proshare.proshare1.R;
+//import yandex.translator.api.TranslateAPI;
+
+import com.rmtheis.yandtran.language.Language;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -48,11 +58,20 @@ public class ProfileAct extends Fragment {
     private ProgressDialog loading,uploading;
     private de.hdodenhof.circleimageview.CircleImageView profile_photo;
     private static final int ambilPhoto=2;
+   // private static final String API_KEY="trnsl.1.1.20180519T160825Z.7299a6aefc25b5ed.686b9fb304f26f1dfa1977702787e8088567146b";
     private Uri alamatPhoto;
+    private boolean profileLoaded=false;
+    //private Translate ts;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile, container, false);
+        if (android.os.Build.VERSION.SDK_INT > 9)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+       // ts = TranslateOptions.getDefaultInstance().getService();
         dataRef = FirebaseDatabase.getInstance().getReference("User");
         storageRef = FirebaseStorage.getInstance().getReference("User");
         uploading = new ProgressDialog(getActivity());
@@ -69,7 +88,10 @@ public class ProfileAct extends Fragment {
         profile_photo.setVisibility(View.GONE);
         idUser = FirebaseAuth.getInstance().getUid();
         loadData();
+       // if(profileLoaded) {
 
+
+      //  }
         addPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -121,10 +143,38 @@ public class ProfileAct extends Fragment {
                 String nama_ = (String) map.get("Nama");
                 String status_ = (String) map.get("Type");
                 String photo_ = (String) map.get("Photo");
-                nama.setText(nama_);
-                status.setText(status_);
                 String bidang_ = (String) map.get("Specialization");
-
+                String langID = (String) map.get("Negara");
+                Language languageID=null;
+                profileLoaded=true;
+                switch (langID){
+                    case "Indonesia" : languageID=Language.INDONESIAN; break;
+                    case "United States" : languageID=Language.ENGLISH; break;
+                    case "United Kingdom" : languageID=Language.ENGLISH; break;
+                    case "Japan" : languageID=Language.JAPANESE; break;
+                }
+                     //   TranslateOptions options = TranslateOptions.newBuilder().setApiKey(API_KEY).build();
+                     //   Translate ts = options.getService();
+                     //   Translation statusTS = ts.translate(status_, Translate.TranslateOption.sourceLanguage("en"), Translate.TranslateOption.targetLanguage(langID));
+                     //   Translation bidangTS = ts.translate(bidang_, Translate.TranslateOption.sourceLanguage("en"), Translate.TranslateOption.targetLanguage(langID));
+                com.rmtheis.yandtran.translate.Translate.setKey("trnsl.1.1.20180519T160825Z.7299a6aefc25b5ed.686b9fb304f26f1dfa1977702787e8088567146b");
+                try {
+                    bidang.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang_, Language.ENGLISH, languageID));
+                    status.setText(com.rmtheis.yandtran.translate.Translate.execute(status_, Language.ENGLISH, languageID));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+               /* try {
+                    status.setText(TranslateAPI.translate(status_, "en", langID));
+                    if (bidang_.equals("-")) {
+                        bidang.setVisibility(View.GONE);
+                    }else{
+                        bidang.setText(TranslateAPI.translate("Enviromental","en", langID));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } */
+                nama.setText(nama_);
                 if(!photo_.equals("-")){
                     Glide.with(getActivity()).load(photo_).into(profile_photo);
                     pp_view.setVisibility(View.GONE);
@@ -132,11 +182,6 @@ public class ProfileAct extends Fragment {
                     profile_photo.setVisibility(View.VISIBLE);
                 }
 
-                if (bidang_.equals("-")) {
-                    bidang.setVisibility(View.GONE);
-                }else{
-                    bidang.setText(bidang_);
-                }
                 loading.dismiss();
             }
 
@@ -163,6 +208,12 @@ public class ProfileAct extends Fragment {
             }
         });
     }
+
+    // method untuk yandex translator
+   /* String Translate(String textToBeTranslated,String languagePair){
+        TranslatorBackgroundTask translatorBackgroundTask= new TranslatorBackgroundTask(getActivity());
+        return translatorBackgroundTask.execute(textToBeTranslated,languagePair).toString(); // Returns the translated text as a String
+    } */
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
