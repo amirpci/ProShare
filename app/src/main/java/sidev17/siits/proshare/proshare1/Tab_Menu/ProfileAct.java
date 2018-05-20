@@ -159,7 +159,11 @@ public class ProfileAct extends Fragment {
                      //   Translation bidangTS = ts.translate(bidang_, Translate.TranslateOption.sourceLanguage("en"), Translate.TranslateOption.targetLanguage(langID));
                 com.rmtheis.yandtran.translate.Translate.setKey("trnsl.1.1.20180519T160825Z.7299a6aefc25b5ed.686b9fb304f26f1dfa1977702787e8088567146b");
                 try {
-                    bidang.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang_, Language.ENGLISH, languageID));
+                    if(bidang_.equals("-")){
+                        bidang.setVisibility(View.GONE);
+                    }else{
+                        bidang.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang_, Language.ENGLISH, languageID));
+                    }
                     status.setText(com.rmtheis.yandtran.translate.Translate.execute(status_, Language.ENGLISH, languageID));
                 } catch (Exception e) {
                     e.printStackTrace();
