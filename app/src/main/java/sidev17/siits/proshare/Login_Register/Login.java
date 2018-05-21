@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.proshare1.Login_Register;
+package sidev17.siits.proshare.Login_Register;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;

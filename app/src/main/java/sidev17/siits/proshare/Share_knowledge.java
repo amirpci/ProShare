@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.proshare1;
+package sidev17.siits.proshare;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;

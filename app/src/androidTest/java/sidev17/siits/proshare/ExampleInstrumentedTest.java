@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.proshare1;
+package sidev17.siits.proshare;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

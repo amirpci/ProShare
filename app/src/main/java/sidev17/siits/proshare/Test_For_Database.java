@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.proshare1;
+package sidev17.siits.proshare;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

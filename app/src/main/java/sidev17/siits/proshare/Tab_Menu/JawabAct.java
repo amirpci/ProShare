@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.proshare1.Tab_Menu;
+package sidev17.siits.proshare.Tab_Menu;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
