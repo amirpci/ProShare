@@ -18,8 +18,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import sidev17.siits.proshare.proshare1.MainActivity;
-import sidev17.siits.proshare.proshare1.R;
+import sidev17.siits.proshare.MainActivity;
+import sidev17.siits.proshare.R;
 
 public class Login extends AppCompatActivity {
     private EditText Email,Password;

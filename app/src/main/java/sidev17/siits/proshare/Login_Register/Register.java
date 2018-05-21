@@ -4,6 +4,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,6 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -23,20 +28,26 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import sidev17.siits.proshare.proshare1.R;
+import sidev17.siits.proshare.Login_Register.RegisterPage.Register1;
+import sidev17.siits.proshare.Login_Register.RegisterPage.Register2;
+import sidev17.siits.proshare.R;
 
 public class Register extends AppCompatActivity {
     private EditText Nama, Email, Country, Password, Re_password, specialized;
-    private Button Register;
+    private Button Register, Previous;
+    public Button Next;
     private TextView Sp_Q;
     private Switch expert;
     private FirebaseAuth authUser;
     private DatabaseReference db;
     private ProgressDialog progress;
-    private Spinner PilihanBidang, PilihanNegara;
-    private String Special, Negara;
-    private static final String[] negara = {"Indonesia", "United States", "United Kingdom", "Japan"};
-    private static final String[] specialization = {"Safety Engineering", "Civil Engineering", "Constructional", "Enviromental Engineering","Materials Science","More Options"};
+    public LinearLayout Btn2;
+    public FrameLayout registerLayout;
+    public String namaReg="", emailReg="", negaraReg="", spesialisasiReg="", passwordReg="";
+    public int positionNegara=0,positionBidang=0;
+    public int clickCounter=0;
+    public static final String[] negara = {"Select...","Indonesia", "United States", "United Kingdom", "Japan"};
+    public static final String[] specialization = {"Select...","Safety Engineering", "Civil Engineering", "Constructional", "Enviromental Engineering","Materials Science","More Options"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +55,7 @@ public class Register extends AppCompatActivity {
         progress = new ProgressDialog(this);
         db = FirebaseDatabase.getInstance().getReference().child("User");
         authUser = FirebaseAuth.getInstance();
+        Btn2 = (LinearLayout)findViewById(R.id.reg2_btn);
         Nama = (EditText)findViewById(R.id.nama_reg);
         Email = (EditText)findViewById(R.id.email_reg);
         //Country = (EditText)findViewById(R.id.country_reg);
@@ -51,127 +63,79 @@ public class Register extends AppCompatActivity {
         Password = (EditText)findViewById(R.id.pass_reg);
         Re_password = (EditText)findViewById(R.id.retypepass_reg);
         expert = (Switch)findViewById(R.id.expert_switch);
-        Register = (Button)findViewById(R.id.btn_register);
-        PilihanBidang = (Spinner)findViewById(R.id.specialization_option);
-        PilihanNegara = (Spinner)findViewById(R.id.pil_negara);
-        Sp_Q = (TextView)findViewById(R.id.sp_Q);
-        ArrayAdapter<String> spPilihanBidang = new ArrayAdapter<String>(Register.this,
-                android.R.layout.simple_spinner_item,specialization);
-        spPilihanBidang.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        PilihanBidang.setAdapter(spPilihanBidang);
-        ArrayAdapter<String> spPilihanNegara = new ArrayAdapter<String>(Register.this,
-                android.R.layout.simple_spinner_item,negara);
-        spPilihanNegara.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        PilihanNegara.setAdapter(spPilihanNegara);
-        specialized.setVisibility(View.GONE);
-        PilihanBidang.setVisibility(View.GONE);
-        Sp_Q.setVisibility(View.GONE);
-        PilihanBidang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position==specialization.length-1){
-                    specialized.setVisibility(View.VISIBLE);
-                }else{
-                    Special=specialization[position];
-                    specialized.setVisibility(View.GONE);
-                }
-            }
+        Previous = (Button)findViewById(R.id.prev_reg);
+        Register = (Button)findViewById(R.id.finish_reg);
+        Next = (Button)findViewById(R.id.next_reg);
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+        tampilkan(new Register1());
 
-            }
-        });
-        PilihanNegara.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        Btn2.setVisibility(View.GONE);
+        Next.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Negara = negara[position];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        expert.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked){
-                    PilihanBidang.setVisibility(View.VISIBLE);
-                    Sp_Q.setVisibility(View.VISIBLE);
-                }else{
-                    specialized.setVisibility(View.GONE);
-                    PilihanBidang.setVisibility(View.GONE);
-                    Sp_Q.setVisibility(View.GONE);
+            public void onClick(View v) {
+                Register1 fragment = (Register1) getSupportFragmentManager().findFragmentById(R.id.fragment_register);
+                if(fragment.next()){
+                    Next.setVisibility(View.GONE);
+                    Btn2.setVisibility(View.VISIBLE);
+                    tampilkan(new Register2());
                 }
             }
         });
-
+        Previous.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Btn2.setVisibility(View.GONE);
+                Next.setVisibility(View.VISIBLE);
+                tampilkan(new Register1());
+            }
+        });
         Register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Register();
+                Register2 fragment = (Register2) getSupportFragmentManager().findFragmentById(R.id.fragment_register);
+                fragment.SignUp();
             }
         });
+
+    }
+    public void tampilkan(Fragment frag) {
+        if(getFragmentManager().findFragmentById(R.id.fragment_register) != null) {
+            getFragmentManager()
+                    .beginTransaction().
+                    remove(getFragmentManager().findFragmentById(R.id.fragment_register)).commit();
+        }
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        ft.replace(R.id.fragment_register, frag);
+        ft.commit();
     }
 
-    public void Register(){
-        final String Nama_ = Nama.getText().toString().trim();
-        final String Email_ = Email.getText().toString().trim();
-       //final String Country_ = Country.getText().toString().trim();
-        final String Pass = Password.getText().toString().trim();
-        final String Re_Pass = Re_password.getText().toString().trim();
-        final String Specialization_ = Special;
-        final String Specialization = specialized.getText().toString().trim();
-        char[] cekEmail = Email_.toCharArray();
-
-        if(Nama_.matches("") || Email_.matches("") || Negara.matches("") || Pass.matches("") || Re_Pass.matches("")){
-            Toast.makeText(Register.this, "Fill the blank!", Toast.LENGTH_LONG).show();
-        }else if(!cekEmail(cekEmail)){
-            Toast.makeText(Register.this, "Wrong email format!", Toast.LENGTH_LONG).show();
-        }else if(Pass.length()<6){
-            Toast.makeText(Register.this, "Password length less then 6.", Toast.LENGTH_LONG).show();
-        }else if(!Pass.equals(Re_Pass)){
-            Toast.makeText(Register.this, "Password doesn't match!", Toast.LENGTH_LONG).show();
-        } else if(specialized.getVisibility()==View.VISIBLE && Specialization.matches("")){
-            Toast.makeText(Register.this, "Fill the blank!", Toast.LENGTH_LONG).show();
-        }else {
-            progress.setMessage("Registring...!");
-            progress.show();
-            authUser.createUserWithEmailAndPassword(Email_, Pass).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                @Override
-                public void onComplete(@NonNull Task<AuthResult> task) {
-                    if(task.isSuccessful()){
-                        AlertDialog.Builder builder_ = new AlertDialog.Builder(Register.this);
-                        String id_user = authUser.getCurrentUser().getUid();
-                        DatabaseReference idRef =  db.child(id_user);
-                        idRef.child("Nama").setValue(Nama_);
-                        idRef.child("Email").setValue(Email_);
-                        idRef.child("Negara").setValue(Negara);
-                        if(expert.isChecked()){
-                            if(specialized.getVisibility()==View.VISIBLE) {
-                                idRef.child("Specialization").setValue(Specialization);
-                            }else{
-                                idRef.child("Specialization").setValue(Specialization_);
-                            }
-                            idRef.child("Type").setValue("Expert");
-                        }else{
-                            idRef.child("Type").setValue("Worker");
-                            idRef.child("Specialization").setValue("-");
-                        }
-                        idRef.child("Score").child("Answered").setValue(0);
-                        idRef.child("Score").child("Rater").setValue(0);
-                        idRef.child("Score").child("Rating").setValue(0);
-                        idRef.child("Photo").setValue("-");
-                        progress.dismiss();
-                    }else {
-                        progress.dismiss();
-                        Toast.makeText(Register.this, "Register failed!", Toast.LENGTH_LONG).show();
-                    }
+    public void Register(final String Nama_,final String Email_,final String Negara_,final String Bidang_,final String Pass_){
+        progress.setMessage("Signing Up...");
+        progress.show();
+        authUser.createUserWithEmailAndPassword(Email_, Pass_).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    AlertDialog.Builder builder_ = new AlertDialog.Builder(Register.this);
+                    String id_user = authUser.getCurrentUser().getUid();
+                    DatabaseReference idRef =  db.child(id_user);
+                    idRef.child("Nama").setValue(Nama_);
+                    idRef.child("Email").setValue(Email_);
+                    idRef.child("Negara").setValue(Negara_);
+                    idRef.child("Specialization").setValue(Bidang_);
+                    idRef.child("Type").setValue("Worker");
+                    idRef.child("Score").child("Answered").setValue(0);
+                    idRef.child("Score").child("Rater").setValue(0);
+                    idRef.child("Score").child("Rating").setValue(0);
+                    idRef.child("Photo").setValue("-");
+                    progress.dismiss();
+                }else {
+                    progress.dismiss();
+                    Toast.makeText(Register.this, "Register failed!", Toast.LENGTH_LONG).show();
                 }
-            });
-        }
+            }
+        });
 
     }
 

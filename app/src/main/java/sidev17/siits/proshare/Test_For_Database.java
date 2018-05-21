@@ -6,6 +6,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import sidev17.siits.proshare.R;
+
 public class Test_For_Database extends AppCompatActivity {
     private EditText addData,searchData;
     private Button add, search;

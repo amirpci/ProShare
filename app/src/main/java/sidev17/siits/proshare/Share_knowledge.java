@@ -22,6 +22,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import sidev17.siits.proshare.R;
+
 public class Share_knowledge extends AppCompatActivity {
     private EditText Problem_desc;
     private Button add_newProblem, add_Photos, add_Videos;

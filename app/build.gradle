@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 27
     defaultConfig {
-        applicationId "sidev17.siits.proshare.proshare1"
+        applicationId "sidev17.siits.proshare"
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1

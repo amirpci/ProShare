@@ -35,7 +35,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import sidev17.siits.proshare.proshare1.R;
+import sidev17.siits.proshare.R;
 
 import static android.app.Activity.RESULT_OK;
 

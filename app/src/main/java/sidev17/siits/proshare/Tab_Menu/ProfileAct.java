@@ -31,8 +31,8 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.Map;
 
-import sidev17.siits.proshare.proshare1.Login_Register.Login;
-import sidev17.siits.proshare.proshare1.R;
+import sidev17.siits.proshare.Login_Register.Login;
+import sidev17.siits.proshare.R;
 
 import com.rmtheis.yandtran.language.Language;
 

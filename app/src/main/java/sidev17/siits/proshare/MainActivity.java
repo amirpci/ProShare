@@ -13,9 +13,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import sidev17.siits.proshare.proshare1.Tab_Menu.JawabAct;
-import sidev17.siits.proshare.proshare1.Tab_Menu.ProfileAct;
-import sidev17.siits.proshare.proshare1.Tab_Menu.TanyaAct;
+import sidev17.siits.proshare.Tab_Menu.JawabAct;
+import sidev17.siits.proshare.Tab_Menu.ProfileAct;
+import sidev17.siits.proshare.Tab_Menu.TanyaAct;
+import sidev17.siits.proshare.R;
 
 public class MainActivity extends AppCompatActivity {
 

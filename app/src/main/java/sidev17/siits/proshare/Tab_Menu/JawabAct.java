@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import sidev17.siits.proshare.proshare1.R;
+import sidev17.siits.proshare.R;
 
 
 /**
