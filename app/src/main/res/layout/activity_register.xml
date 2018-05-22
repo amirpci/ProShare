@@ -53,7 +53,7 @@ tools:context="sidev17.siits.proshare.Login_Register.Register">
             android:text="Back"
             android:textStyle="bold"
             android:textColor="@color/primary_white"
-            android:backgroundTint="@color/colorPrimaryDark"
+            android:backgroundTint="#c9c9c9"
             android:textAllCaps="false"/>
         <Button
             android:id="@+id/finish_reg"

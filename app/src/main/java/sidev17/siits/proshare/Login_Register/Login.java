@@ -75,7 +75,7 @@ public class Login extends AppCompatActivity {
                 }else {
                     String Email_=Email.getText().toString();
                     String Pass_=Password.getText().toString();
-                    progress.setMessage("Sedang masuk...!");
+                    progress.setMessage("Logging in...");
                     progress.show();
                     authUser.signInWithEmailAndPassword(Email_,Pass_).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
@@ -83,7 +83,7 @@ public class Login extends AppCompatActivity {
                             if(!task.isSuccessful()){
                                 progress.dismiss();
                                 AlertDialog.Builder builder_ = new AlertDialog.Builder(getApplicationContext());
-                                builder_.setMessage("Anda belum berhasil login.")
+                                builder_.setMessage("Login failed, please try again!")
                                         .setCancelable(false)
                                         .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                             @Override
@@ -92,7 +92,7 @@ public class Login extends AppCompatActivity {
                                             }
                                         });
                                 AlertDialog alert = builder_.create();
-                                alert.setTitle("Mohon maaf !");
+                                alert.setTitle("We're sorry!");
                                 alert.show();
                             }
                         }

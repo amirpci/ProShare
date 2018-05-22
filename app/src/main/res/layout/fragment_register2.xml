@@ -33,7 +33,7 @@
         <LinearLayout
             android:paddingTop="10dp"
             android:paddingLeft="25dp"
-            android:paddingRight="25dp"
+            android:paddingRight="10dp"
             android:layout_width="match_parent"
             android:layout_height="180dp"
             android:orientation="vertical"
@@ -60,6 +60,13 @@
                     android:textSize="15sp"
                     android:inputType="textPassword"
                     android:padding="7dp" />
+                <ImageView
+                    android:id="@+id/passStrong"
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginTop="11sp"
+                    android:src="@drawable/obj_centang"
+                    android:tint="@color/abu"/>
             </LinearLayout>
             <LinearLayout
                 android:layout_gravity="end"
@@ -78,6 +85,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:layout_marginTop="18sp"
+                    android:layout_marginRight="15dp"
                     android:ems="10"
                     android:textSize="15sp"
                     android:inputType="textPassword"
