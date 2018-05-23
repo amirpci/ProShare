@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.regex.Pattern;
@@ -28,6 +29,7 @@ public class Register2 extends Fragment {
     private EditText Password, RetypePassword;
     private Button Previous, Register;
     private ImageView PasswordStrong;
+    private LinearLayout passwordContainer;
     private boolean passStrong = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,6 +41,12 @@ public class Register2 extends Fragment {
         Previous = (Button)v.findViewById(R.id.prev_reg);
         Register = (Button)v.findViewById(R.id.finish_reg);
         PasswordStrong = (ImageView)v.findViewById(R.id.passStrong);
+        passwordContainer = (LinearLayout)v.findViewById(R.id.passContainer);
+
+        // set tinggi default sama dengan sebelumnya
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
+                registerRef2.contHeight);
+        passwordContainer.setLayoutParams(lp);
 
         Password.addTextChangedListener(new TextWatcher() {
             @Override

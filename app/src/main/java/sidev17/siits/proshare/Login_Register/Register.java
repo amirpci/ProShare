@@ -46,6 +46,7 @@ public class Register extends AppCompatActivity {
     public String namaReg="", emailReg="", negaraReg="", spesialisasiReg="", passwordReg="";
     public int positionNegara=0,positionBidang=0;
     public int clickCounter=0;
+    public int contHeight = 0;
     public static final String[] negara = {"Select...","Indonesia", "United States", "United Kingdom", "Japan"};
     public static final String[] specialization = {"Select...","Safety Engineering", "Civil Engineering", "Constructional", "Enviromental Engineering","Materials Science","More Options"};
     @Override

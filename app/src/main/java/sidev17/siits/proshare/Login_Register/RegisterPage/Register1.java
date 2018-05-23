@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -29,6 +30,7 @@ public class Register1 extends Fragment {
     private Spinner PilihanBidang, PilihanNegara;
     private EditText Nama, Email;
     private Button Next;
+   private LinearLayout pDataContainer;
     private String Negara="", Bidang="";
     //savedStateData
     private String nama_="",email_="";
@@ -59,6 +61,8 @@ public class Register1 extends Fragment {
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_register1, container, false);
         registerRef1 = (Register)getActivity();
+        pDataContainer = (LinearLayout)v.findViewById(R.id.PersonalDataContainer);
+        //pDataContainer = new LinearLayout(getActivity());
         Next = (Button)v.findViewById(R.id.next_reg);
         Nama = (EditText)v.findViewById(R.id.nama_reg);
         Email = (EditText)v.findViewById(R.id.email_reg);
@@ -82,8 +86,11 @@ public class Register1 extends Fragment {
         PilihanNegara.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                 Negara = registerRef1.negara[position];
-                 negara_ = position;
+                 if(position!=0) {
+                     Negara = registerRef1.negara[position];
+                     negara_ = position;
+                 }
+                 registerRef1.contHeight = pDataContainer.getHeight();
             }
 
             @Override
@@ -95,10 +102,11 @@ public class Register1 extends Fragment {
         PilihanBidang.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if(position!=0){
+                if(position!=0) {
                     Bidang = registerRef1.specialization[position];
                     bidang_ = position;
                 }
+                registerRef1.contHeight = pDataContainer.getHeight();
             }
 
             @Override
@@ -109,6 +117,22 @@ public class Register1 extends Fragment {
 
         return v;
     }
+/*
+    void setTinggi(int a){
+        switch (a){
+            case 0: ViewGroup.LayoutParams params = pDataContainer.getLayoutParams();
+                params.width = LinearLayout.LayoutParams.MATCH_PARENT;
+                params.height = LinearLayout.LayoutParams.WRAP_CONTENT;
+                pDataContainer.requestLayout();
+                 break;
+            case 1: ViewGroup.LayoutParams params1 = pDataContainer.getLayoutParams();
+                params1.width = LinearLayout.LayoutParams.MATCH_PARENT;
+                params1.height = 180;
+                pDataContainer.requestLayout();
+                 break;
+        }
+    }
+    */
 
     public boolean next(){
         boolean returnVal=false;

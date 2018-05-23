@@ -31,6 +31,7 @@
                 android:textColor="@color/hitam"/>
         </LinearLayout>
         <LinearLayout
+            android:id="@+id/passContainer"
             android:paddingTop="10dp"
             android:paddingLeft="25dp"
             android:paddingRight="10dp"
