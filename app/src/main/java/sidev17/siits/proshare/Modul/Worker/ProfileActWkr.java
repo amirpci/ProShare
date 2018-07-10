@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Tab_Menu;
+package sidev17.siits.proshare.Modul.Worker;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -42,7 +42,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by USER on 02/05/2018.
  */
 
-public class ProfileAct extends Fragment {
+public class ProfileActWkr extends Fragment {
     private DatabaseReference dataRef;
     private StorageReference storageRef;
     private TextView nama, bidang, status, terjawab, rating, penilai;

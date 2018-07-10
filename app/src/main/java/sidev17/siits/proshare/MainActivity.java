@@ -13,10 +13,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import sidev17.siits.proshare.Tab_Menu.JawabAct;
-import sidev17.siits.proshare.Tab_Menu.ProfileAct;
-import sidev17.siits.proshare.Tab_Menu.TanyaAct;
-import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Modul.Worker.JawabActWkr;
+import sidev17.siits.proshare.Modul.Worker.ProfileActWkr;
+import sidev17.siits.proshare.Modul.Worker.TanyaActWkr;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         tmb_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ProfileAct());
+                tampilkan(new ProfileActWkr());
                 pesan("Let\'s set up your Profile!");
                 saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon), warnaTab[0],
                         tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis), warnaTab[1]);
@@ -66,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
         tmb_Tanya.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new TanyaAct());
+                tampilkan(new TanyaActWkr());
                 pesan("Wanna ask something?");
                 saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_tanya_ikon), warnaTab[0],
                         tmbTab[1], (ImageView) findViewById(R.id.tab_tanya_garis), warnaTab[1]);
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
         tmb_Jawab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new JawabAct());
+                tampilkan(new JawabActWkr());
                 pesan("You\'ve got a new message!");
                 saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_jawab_ikon), warnaTab[0],
                         tmbTab[1], (ImageView) findViewById(R.id.tab_jawab_garis), warnaTab[1]);

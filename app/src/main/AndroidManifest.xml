@@ -27,6 +27,7 @@
         <activity android:name=".Login_Register.Register" />
         <activity android:name=".Test_For_Database" />
         <activity android:name=".Share_knowledge" />
+        <activity android:name=".Modul.Expert.TimelineActExprt"></activity>
     </application>
 
 </manifest>

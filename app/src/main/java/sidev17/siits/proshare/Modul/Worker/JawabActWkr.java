@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Tab_Menu;
+package sidev17.siits.proshare.Modul.Worker;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,7 +14,7 @@ import sidev17.siits.proshare.R;
  * Created by USER on 02/05/2018.
  */
 
-public class JawabAct extends Fragment {
+public class JawabActWkr extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

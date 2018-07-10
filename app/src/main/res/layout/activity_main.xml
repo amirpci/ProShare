@@ -125,7 +125,7 @@
     -->
     <fragment
         android:id="@+id/layout_wadah_fragment"
-        class="sidev17.siits.proshare.Tab_Menu.ProfileAct"
+        class="sidev17.siits.proshare.Modul.Worker.ProfileActWkr"
         android:layout_below="@id/layout_tab"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

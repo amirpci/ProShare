@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Tab_Menu;
+package sidev17.siits.proshare.Modul.Worker;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -43,7 +43,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by USER on 02/05/2018.
  */
 
-public class TanyaAct extends Fragment {
+public class TanyaActWkr extends Fragment {
     private LinearLayout relatedQuestion, addQuestion, loading;
     private EditText search_input,question_input;
     private TextView fileName;
