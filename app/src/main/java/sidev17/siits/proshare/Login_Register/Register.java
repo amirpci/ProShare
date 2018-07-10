@@ -111,7 +111,7 @@ public class Register extends AppCompatActivity {
         ft.commit();
     }
 
-    public void Register(final String Nama_,final String Email_,final String Negara_,final String Bidang_,final String Pass_){
+    public void Register(final String Nama_,final String Email_,final String Negara_,final String Bidang_,final String Pass_, final boolean expert){
         progress.setMessage("Signing Up...");
         progress.show();
         authUser.createUserWithEmailAndPassword(Email_, Pass_).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -125,7 +125,11 @@ public class Register extends AppCompatActivity {
                     idRef.child("Email").setValue(Email_);
                     idRef.child("Negara").setValue(Negara_);
                     idRef.child("Specialization").setValue(Bidang_);
-                    idRef.child("Type").setValue("Worker");
+                    if(expert){
+                        idRef.child("Type").setValue("Expert");
+                    }else{
+                        idRef.child("Type").setValue("Worker");
+                    }
                     idRef.child("Score").child("Answered").setValue(0);
                     idRef.child("Score").child("Rater").setValue(0);
                     idRef.child("Score").child("Rating").setValue(0);

@@ -16,6 +16,8 @@ tools:context="sidev17.siits.proshare.Login_Register.Register">
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="20dp"
+    android:minHeight="?android:attr/actionBarSize"
+    android:elevation="3dp"
     android:background="@drawable/shape_rounded_rectangle">
 
     <fragment

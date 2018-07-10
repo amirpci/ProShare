@@ -34,29 +34,6 @@
                 android:background="@drawable/tab_dipencet"/>
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/tab_tanya"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/tab_tanya_ikon"
-                android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="10dp"
-                android:layout_gravity="center_horizontal"
-                android:src="@drawable/tab_tanya"/>
-            <ImageView
-                android:id="@+id/tab_tanya_garis"
-                android:layout_width="match_parent"
-                android:layout_height="7dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_weight="1"
-                android:background="@drawable/tab_dipencet"/>
-        </LinearLayout>
-        <LinearLayout
             android:id="@+id/tab_jawab"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,6 +49,52 @@
                 android:src="@drawable/tab_jawab"/>
             <ImageView
                 android:id="@+id/tab_jawab_garis"
+                android:layout_width="match_parent"
+                android:layout_height="7dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/tab_dipencet"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/tab_timeline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/tab_timeline_ikon"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/tab_share_knowledge"/>
+            <ImageView
+                android:id="@+id/tab_timeline_garis"
+                android:layout_width="match_parent"
+                android:layout_height="7dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="1"
+                android:background="@drawable/tab_dipencet"/>
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/tab_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <ImageView
+                android:id="@+id/tab_feedback_ikon"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/tab_feedback"/>
+            <ImageView
+                android:id="@+id/tab_feedback_garis"
                 android:layout_width="match_parent"
                 android:layout_height="7dp"
                 android:layout_marginLeft="20dp"

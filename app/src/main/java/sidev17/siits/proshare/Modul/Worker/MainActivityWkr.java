@@ -1,4 +1,4 @@
-package sidev17.siits.proshare;
+package sidev17.siits.proshare.Modul.Worker;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,20 +13,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import sidev17.siits.proshare.Modul.Worker.JawabActWkr;
-import sidev17.siits.proshare.Modul.Worker.ProfileActWkr;
-import sidev17.siits.proshare.Modul.Worker.TanyaActWkr;
+import sidev17.siits.proshare.Modul.Worker.Tab.JawabActWkr;
+import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
+import sidev17.siits.proshare.Modul.Worker.Tab.TanyaActWkr;
+import sidev17.siits.proshare.R;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivityWkr extends AppCompatActivity {
 
-    LinearLayout tmb_Profile;
-    ImageView garis_Profile;
+    private LinearLayout tmb_Profile;
+    private ImageView garis_Profile;
 
-    LinearLayout tmb_Tanya;
-    ImageView garis_Tanya;
+    private LinearLayout tmb_Tanya;
+    private ImageView garis_Tanya;
 
-    LinearLayout tmb_Jawab;
-    ImageView garis_Jawab;
+    private LinearLayout tmb_Jawab;
+    private ImageView garis_Jawab;
 
     private boolean click_duaKali=false;
     @Override
@@ -146,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             finish();
             System.exit(0);
         }
-        Toast.makeText(MainActivity.this, "Press BACK again to exit!", Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivityWkr.this, "Press BACK again to exit!", Toast.LENGTH_LONG).show();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

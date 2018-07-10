@@ -12,7 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".Modul.Worker.MainActivityWkr">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -27,7 +27,8 @@
         <activity android:name=".Login_Register.Register" />
         <activity android:name=".Test_For_Database" />
         <activity android:name=".Share_knowledge" />
-        <activity android:name=".Modul.Expert.TimelineActExprt"></activity>
+        <activity android:name=".Modul.Expert.Tab.TimelineActExprt" />
+        <activity android:name=".Modul.Expert.MainActivityExprt"></activity>
     </application>
 
 </manifest>

@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.util.regex.Pattern;
@@ -30,6 +31,7 @@ public class Register2 extends Fragment {
     private Button Previous, Register;
     private ImageView PasswordStrong;
     private LinearLayout passwordContainer;
+    private Switch statusSwitch;
     private boolean passStrong = false;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,7 +44,7 @@ public class Register2 extends Fragment {
         Register = (Button)v.findViewById(R.id.finish_reg);
         PasswordStrong = (ImageView)v.findViewById(R.id.passStrong);
         passwordContainer = (LinearLayout)v.findViewById(R.id.passContainer);
-
+        statusSwitch = (Switch)v.findViewById(R.id.register_expert_switch);
         // set tinggi default sama dengan sebelumnya
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 registerRef2.contHeight);
@@ -102,7 +104,7 @@ public class Register2 extends Fragment {
         }else if(!passStrong) {
             Toast.makeText(getActivity(), "Password should contain at least one number!", Toast.LENGTH_LONG).show();
         }else{
-            registerRef2.Register(registerRef2.namaReg,registerRef2.emailReg, registerRef2.negaraReg, registerRef2.spesialisasiReg, Password.getText().toString() );
+            registerRef2.Register(registerRef2.namaReg,registerRef2.emailReg, registerRef2.negaraReg, registerRef2.spesialisasiReg, Password.getText().toString(), statusSwitch.isChecked());
         }
     }
 }

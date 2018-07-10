@@ -2,8 +2,11 @@ package sidev17.siits.proshare.Login_Register;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -17,8 +20,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import sidev17.siits.proshare.MainActivity;
+import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
+import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
 import sidev17.siits.proshare.R;
 
 public class Login extends AppCompatActivity {
@@ -45,7 +53,7 @@ public class Login extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if(firebaseAuth.getCurrentUser() != null){
                     progress.dismiss();
-                    startActivity(new Intent(Login.this, MainActivity.class));
+                    startActivity(new Intent(Login.this, MainActivityWkr.class));
                 }
             }
 
@@ -77,26 +85,63 @@ public class Login extends AppCompatActivity {
                     String Pass_=Password.getText().toString();
                     progress.setMessage("Logging in...");
                     progress.show();
-                    authUser.signInWithEmailAndPassword(Email_,Pass_).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(!task.isSuccessful()){
-                                progress.dismiss();
-                                AlertDialog.Builder builder_ = new AlertDialog.Builder(getApplicationContext());
-                                builder_.setMessage("Login failed, please try again!")
-                                        .setCancelable(false)
-                                        .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialogInterface, int i) {
-                                                dialogInterface.cancel();
-                                            }
-                                        });
-                                AlertDialog alert = builder_.create();
-                                alert.setTitle("We're sorry!");
-                                alert.show();
+                    ConnectivityManager connectivity = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                    NetworkInfo activeNetwork = connectivity.getActiveNetworkInfo();
+                    if (activeNetwork != null) { // connected to the internet
+                        authUser.signInWithEmailAndPassword(Email_,Pass_).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if(task.isSuccessful()){
+                                    final String id_user = authUser.getCurrentUser().getUid();
+                                    FirebaseDatabase.getInstance().getReference("User/"+id_user).addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            AccountType = dataSnapshot.child("Type").getValue().toString();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                    if(AccountType.equals("Expert")){
+                                        startActivity(new Intent(getApplicationContext(), MainActivityExprt.class));
+                                    }else{
+                                        startActivity(new Intent(getApplicationContext(), MainActivityWkr.class));
+                                    }
+                                }else{
+                                    progress.dismiss();
+                                    AlertDialog.Builder builder_ = new AlertDialog.Builder(getApplicationContext());
+                                    builder_.setMessage("Login failed, please try again!")
+                                            .setCancelable(false)
+                                            .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    dialogInterface.cancel();
+                                                }
+                                            });
+                                    AlertDialog alert = builder_.create();
+                                    alert.setTitle("We're sorry!");
+                                    alert.show();
+                                }
                             }
-                        }
-                    });
+                        });
+                    }else{
+                        progress.dismiss();
+                        AlertDialog.Builder builder_ = new AlertDialog.Builder(getApplicationContext());
+                        builder_.setMessage("No internet connection found!")
+                                .setCancelable(false)
+                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
+                        AlertDialog alert = builder_.create();
+                        alert.setTitle("We're sorry!");
+                        alert.show();
+                    }
+
                 }
             }
         });
