@@ -145,11 +145,17 @@
                 android:layout_weight="1"
                 android:background="@drawable/tab_dipencet"/>
         </LinearLayout>
-    -->
+    --> <!--
     <fragment
         android:id="@+id/layout_wadah_fragment_Exprt"
         class="sidev17.siits.proshare.Modul.Expert.Tab.JawabActExprt"
         android:layout_below="@id/layout_tab_Exprt"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"/> -->
+    <android.support.v4.view.ViewPager
+        android:id="@+id/layout_wadah_fragment_Exprt"
+        android:layout_below="@id/layout_tab_Exprt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 </RelativeLayout>
