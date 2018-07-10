@@ -26,7 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
-import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
+import sidev17.siits.proshare.MainActivity;
 import sidev17.siits.proshare.R;
 
 public class Login extends AppCompatActivity {
@@ -53,7 +53,7 @@ public class Login extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 if(firebaseAuth.getCurrentUser() != null){
                     progress.dismiss();
-                    startActivity(new Intent(Login.this, MainActivityWkr.class));
+                    startActivity(new Intent(Login.this, MainActivity.class));
                 }
             }
 
@@ -92,23 +92,7 @@ public class Login extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if(task.isSuccessful()){
-                                    final String id_user = authUser.getCurrentUser().getUid();
-                                    FirebaseDatabase.getInstance().getReference("User/"+id_user).addValueEventListener(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            AccountType = dataSnapshot.child("Type").getValue().toString();
-                                        }
-
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-
-                                        }
-                                    });
-                                    if(AccountType.equals("Expert")){
-                                        startActivity(new Intent(getApplicationContext(), MainActivityExprt.class));
-                                    }else{
-                                        startActivity(new Intent(getApplicationContext(), MainActivityWkr.class));
-                                    }
+                                   Toast.makeText(getApplicationContext(), "Sign in successful!", Toast.LENGTH_LONG).show();
                                 }else{
                                     progress.dismiss();
                                     AlertDialog.Builder builder_ = new AlertDialog.Builder(getApplicationContext());

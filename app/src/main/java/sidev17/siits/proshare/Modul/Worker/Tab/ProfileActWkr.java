@@ -55,7 +55,7 @@ public class ProfileActWkr extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_profile, container, false);
+        View v = inflater.inflate(R.layout.fragment_profile_wkr, container, false);
         // untuk menghindari kesalahan multithreading dalam network connection
         if (android.os.Build.VERSION.SDK_INT > 9)
         {

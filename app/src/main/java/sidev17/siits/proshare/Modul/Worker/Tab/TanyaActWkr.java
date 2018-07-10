@@ -61,7 +61,7 @@ public class TanyaActWkr extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_tanya, container, false);
+        View v = inflater.inflate(R.layout.fragment_tanya_wkr, container, false);
         storageRef = FirebaseStorage.getInstance().getReference();
         dataRef = FirebaseDatabase.getInstance().getReference();
         relatedQuestion = (LinearLayout)v.findViewById(R.id.tanya_related_q);

@@ -33,32 +33,31 @@ public class MainActivityWkr extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        final int tmbTab[][] = {{R.id.tab_profile_ikon, R.id.tab_tanya_ikon, R.id.tab_jawab_ikon},
-                {R.id.tab_profile_garis, R.id.tab_tanya_garis, R.id.tab_jawab_garis}};
+        setContentView(R.layout.activity_main_wkr);
+        final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr, R.id.tab_jawab_ikon_wkr},
+                {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, R.id.tab_jawab_garis_wkr}};
         final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
                 {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
-        final ImageView icon_Profile = (ImageView) findViewById(R.id.tab_profile_ikon);
-        garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis);
-
-        tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile);
-        tmb_Tanya = (LinearLayout) findViewById(R.id.tab_tanya);
-        tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab);
+        final ImageView icon_Profile = (ImageView) findViewById(R.id.tab_profile_ikon_wkr);
+        garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis_wkr);
+        tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile_wkr);
+        tmb_Tanya = (LinearLayout) findViewById(R.id.tab_tanya_wkr);
+        tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab_wkr);
 
 
         //Buat Warna Inisiasi
-        saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon), warnaTab[0],
-                tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis), warnaTab[1]);
+       saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_wkr), warnaTab[0],
+                tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis_wkr), warnaTab[1]);
 
-//        garis_Profile= (ImageView) findViewById(R.id.tab_profile_garis);
+//        garis_Profile= (ImageView) findViewById(R.id.tab_profile_garis_wkr);
         tmb_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tampilkan(new ProfileActWkr());
                 pesan("Let\'s set up your Profile!");
-                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon), warnaTab[0],
-                        tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis), warnaTab[1]);
+                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_wkr), warnaTab[0],
+                        tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis_wkr), warnaTab[1]);
             }
         });
 
@@ -68,8 +67,8 @@ public class MainActivityWkr extends AppCompatActivity {
             public void onClick(View v) {
                 tampilkan(new TanyaActWkr());
                 pesan("Wanna ask something?");
-                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_tanya_ikon), warnaTab[0],
-                        tmbTab[1], (ImageView) findViewById(R.id.tab_tanya_garis), warnaTab[1]);
+                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_tanya_ikon_wkr), warnaTab[0],
+                        tmbTab[1], (ImageView) findViewById(R.id.tab_tanya_garis_wkr), warnaTab[1]);
             }
         });
 
@@ -79,17 +78,16 @@ public class MainActivityWkr extends AppCompatActivity {
             public void onClick(View v) {
                 tampilkan(new JawabActWkr());
                 pesan("You\'ve got a new message!");
-                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_jawab_ikon), warnaTab[0],
-                        tmbTab[1], (ImageView) findViewById(R.id.tab_jawab_garis), warnaTab[1]);
+                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_jawab_ikon_wkr), warnaTab[0],
+                        tmbTab[1], (ImageView) findViewById(R.id.tab_jawab_garis_wkr), warnaTab[1]);
             }
         });
-
     }
 
     void tampilkan(Fragment frag) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.layout_wadah_fragment, frag);
+        ft.replace(R.id.layout_wadah_fragment_wkr, frag);
         ft.commit();
     }
 
@@ -147,7 +145,7 @@ public class MainActivityWkr extends AppCompatActivity {
             finish();
             System.exit(0);
         }
-        Toast.makeText(MainActivityWkr.this, "Press BACK again to exit!", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Press BACK again to exit!", Toast.LENGTH_LONG).show();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

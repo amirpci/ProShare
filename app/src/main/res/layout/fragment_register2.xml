@@ -2,104 +2,108 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/abu"
     tools:context="sidev17.siits.proshare.Login_Register.RegisterPage.Register2">
 
-    <LinearLayout
-        android:layout_marginTop="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:text="Sign Up"
-                android:textStyle="bold"
-                android:textColor="@color/hitam"
-                android:textSize="30sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=" - Password"
-                android:textSize="15sp"
-                android:textColor="@color/hitam"/>
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/passContainer"
-            android:paddingTop="15dp"
-            android:paddingLeft="25dp"
-            android:paddingRight="10dp"
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_gravity="center_horizontal">
-
+            android:orientation="vertical">
             <LinearLayout
-                android:layout_gravity="end"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Password"
+                    android:layout_marginLeft="30dp"
+                    android:text="Sign Up"
+                    android:textStyle="bold"
                     android:textColor="@color/hitam"
-                    android:textSize="15sp"/>
-                <EditText
-                    android:id="@+id/pass_reg"
-                    android:layout_width="130dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:ems="10"
-                    android:textSize="15sp"
-                    android:inputType="textPassword"
-                    android:padding="7dp" />
-                <ImageView
-                    android:id="@+id/passStrong"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_marginTop="11sp"
-                    android:src="@drawable/obj_centang"
-                    android:tint="@color/abu"/>
-            </LinearLayout>
-            <LinearLayout
-                android:layout_gravity="end"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                    android:textSize="30sp"/>
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Retye\nPassword"
-                    android:textColor="@color/hitam"
-                    android:textSize="15sp"/>
-                <EditText
-                    android:id="@+id/retypepass_reg"
-                    android:layout_width="130dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="18sp"
-                    android:layout_marginRight="15dp"
-                    android:ems="10"
+                    android:text=" - Password"
                     android:textSize="15sp"
-                    android:inputType="textPassword"
-                    android:padding="7dp" />
+                    android:textColor="@color/hitam"/>
             </LinearLayout>
+            <LinearLayout
+                android:id="@+id/passContainer"
+                android:paddingTop="20dp"
+                android:paddingLeft="25dp"
+                android:paddingRight="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="center_horizontal">
 
+                <LinearLayout
+                    android:layout_gravity="end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Password"
+                        android:textColor="@color/hitam"
+                        android:textSize="15sp"/>
+                    <EditText
+                        android:id="@+id/pass_reg"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:ems="10"
+                        android:textSize="15sp"
+                        android:inputType="textPassword"
+                        android:padding="7dp" />
+                    <ImageView
+                        android:id="@+id/passStrong"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginTop="11sp"
+                        android:src="@drawable/obj_centang"
+                        android:tint="@color/abu"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_gravity="end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Retye\nPassword"
+                        android:textColor="@color/hitam"
+                        android:textSize="15sp"/>
+                    <EditText
+                        android:id="@+id/retypepass_reg"
+                        android:layout_width="130dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="18sp"
+                        android:layout_marginRight="15dp"
+                        android:ems="10"
+                        android:textSize="15sp"
+                        android:inputType="textPassword"
+                        android:padding="7dp" />
+                </LinearLayout>
+
+            </LinearLayout>
         </LinearLayout>
-
         <Switch
-            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="10dp"
             android:id="@+id/register_expert_switch"
-            android:layout_width="180sp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:text="Register as an Expert" />
-    </LinearLayout>
-
+            android:text="Register as an Expert"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+    </RelativeLayout>
 </FrameLayout>

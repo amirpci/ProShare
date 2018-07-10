@@ -13,10 +13,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
-import sidev17.siits.proshare.Modul.Worker.Tab.JawabActWkr;
-import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
-import sidev17.siits.proshare.Modul.Worker.Tab.TanyaActWkr;
+import sidev17.siits.proshare.Modul.Expert.Tab.FeedbackActExprt;
+import sidev17.siits.proshare.Modul.Expert.Tab.JawabActExprt;
+import sidev17.siits.proshare.Modul.Expert.Tab.ProfileActExprt;
+import sidev17.siits.proshare.Modul.Expert.Tab.TimelineActExprt;
 import sidev17.siits.proshare.R;
 
 public class MainActivityExprt extends AppCompatActivity {
@@ -29,31 +29,31 @@ public class MainActivityExprt extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_exprt);
-        final int tmbTab[][] = {{R.id.tab_profile_ikon, R.id.tab_tanya_ikon, R.id.tab_timeline, R.id.tab_feedback},
-                {R.id.tab_profile_garis, R.id.tab_jawab_garis, R.id.tab_timeline_garis, R.id.tab_feedback_garis}};
+        final int tmbTab[][] = {{R.id.tab_profile_ikon_Exprt, R.id.tab_jawab_ikon_Exprt, R.id.tab_timeline_ikon_Exprt, R.id.tab_feedback_ikon_Exprt},
+                {R.id.tab_profile_garis_Exprt, R.id.tab_jawab_garis_Exprt, R.id.tab_timeline_garis_Exprt, R.id.tab_feedback_garis_Exprt}};
         final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
                 {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
        // final ImageView icon_Profile = (ImageView) findViewById(R.id.tab_profile_ikon);
       //  garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis);
 
-        tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile);
-        tmb_Timeline = (LinearLayout) findViewById(R.id.tab_timeline);
-        tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab);
-        tmb_Feedback = (LinearLayout) findViewById(R.id.tab_feedback);
+        tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile_Exprt);
+        tmb_Timeline = (LinearLayout) findViewById(R.id.tab_timeline_Exprt);
+        tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab_Exprt);
+        tmb_Feedback = (LinearLayout) findViewById(R.id.tab_feedback_Exprt);
 
 
         //Buat Warna Inisiasi
-        saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_jawab_ikon), warnaTab[0],
-                tmbTab[1], (ImageView) findViewById(R.id.tab_jawab_garis), warnaTab[1]);
+        saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_jawab_ikon_Exprt), warnaTab[0],
+                tmbTab[1], (ImageView) findViewById(R.id.tab_jawab_garis_Exprt), warnaTab[1]);
 
 //        garis_Profile= (ImageView) findViewById(R.id.tab_profile_garis);
         tmb_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ProfileActWkr());
-                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon), warnaTab[0],
-                        tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis), warnaTab[1]);
+                tampilkan(new ProfileActExprt());
+                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_Exprt), warnaTab[0],
+                        tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis_Exprt), warnaTab[1]);
             }
         });
 
@@ -61,9 +61,9 @@ public class MainActivityExprt extends AppCompatActivity {
         tmb_Timeline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new TanyaActWkr());
-                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_timeline_ikon), warnaTab[0],
-                        tmbTab[1], (ImageView) findViewById(R.id.tab_timeline_garis), warnaTab[1]);
+                tampilkan(new TimelineActExprt());
+                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_timeline_ikon_Exprt), warnaTab[0],
+                        tmbTab[1], (ImageView) findViewById(R.id.tab_timeline_garis_Exprt), warnaTab[1]);
             }
         });
 
@@ -71,18 +71,18 @@ public class MainActivityExprt extends AppCompatActivity {
         tmb_Jawab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new JawabActWkr());
-                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_jawab_ikon), warnaTab[0],
-                        tmbTab[1], (ImageView) findViewById(R.id.tab_jawab_garis), warnaTab[1]);
+                tampilkan(new JawabActExprt());
+                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_jawab_ikon_Exprt), warnaTab[0],
+                        tmbTab[1], (ImageView) findViewById(R.id.tab_jawab_garis_Exprt), warnaTab[1]);
             }
         });
 
         tmb_Feedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new JawabActWkr());
-                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_feedback_ikon), warnaTab[0],
-                        tmbTab[1], (ImageView) findViewById(R.id.tab_feedback_garis), warnaTab[1]);
+                tampilkan(new FeedbackActExprt());
+                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_feedback_ikon_Exprt), warnaTab[0],
+                        tmbTab[1], (ImageView) findViewById(R.id.tab_feedback_garis_Exprt), warnaTab[1]);
             }
         });
     }
@@ -91,7 +91,7 @@ public class MainActivityExprt extends AppCompatActivity {
     void tampilkan(Fragment frag) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.replace(R.id.layout_wadah_fragment, frag);
+        ft.replace(R.id.layout_wadah_fragment_Exprt, frag);
         ft.commit();
     }
 
