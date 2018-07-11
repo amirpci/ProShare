@@ -4,9 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -14,10 +11,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import sidev17.siits.proshare.Modul.Expert.Tab.JawabActExprt;
-import sidev17.siits.proshare.Modul.Worker.Tab.JawabActWkr;
+import sidev17.siits.proshare.Modul.Worker.Tab.DaftarTanyaActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
-import sidev17.siits.proshare.Modul.Worker.Tab.TanyaActWkr;
+import sidev17.siits.proshare.Modul.Worker.Tab.ShareActWkr;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.ViewPagerAdapter;
 
@@ -52,8 +48,8 @@ public class MainActivityWkr extends AppCompatActivity {
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
         adapter.AddFragment(new ProfileActWkr(), "");
-        adapter.AddFragment(new TanyaActWkr(), "");
-        adapter.AddFragment(new JawabActWkr(), "");
+        adapter.AddFragment(new ShareActWkr(), "");
+        adapter.AddFragment(new DaftarTanyaActWkr(), "");
         mvPager.setAdapter(adapter);
 
         mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

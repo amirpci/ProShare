@@ -3,9 +3,6 @@ package sidev17.siits.proshare.Modul.Expert;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,11 +13,8 @@ import android.widget.Toast;
 
 import sidev17.siits.proshare.Modul.Expert.Tab.FeedbackActExprt;
 import sidev17.siits.proshare.Modul.Expert.Tab.JawabActExprt;
-import sidev17.siits.proshare.Modul.Expert.Tab.ProfileActExprt;
 import sidev17.siits.proshare.Modul.Expert.Tab.TimelineActExprt;
-import sidev17.siits.proshare.Modul.Worker.Tab.JawabActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
-import sidev17.siits.proshare.Modul.Worker.Tab.TanyaActWkr;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.ViewPagerAdapter;
 

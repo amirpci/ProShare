@@ -31,7 +31,7 @@
                 android:src="@drawable/obj_centang_lingkaran_full"/>
         </RelativeLayout>
         <TextView
-            android:id="@+id/kometar_orang_nama"
+            android:id="@+id/komentar_orang_nama"
             android:layout_toRightOf="@id/komentar_orang_dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,9 +40,9 @@
             android:textColor="#000000"
             android:text="Mr. Your Name Here"/>
         <TextView
-            android:id="@+id/kometar_orang_job"
+            android:id="@+id/komentar_orang_job"
             android:layout_toRightOf="@id/komentar_orang_dp"
-            android:layout_below="@id/kometar_orang_nama"
+            android:layout_below="@id/komentar_orang_nama"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
@@ -57,6 +57,7 @@
         android:tint="@color/abuLebihTua"
         android:src="@drawable/obj_gambar"/>
     <TextView
+        android:id="@+id/komentar_deskripsi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
