@@ -15,22 +15,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:background="@color/abuTua">
-            <TextView
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#000000"
-                android:text="Halaman Profile"
-                android:textColor="#FFFFFF"
-                android:textSize="50sp"/>
-            <TextView
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#000000"
-                android:text="Halaman Profile"
-                android:textColor="#FFFFFF"
-                android:textSize="50sp"/>
             <LinearLayout
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"

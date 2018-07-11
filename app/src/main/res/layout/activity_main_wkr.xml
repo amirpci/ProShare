@@ -69,7 +69,7 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="10dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/tab_jawab"/>
+                android:src="@drawable/tab_share_knowledge"/>
             <ImageView
                 android:id="@+id/tab_jawab_garis_wkr"
                 android:layout_width="match_parent"
