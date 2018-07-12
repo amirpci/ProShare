@@ -25,6 +25,7 @@
         <activity android:name=".MainActivity" />
         <activity android:name=".Modul.Expert.MainActivityExprt" />
         <activity android:name=".Modul.Worker.MainActivityWkr"></activity>
+        <activity android:name=".Modul.Worker.DetailPertanyaanActivityWkr"/>
     </application>
 
 </manifest>

@@ -55,6 +55,9 @@ public class BaseAdapterPertanyaan extends BaseAdapter {
         TextView teksJudul= view.findViewById(idJudul);
         TextView teksDesc= view.findViewById(idDesc);
 
+        teksJudul.setText(judul[position]);
+        teksDesc.setText(deskripsi[position]);
+
         return view;
     }
 }

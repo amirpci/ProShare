@@ -34,8 +34,9 @@ public class DaftarTanyaActWkr extends Fragment {
         View view= inflater.inflate(R.layout.fragment_daftar_tanya_wkr, container, false);
 
         daftarTanya= view.findViewById(R.id.daftar_pertanyaan_wadah);
-        BaseAdapterPertanyaan adpTanya= new BaseAdapterPertanyaan(R.layout.model_daftar_pertanyaan, R.id.tambah_judul, R.id.tambah_deskripsi,
+        BaseAdapterPertanyaan adpTanya= new BaseAdapterPertanyaan(R.layout.model_daftar_pertanyaan, R.id.daftar_pertanyaan_judul, R.id.daftar_pertanyaan_deskripsi,
                 judul, desc);
+        adpTanya.setInflater(getLayoutInflater());
         daftarTanya.setAdapter(adpTanya);
 
         daftarTanya.setOnItemClickListener(new AdapterView.OnItemClickListener() {
