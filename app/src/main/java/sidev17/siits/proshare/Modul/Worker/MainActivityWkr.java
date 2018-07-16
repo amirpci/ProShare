@@ -35,8 +35,10 @@ public class MainActivityWkr extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_wkr);
-        final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr, R.id.tab_jawab_ikon_wkr},
-                {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, R.id.tab_jawab_garis_wkr}};
+
+        final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr, R.id.tab_tl_ikon_wkr},
+                {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, R.id.tab_tl_garis_wkr}};
+
         final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
                 {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
@@ -44,12 +46,13 @@ public class MainActivityWkr extends AppCompatActivity {
         garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis_wkr);
         tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile_wkr);
         tmb_Tanya = (LinearLayout) findViewById(R.id.tab_tanya_wkr);
-        tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab_wkr);
+        tmb_Jawab = (LinearLayout) findViewById(R.id.tab_tl_wkr);
+
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
         adapter.AddFragment(new ProfileActWkr(), "");
-        adapter.AddFragment(new ShareActWkr(), "");
         adapter.AddFragment(new DaftarTanyaActWkr(), "");
+        adapter.AddFragment(new ShareActWkr(), "");
         mvPager.setAdapter(adapter);
 
         mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

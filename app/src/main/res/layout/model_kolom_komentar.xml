@@ -27,8 +27,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:layout_width="25dp"
-                android:layout_height="25dp"
-                android:src="@drawable/obj_centang_lingkaran_full"/>
+                android:layout_height="25dp"/>
         </RelativeLayout>
         <TextView
             android:id="@+id/komentar_orang_nama"

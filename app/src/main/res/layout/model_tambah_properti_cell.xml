@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="100dp"
+    android:layout_height="100dp"
+    android:padding="5dp">
+
+    <ImageView
+        android:id="@+id/tambah_cell_pratinjau"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/obj_gambar_kotak"
+        android:backgroundTint="@color/abuTua"/>
+    <ImageView
+        android:id="@+id/tambah_cell_centang"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="5dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:foreground="@drawable/latar_lingkaran_bolong"
+        android:background="@drawable/latar_lingkaran"
+        android:backgroundTint="#33000000"/>
+    <ImageView
+        android:id="@+id/tambah_cell_indek_video"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="5dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp" />
+
+</RelativeLayout>

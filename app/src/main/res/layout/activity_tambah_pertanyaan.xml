@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".Modul.Worker.TambahPertanyaanWkr">
 
-    <TextView
+    <EditText
         android:id="@+id/tambah_judul"
         android:layout_alignParentTop="true"
         android:layout_width="match_parent"
@@ -16,43 +18,74 @@
         android:textColor="#000000"
         android:text="Your Title Goes Here"
         android:background="@color/abu"/>
-    <TextView
-        android:id="@+id/tambah_deskripsi"
-        android:layout_below="@id/tambah_judul"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="12sp"
-        android:textColor="#000000"
-        android:text="You insert description here about your problem."/>
 
-    <LinearLayout
-        android:layout_alignParentBottom="true"
+    <RelativeLayout
+        android:id="@+id/tambah_properti_wadah"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:padding="10dp"
-        android:orientation="horizontal"
-        android:background="#FFFFFF">
-        <ImageView
-            android:id="@+id/tambah_gambar"
+        android:layout_alignParentBottom="true">
+        <LinearLayout
+            android:id="@+id/tambah_properti_icon"
+            android:layout_alignParentBottom="true"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/tab_tambah_gambar"/>
-        <ImageView
-            android:id="@+id/tambah_video"
+            android:layout_height="50dp"
+            android:padding="10dp"
+            android:orientation="horizontal"
+            android:background="#FFFFFF">
+            <ImageView
+                android:id="@+id/tambah_gambar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/tab_tambah_gambar"
+                android:tint="@color/abuLebihTua"
+                android:onClick="tekan"/>
+            <ImageView
+                android:id="@+id/tambah_video"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/tab_tambah_video"
+                android:tint="@color/abuLebihTua"
+                android:onClick="tekan"/>
+            <ImageView
+                android:id="@+id/tambah_link"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/tab_tambah_link"
+                android:tint="@color/abuLebihTua"
+                android:onClick="tekan"/>
+        </LinearLayout>
+        <GridView
+            android:id="@+id/tambah_properti_cell_wadah"
+            android:layout_below="@id/tambah_properti_icon"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/tab_tambah_video"/>
-        <ImageView
-            android:id="@+id/tambah_link"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:src="@drawable/tab_tambah_link"/>
-    </LinearLayout>
+            android:layout_height="wrap_content"
+            android:numColumns="5"/>
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/tambah_deskripsi"
+        android:layout_above="@id/tambah_properti_wadah"
+        android:layout_below="@id/tambah_judul"
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textSize="12sp"
+        android:textColor="#000000"
+        android:text="You insert description here about your problem."
+        android:gravity="start"
+        android:backgroundTint="#00000000"/>
+
+    <ImageView
+        android:id="@+id/tambah_ok"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/obj_centang_lingkaran"
+        android:tint="@color/biruLaut"/>
 
 </RelativeLayout>

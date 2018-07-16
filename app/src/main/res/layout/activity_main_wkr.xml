@@ -57,13 +57,13 @@
                 android:background="@drawable/tab_dipencet"/>
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/tab_jawab_wkr"
+            android:id="@+id/tab_tl_wkr"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
             <ImageView
-                android:id="@+id/tab_jawab_ikon_wkr"
+                android:id="@+id/tab_tl_ikon_wkr"
                 android:layout_width="wrap_content"
                 android:layout_height="40dp"
                 android:layout_marginTop="15dp"
@@ -71,7 +71,7 @@
                 android:layout_gravity="center_horizontal"
                 android:src="@drawable/tab_share_knowledge"/>
             <ImageView
-                android:id="@+id/tab_jawab_garis_wkr"
+                android:id="@+id/tab_tl_garis_wkr"
                 android:layout_width="match_parent"
                 android:layout_height="7dp"
                 android:layout_marginLeft="20dp"
