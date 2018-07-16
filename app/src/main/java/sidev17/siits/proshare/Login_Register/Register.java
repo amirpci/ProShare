@@ -1,7 +1,7 @@
 package sidev17.siits.proshare.Login_Register;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -9,28 +9,27 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import sidev17.siits.proshare.Login_Register.RegisterPage.Register1;
 import sidev17.siits.proshare.Login_Register.RegisterPage.Register2;
+import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Utilities;
 
 public class Register extends AppCompatActivity {
     private EditText Nama, Email, Country, Password, Re_password, specialized;
@@ -41,6 +40,8 @@ public class Register extends AppCompatActivity {
     private FirebaseAuth authUser;
     private DatabaseReference db;
     private ProgressDialog progress;
+    public boolean emailBenar=false;
+    public boolean halamanPertama=true;
     public LinearLayout Btn2;
     public FrameLayout registerLayout;
     public String namaReg="", emailReg="", negaraReg="", spesialisasiReg="", passwordReg="";
@@ -114,6 +115,34 @@ public class Register extends AppCompatActivity {
     public void Register(final String Nama_,final String Email_,final String Negara_,final String Bidang_,final String Pass_, final boolean expert){
         progress.setMessage("Signing Up...");
         progress.show();
+        Pengguna user = new Pengguna();
+        user.setNama(Nama_);
+        user.setEmail(Email_.replace(".",","));
+        user.setPassword(Pass_);
+        user.setNegara(Negara_);
+        user.setBidang(Bidang_);
+        if(expert){
+            user.setStatus("Expert");
+        }else{
+            user.setStatus("Worker");
+        }
+        Utilities.getUserRef(user.getEmail()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(getApplicationContext(), "Sign up successful!", Toast.LENGTH_SHORT).show();
+                progress.dismiss();
+                startActivity(new Intent(Register.this, Login.class));
+                finish();
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getApplicationContext(), "Sign up failed!", Toast.LENGTH_SHORT).show();
+                progress.dismiss();
+            }
+        });
+
+            /*
         authUser.createUserWithEmailAndPassword(Email_, Pass_).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
@@ -140,9 +169,14 @@ public class Register extends AppCompatActivity {
                     Toast.makeText(Register.this, "Register failed!", Toast.LENGTH_LONG).show();
                 }
             }
-        });
+        });*/
 
     }
+
+    public void buatAkun(){
+
+    }
+
 
     public Boolean cekEmail(char[] mail_char){
         int isEmail=0;

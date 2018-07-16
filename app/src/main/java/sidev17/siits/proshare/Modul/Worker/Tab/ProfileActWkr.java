@@ -1,8 +1,11 @@
 package sidev17.siits.proshare.Modul.Worker.Tab;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -32,7 +35,9 @@ import com.google.firebase.storage.UploadTask;
 import java.util.Map;
 
 import sidev17.siits.proshare.Login_Register.Login;
+import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Utilities;
 
 import com.rmtheis.yandtran.language.Language;
 
@@ -43,8 +48,8 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class ProfileActWkr extends Fragment {
-    private DatabaseReference dataRef;
-    private StorageReference storageRef;
+    //private DatabaseReference dataRef;
+   // private StorageReference storageRef;
     private TextView nama, bidang, status, terjawab, rating, penilai;
     private String idUser,pp_url;
     private ImageView signout,pp_view, addPhoto;
@@ -62,8 +67,8 @@ public class ProfileActWkr extends Fragment {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-        dataRef = FirebaseDatabase.getInstance().getReference("User");
-        storageRef = FirebaseStorage.getInstance().getReference("User");
+        //dataRef = FirebaseDatabase.getInstance().getReference("User");
+        //storageRef = FirebaseStorage.getInstance().getReference("User");
         uploading = new ProgressDialog(getActivity());
         nama = (TextView)v.findViewById(R.id.nama_profile);
         bidang = (TextView)v.findViewById(R.id.bidang_profile);
@@ -90,7 +95,8 @@ public class ProfileActWkr extends Fragment {
         signout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
+                Utilities.removeDataLogin(getActivity());
+                //FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getActivity(), Login.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -100,16 +106,18 @@ public class ProfileActWkr extends Fragment {
     }
 
     void loadUploadedPP(){
-        dataRef.child(idUser).addValueEventListener(new ValueEventListener() {
+        Utilities.getUserRef(Utilities.getUserID(getActivity())).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String alamatPP = dataSnapshot.child("Photo").getValue(String.class);
-                Glide.with(getActivity()).load(alamatPP).into(profile_photo);
-                pp_view.setVisibility(View.GONE);
-                addPhoto.setVisibility(View.GONE);
-                profile_photo.setVisibility(View.VISIBLE);
-                uploading.dismiss();
-                Toast.makeText(getActivity(), "Profile photo updated!", Toast.LENGTH_LONG).show();
+                String alamatPP = dataSnapshot.child("photoProfile").getValue(String.class);
+                if(alamatPP!=null){
+                    Glide.with(getActivity()).load(alamatPP).into(profile_photo);
+                    pp_view.setVisibility(View.GONE);
+                    addPhoto.setVisibility(View.GONE);
+                    profile_photo.setVisibility(View.VISIBLE);
+                    uploading.dismiss();
+                    Toast.makeText(getActivity(), "Profile photo updated!", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
@@ -122,48 +130,52 @@ public class ProfileActWkr extends Fragment {
         loading = new ProgressDialog(getActivity());
         loading.setMessage("loading...");
         loading.show();
-        dataRef.child(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
-                String nama_ = (String) map.get("Nama");
-                String status_ = (String) map.get("Type");
-                String photo_ = (String) map.get("Photo");
-                String bidang_ = (String) map.get("Specialization");
-                String langID = (String) map.get("Negara");
-                Language languageID=null;
-                switch (langID){
-                    case "Indonesia" : languageID=Language.INDONESIAN; break;
-                    case "United States" : languageID=Language.ENGLISH; break;
-                    case "United Kingdom" : languageID=Language.ENGLISH; break;
-                    case "Japan" : languageID=Language.JAPANESE; break;
-                }
-                com.rmtheis.yandtran.translate.Translate.setKey("trnsl.1.1.20180519T160825Z.7299a6aefc25b5ed.686b9fb304f26f1dfa1977702787e8088567146b");
-                try {
-                    if(bidang_.equals("-")){
-                        bidang.setVisibility(View.GONE);
-                    }else{
-                        bidang.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang_, Language.ENGLISH, languageID));
+        ConnectivityManager connectivity = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = connectivity.getActiveNetworkInfo();
+        if(activeNetwork!=null){
+            Utilities.getUserRef(Utilities.getUserID(getActivity())).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Pengguna user = dataSnapshot.getValue(Pengguna.class);
+                    String nama_ = user.getNama();
+                    String status_ = user.getStatus();
+                    String photo_ = user.getPhotoProfile();
+                    String bidang_ = user.getBidang();
+                    String langID = user.getNegara();
+                    Language languageID=null;
+                    switch (langID){
+                        case "Indonesia" : languageID=Language.INDONESIAN; break;
+                        case "United States" : languageID=Language.ENGLISH; break;
+                        case "United Kingdom" : languageID=Language.ENGLISH; break;
+                        case "Japan" : languageID=Language.JAPANESE; break;
                     }
-                    status.setText(com.rmtheis.yandtran.translate.Translate.execute(status_, Language.ENGLISH, languageID));
-                } catch (Exception e) {
-                    e.printStackTrace();
+                    com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
+                    try {
+                        bidang.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang_, Language.ENGLISH, languageID));
+                        status.setText(com.rmtheis.yandtran.translate.Translate.execute(status_, Language.ENGLISH, languageID));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    nama.setText(nama_);
+                    if(photo_!=null){
+                        Glide.with(getActivity()).load(photo_).into(profile_photo);
+                        pp_view.setVisibility(View.GONE);
+                        addPhoto.setVisibility(View.GONE);
+                        profile_photo.setVisibility(View.VISIBLE);
+                    }
+
+                    loading.dismiss();
                 }
-                nama.setText(nama_);
-                if(!photo_.equals("-")){
-                    Glide.with(getActivity()).load(photo_).into(profile_photo);
-                    pp_view.setVisibility(View.GONE);
-                    addPhoto.setVisibility(View.GONE);
-                    profile_photo.setVisibility(View.VISIBLE);
-                }
 
-                loading.dismiss();
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {}
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-
-        });
+            });
+        }else{
+            loading.dismiss();
+            Toast.makeText(getActivity(), "No internet connection found!", Toast.LENGTH_LONG).show();
+        }
+        /*
         dataRef.child(idUser).child("Score").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -181,7 +193,7 @@ public class ProfileActWkr extends Fragment {
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });
+        }); */
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -189,12 +201,12 @@ public class ProfileActWkr extends Fragment {
             uploading.setMessage("uploading...");
             uploading.show();
             alamatPhoto = data.getData();
-            StorageReference filepath = storageRef.child("Photos").child(idUser).child(alamatPhoto.getLastPathSegment());
+            StorageReference filepath = Utilities.getProfileImageStorageRef(getActivity()).child("myProfile");
             filepath.putFile(alamatPhoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     pp_url = taskSnapshot.getDownloadUrl().toString();
-                    dataRef.child(idUser).child("Photo").setValue(pp_url);
+                    Utilities.getProfileImageRef(getActivity()).setValue(pp_url);
                     loadUploadedPP();
                 }
             }).addOnFailureListener(new OnFailureListener() {

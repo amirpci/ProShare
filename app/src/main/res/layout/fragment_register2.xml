@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/abu"
+    android:background="@android:color/white"
     tools:context="sidev17.siits.proshare.Login_Register.RegisterPage.Register2">
 
     <RelativeLayout
@@ -69,7 +69,7 @@
                         android:layout_height="15dp"
                         android:layout_marginTop="11sp"
                         android:src="@drawable/obj_centang"
-                        android:tint="@color/abu"/>
+                        android:tint="@android:color/white"/>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_gravity="end"
@@ -98,12 +98,11 @@
             </LinearLayout>
         </LinearLayout>
         <Switch
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="220dp"
             android:id="@+id/register_expert_switch"
             android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:text="Register as an Expert"
-            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"/>
     </RelativeLayout>
 </FrameLayout>

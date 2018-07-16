@@ -6,6 +6,7 @@
     <string name="tab_text_3">Tab 3</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+    <string name="yandex_api_key">trnsl.1.1.20180519T160825Z.7299a6aefc25b5ed.686b9fb304f26f1dfa1977702787e8088567146b</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

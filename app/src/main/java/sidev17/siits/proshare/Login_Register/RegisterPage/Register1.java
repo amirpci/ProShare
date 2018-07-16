@@ -1,13 +1,14 @@
 package sidev17.siits.proshare.Login_Register.RegisterPage;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,20 +19,26 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import sidev17.siits.proshare.Login_Register.Register;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Benar;
+import sidev17.siits.proshare.Utils.Utilities;
 
 public class Register1 extends Fragment {
     private Register registerRef1;
     private Spinner PilihanBidang, PilihanNegara;
     private EditText Nama, Email;
     private Button Next;
-   private LinearLayout pDataContainer;
+    private ImageView PasswordStrong;
+    private LinearLayout pDataContainer;
     private String Negara="", Bidang="";
+    private boolean emailAda;
     //savedStateData
     private String nama_="",email_="";
     private int bidang_=0,negara_=0;
@@ -68,6 +75,7 @@ public class Register1 extends Fragment {
         Email = (EditText)v.findViewById(R.id.email_reg);
         PilihanBidang = (Spinner)v.findViewById(R.id.specialization_option);
         PilihanNegara = (Spinner)v.findViewById(R.id.pil_negara);
+        PasswordStrong = (ImageView)v.findViewById(R.id.passStrong);
         ArrayAdapter<String> spPilihanBidang = new ArrayAdapter<String>(getActivity(),
                 R.layout.spinner_item,registerRef1.specialization);
         spPilihanBidang.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -77,12 +85,51 @@ public class Register1 extends Fragment {
         spPilihanNegara.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         PilihanNegara.setAdapter(spPilihanNegara);
 
+        registerRef1.halamanPertama=true;
         //set untuk inisiasi savedState
         Nama.setText(registerRef1.namaReg);
         Email.setText(registerRef1.emailReg);
         PilihanBidang.setSelection(registerRef1.positionBidang);
         PilihanNegara.setSelection(registerRef1.positionNegara);
+        initEmail();
+        Email.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                final String str = s.toString();
+                Utilities.getUserRef().addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(registerRef1.halamanPertama){
+                            if(!dataSnapshot.child(str.replace(".",",")).exists() && cekEmail(str.toCharArray())){
+                                PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.green_light));
+                            }else{
+                                PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), android.R.color.white));
+                            }
+                            if(dataSnapshot.child(str.replace(".",",")).exists()){
+                                emailAda=true;
+                            }else{
+                                emailAda=false;
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+        });
         PilihanNegara.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -117,6 +164,14 @@ public class Register1 extends Fragment {
 
         return v;
     }
+
+    private void initEmail(){
+        if(registerRef1.emailBenar){
+            PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.green_light));
+        }else{
+            PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), android.R.color.white));
+        }
+    }
 /*
     void setTinggi(int a){
         switch (a){
@@ -137,10 +192,13 @@ public class Register1 extends Fragment {
     public boolean next(){
         boolean returnVal=false;
         if(cekKosong()){
-            Toast.makeText(getActivity(), "Please fill the blank!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Please fill the blank!", Toast.LENGTH_SHORT).show();
         }else if(!cekEmail(Email.getText().toString().toCharArray())){
-            Toast.makeText(getActivity(), "Wrong email format!", Toast.LENGTH_LONG).show();
-        }else{
+            Toast.makeText(getActivity(), "Wrong email address format!", Toast.LENGTH_SHORT).show();
+        }else if(emailAda) {
+            Toast.makeText(getActivity(), "Email address is already exist!", Toast.LENGTH_SHORT).show();
+        }else {
+            registerRef1.emailBenar=true;
             registerRef1.namaReg=Nama.getText().toString();
             registerRef1.emailReg=Email.getText().toString();
             registerRef1.negaraReg=Negara;

@@ -49,7 +49,7 @@ public class Register2 extends Fragment {
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,
                 registerRef2.contHeight);
         passwordContainer.setLayoutParams(lp);
-
+        registerRef2.halamanPertama=false;
         Password.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -68,7 +68,7 @@ public class Register2 extends Fragment {
                     PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.green_light));
                 }else{
                     passStrong = false;
-                    PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.abu));
+                    PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), android.R.color.white));
                 }
             }
         });
@@ -77,7 +77,8 @@ public class Register2 extends Fragment {
     }
 
     boolean passwordKuat(String pass){
-        if(pass.length()>5 && Pattern.compile( "[0-9]" ).matcher(pass).find()){
+        if(pass.length()>5 && Pattern.compile( "[0-9]" ).matcher(pass).find()
+                && Pattern.compile("[a-zA-Z]+").matcher(pass).find()){
             return true;
         }else {
             return false;
@@ -102,7 +103,7 @@ public class Register2 extends Fragment {
         }else if(Password.getText().toString().length()<6){
             Toast.makeText(getActivity(), "Password should have at least 6 character length!", Toast.LENGTH_LONG).show();
         }else if(!passStrong) {
-            Toast.makeText(getActivity(), "Password should contain at least one number!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Password should contain letter and number!", Toast.LENGTH_LONG).show();
         }else{
             registerRef2.Register(registerRef2.namaReg,registerRef2.emailReg, registerRef2.negaraReg, registerRef2.spesialisasiReg, Password.getText().toString(), statusSwitch.isChecked());
         }
