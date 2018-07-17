@@ -29,13 +29,18 @@ import sidev17.siits.proshare.R;
  */
 
 public class DaftarTanyaActWkr extends Fragment {
+    public final int PENGGUNA_EXPERT_TERVERIFIKASI= 2;
+    public final int PENGGUNA_EXPERT= 1;
+    public final int PENGGUNA_BIASA= 0;
 
     private ListView daftarTanya;
     private ImageView tmbTambah;
 
-    String judul[]= {"What should I do whe this happen?", "How to gain inspiration?", "How to else?"};
-    String deskripsi[]= {"I do this everyday, but somehow...", "When it happens, I don't know what to do. I need inspiration.", "bla bla bla..."};
-    Image gambar[][];
+    private String judul[]= {"What should I do whe this happen?", "How to gain inspiration?", "How to else?"};
+    private String deskripsi[]= {"I do this everyday, but somehow...", "When it happens, I don't know what to do. I need inspiration.", "bla bla bla..."};
+
+    private Image gambar[][];
+    private int kategoriSoal[]= {1, 2, 1, 0};
 
     @Nullable
     @Override
@@ -43,7 +48,7 @@ public class DaftarTanyaActWkr extends Fragment {
         View view= inflater.inflate(R.layout.fragment_daftar_tanya_wkr, container, false);
 
         daftarTanya= view.findViewById(R.id.daftar_pertanyaan_wadah);
-        BaseAdapterPertanyaan adpTanya= new BaseAdapterPertanyaan();
+        AdapterDaftarPertanyaan adpTanya= new AdapterDaftarPertanyaan();
         daftarTanya.setAdapter(adpTanya);
 
         daftarTanya.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -69,9 +74,9 @@ public class DaftarTanyaActWkr extends Fragment {
 
         return view;
     }
-    private class BaseAdapterPertanyaan extends BaseAdapter {
+    private class AdapterDaftarPertanyaan extends BaseAdapter {
 
-        BaseAdapterPertanyaan(){
+        AdapterDaftarPertanyaan(){
         }
 
         @Override
@@ -95,9 +100,15 @@ public class DaftarTanyaActWkr extends Fragment {
 
             TextView teksJudul= view.findViewById( R.id.daftar_pertanyaan_judul);
             TextView teksDesc= view.findViewById(R.id.daftar_pertanyaan_deskripsi);
+            ImageView centang= view.findViewById(R.id.daftar_pertanyaan_centang);
 
             teksJudul.setText(judul[position]);
             teksDesc.setText(deskripsi[position]);
+
+            if(kategoriSoal[position]== PENGGUNA_EXPERT)
+                centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
+            else if(kategoriSoal[position]== PENGGUNA_EXPERT_TERVERIFIKASI)
+                centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
 
             return view;
         }
