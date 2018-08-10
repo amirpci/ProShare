@@ -52,9 +52,53 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:53481337117:android:b1e6f4dc2da9ce8c",
+        "mobilesdk_app_id": "1:53481337117:android:1301ab64d345841f",
         "android_client_info": {
           "package_name": "sidev17.siits.proshare"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "53481337117-8bqqv79vrphlm3dbb59qpiilns65aa1m.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "sidev17.siits.proshare",
+            "certificate_hash": "f55250f49909ae148440682c83b11abfd9bf6a95"
+          }
+        },
+        {
+          "client_id": "53481337117-41944g7pj2i3m6oo23t28ttskb1dqjgn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDOXMKV5McToZ1oAK38cY4F1y-H9va_m0c"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "53481337117-41944g7pj2i3m6oo23t28ttskb1dqjgn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53481337117:android:b1e6f4dc2da9ce8c",
+        "android_client_info": {
+          "package_name": "sidev17.siits.proshare.proshare1"
         }
       },
       "oauth_client": [
@@ -62,7 +106,7 @@
           "client_id": "53481337117-tu4v1qrn0g5qfqr9fun80fd0f7k448nt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "sidev17.siits.proshare",
+            "package_name": "sidev17.siits.proshare.proshare1",
             "certificate_hash": "f55250f49909ae148440682c83b11abfd9bf6a95"
           }
         },

@@ -49,8 +49,9 @@ public class Login extends AppCompatActivity {
         Password=(EditText)findViewById(R.id.pass_login);
         Login=(Button)findViewById(R.id.btn_login);
         Register=(TextView) findViewById(R.id.register_login);
-
+        //Utilities.getUserBidang(getApplicationContext())!=null
         if(Utilities.getUserBidang(getApplicationContext())!=null){
+            //Utilities.getUserBidang(getApplicationContext())
             switch (Utilities.getUserBidang(getApplicationContext())){
                 case "Expert":{
                     progress.dismiss();
@@ -123,7 +124,7 @@ public class Login extends AppCompatActivity {
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
-
+                                Toast.makeText(getApplicationContext(), "Login failed!", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }else{
