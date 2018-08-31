@@ -1,5 +1,6 @@
 package sidev17.siits.proshare.Modul.Expert.Tab;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
+import sidev17.siits.proshare.Modul.Worker.ChatActivity;
 import sidev17.siits.proshare.R;
 
 public class FeedbackActExprt extends Fragment {
@@ -30,7 +33,7 @@ public class FeedbackActExprt extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_feedback_exprt, container, false);
+        View view= inflater.inflate(R.layout.fragment_beranda_chat, container, false);
         wadahFeedback= view.findViewById(R.id.feedback_wadah);
         AdapterFeedback adpFeedback= new AdapterFeedback();
         wadahFeedback.setAdapter(adpFeedback);
@@ -68,7 +71,7 @@ public class FeedbackActExprt extends Fragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view;
-                view= getLayoutInflater().inflate(R.layout.model_kolom_feedback, parent, false);
+                view= getLayoutInflater().inflate(R.layout.model_kolom_chat, parent, false);
 
                 TextView teksOrang= view.findViewById(R.id.feedback_orang_nama);
                 TextView teksChat= view.findViewById(R.id.feedback_orang_chat);
@@ -83,6 +86,16 @@ public class FeedbackActExprt extends Fragment {
                     centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
                 else if(kategoriExpert[position]== PENGGUNA_EXPERT_TERVERIFIKASI)
                     centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
+
+                final ChatActivity anil= new ChatActivity();
+
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent inten= new Intent(getContext(), ChatActivity.class);
+                        startActivity(inten);
+                    }
+                });
             return view;
         }
     }

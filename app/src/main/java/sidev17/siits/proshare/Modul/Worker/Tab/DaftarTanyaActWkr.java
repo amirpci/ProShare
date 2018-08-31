@@ -68,6 +68,7 @@ public class DaftarTanyaActWkr extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent inten= new Intent(getContext(), TambahPertanyaanWkr.class);
+                inten.putExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr);
                 startActivity(inten);
             }
         });

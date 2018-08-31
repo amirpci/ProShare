@@ -20,8 +20,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
-                android:tint="@color/abuLebihTua"
-                android:src="@drawable/obj_profilephoto"/>
+                android:tint="#FFFFFF"
+                android:src="@drawable/tab_orang"
+                android:padding="14dp"
+                android:background="@drawable/latar_lingkaran"
+                android:backgroundTint="@color/abuLebihTua"/>
             <ImageView
                 android:id="@+id/komentar_orang_centang"
                 android:layout_alignParentTop="true"

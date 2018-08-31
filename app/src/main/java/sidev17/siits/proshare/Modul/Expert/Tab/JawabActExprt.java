@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import sidev17.siits.proshare.Modul.Expert.TambahJawabanExprt;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.DaftarTanyaActWkr;
 import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
@@ -57,7 +58,8 @@ public class JawabActExprt extends Fragment {
         tmbTambah.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent inten = new Intent(getContext(), TambahPertanyaanWkr.class);
+                Intent inten = new Intent(getContext(), TambahJawabanExprt.class);
+                inten.putExtra("idHalaman", R.layout.activity_tambah_jawaban_exprt);
                 startActivity(inten);
             }
         });

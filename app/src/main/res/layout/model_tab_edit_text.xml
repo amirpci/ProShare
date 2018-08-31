@@ -21,7 +21,7 @@
         android:layout_height="25dp"
         android:tint="@color/abuTua"
         android:src="@drawable/obj_search"/>
-    <TextView
+    <EditText
         android:id="@+id/tab_text_teks"
         android:layout_toRightOf="@id/tab_text_gambar"
         android:layout_marginLeft="20dp"
@@ -30,6 +30,7 @@
         android:layout_height="wrap_content"
         android:textSize="15sp"
         android:textColorHint="@color/abuTua"
+        android:backgroundTint="#00000000"
         android:hint="Your question here"/>
     <RelativeLayout
         android:id="@+id/tab_text_tindakan"
@@ -37,12 +38,13 @@
         android:layout_height="35dp"
         android:layout_alignParentRight="true">
         <ImageView
+            android:id="@+id/tab_text_tindakan_latar"
             android:layout_width="70dp"
             android:layout_height="match_parent"
             android:tint="@color/colorPrimaryDark"
             android:src="@drawable/latar_kotak_tumpul_satu_sisi"/>
         <ImageView
-            android:id="@+id/tab_text_gambar_tindakan"
+            android:id="@+id/tab_text_tindakan_gambar"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:layout_margin="5dp"

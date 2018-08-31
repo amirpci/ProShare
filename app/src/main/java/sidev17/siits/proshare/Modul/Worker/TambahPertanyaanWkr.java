@@ -1,11 +1,8 @@
 package sidev17.siits.proshare.Modul.Worker;
 
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
@@ -17,7 +14,6 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import sidev17.siits.proshare.R;
 
@@ -35,10 +31,18 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private final String WARNA_DITEKAN= "#4972AD"; //biruLaut
     private final String WARNA_TAK_DITEKAN= "#ADADAD"; //ambilWarna(R.color.abuLebihTua)
 
+    private int idHalaman;
+
+    protected void setIdHalaman(int idHalaman){
+        this.idHalaman= idHalaman;
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_tambah_pertanyaan);
+        setIdHalaman(getIntent().getIntExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr));
+
+        setContentView(idHalaman);
 
         wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
         tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
