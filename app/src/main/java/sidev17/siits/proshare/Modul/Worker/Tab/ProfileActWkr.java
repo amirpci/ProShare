@@ -138,7 +138,7 @@ public class ProfileActWkr extends Fragment {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Pengguna user = dataSnapshot.getValue(Pengguna.class);
                     String nama_ = user.getNama();
-                    String status_ = user.getStatus();
+                    long status_ = user.getStatus();
                     String photo_ = user.getPhotoProfile();
                     String bidang_ = user.getBidang();
                     String langID = user.getNegara();
@@ -152,7 +152,11 @@ public class ProfileActWkr extends Fragment {
                     com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
                     try {
                         bidang.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang_, Language.ENGLISH, languageID));
-                        status.setText(com.rmtheis.yandtran.translate.Translate.execute(status_, Language.ENGLISH, languageID));
+                        switch ((int)status_){
+                            case 200 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Worker", Language.ENGLISH, languageID)); break;
+                            case 201 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Expert", Language.ENGLISH, languageID)); break;
+                            case 202 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Verified Expert", Language.ENGLISH, languageID)); break;
+                        }
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -205,7 +209,7 @@ public class ProfileActWkr extends Fragment {
             filepath.putFile(alamatPhoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    pp_url = taskSnapshot.getDownloadUrl().toString();
+                //    pp_url = taskSnapshot.getDownloadUrl().toString();
                     Utilities.getProfileImageRef(getActivity()).setValue(pp_url);
                     loadUploadedPP();
                 }

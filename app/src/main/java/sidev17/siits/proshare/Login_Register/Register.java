@@ -122,9 +122,9 @@ public class Register extends AppCompatActivity {
         user.setNegara(Negara_);
         user.setBidang(Bidang_);
         if(expert){
-            user.setStatus("Expert");
+            user.setStatus(201);
         }else{
-            user.setStatus("Worker");
+            user.setStatus(200);
         }
         Utilities.getUserRef(user.getEmail()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override

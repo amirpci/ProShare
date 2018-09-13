@@ -60,9 +60,9 @@ public class Utilities {
         return  id;
     }
     //untuk mendapatkan status pengguna
-    public static String getUserBidang(Context c){
+    public static long getUserBidang(Context c){
         SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
-        String bidang = prefs.getString("bidang", null);
+        long bidang = prefs.getLong("bidang", 0);
         return  bidang;
     }
     //untuk menghapus data login
@@ -70,6 +70,17 @@ public class Utilities {
         SharedPreferences.Editor editor = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE).edit();
         editor.clear();
         editor.apply();
+    }
+    //untuk mendapatkan referensi key chat list
+    public static DatabaseReference getChatListRef(Context c){
+      //  FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        return FirebaseDatabase.getInstance()
+                .getReference("Daftar Chat"+"/"+getUserID(c).replace(".", ","));
+    }
+    //untuk mendapatkan referensi key chat room list
+    public static DatabaseReference getChatRoomRef(String chatListId, Context c){
+        return FirebaseDatabase.getInstance()
+                .getReference("Chat Room/"+Utilities.getUserID(c)+"/"+chatListId);
     }
     //untuk mendapatkan data pengguna
     public static Pengguna getCurrentUser(Context c){

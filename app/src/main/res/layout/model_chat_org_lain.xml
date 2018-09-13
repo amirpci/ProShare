@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_orang"
+    android:visibility="gone"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="10dp"
@@ -27,8 +29,8 @@
             android:paddingBottom="5dp"
             android:background="@drawable/latar_kotak_tumpul"
             android:backgroundTint="#ABABAB">
-            <EditText
-                android:id="@+id/chat_teks"
+            <TextView
+                android:id="@+id/chat_teks_orang"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
@@ -51,7 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true">
         <TextView
-            android:id="@+id/chat_waktu"
+            android:id="@+id/chat_waktu_orang"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="waktu selesai"
@@ -60,7 +62,7 @@
             android:textSize="10sp"/>
         <ImageView
             android:id="@+id/chat_dibaca"
-            android:layout_toRightOf="@id/chat_waktu"
+            android:layout_toRightOf="@id/chat_waktu_orang"
             android:layout_marginLeft="5dp"
             android:layout_width="20dp"
             android:layout_height="20dp"/>

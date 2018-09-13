@@ -123,7 +123,7 @@ public class ProfileActExprt extends Fragment {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
                 String nama_ = (String) map.get("Nama");
-                String status_ = (String) map.get("Type");
+                long status_ = (long) map.get("Type");
                 String photo_ = (String) map.get("Photo");
                 String bidang_ = (String) map.get("Specialization");
                 String langID = (String) map.get("Negara");
@@ -141,7 +141,11 @@ public class ProfileActExprt extends Fragment {
                     }else{
                         bidang.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang_, Language.ENGLISH, languageID));
                     }
-                    status.setText(com.rmtheis.yandtran.translate.Translate.execute(status_, Language.ENGLISH, languageID));
+                    switch ((int)status_){
+                        case 200 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Worker", Language.ENGLISH, languageID)); break;
+                        case 201 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Expert", Language.ENGLISH, languageID)); break;
+                        case 202 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Verified Expert", Language.ENGLISH, languageID)); break;
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -189,7 +193,7 @@ public class ProfileActExprt extends Fragment {
             filepath.putFile(alamatPhoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    pp_url = taskSnapshot.getDownloadUrl().toString();
+  //                  pp_url = taskSnapshot.getDownloadUrl().toString();
                     dataRef.child(idUser).child("Photo").setValue(pp_url);
                     loadUploadedPP();
                 }

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <include layout="@layout/model_chat_diri_sendiri"/>
+    <include layout="@layout/model_chat_org_lain"/>
+</android.support.constraint.ConstraintLayout>

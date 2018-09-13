@@ -25,6 +25,7 @@
         <activity android:name=".Share_knowledge" />
         <activity android:name=".MainActivity" />
         <activity android:name=".Modul.Expert.MainActivityExprt" />
+        <activity android:name=".Modul.Expert.TambahJawabanExprt" />
         <activity android:name=".Modul.Worker.MainActivityWkr"></activity>
         <activity android:name=".Modul.Worker.DetailPertanyaanActivityWkr"/>
         <activity android:name=".Modul.Worker.TambahPertanyaanWkr"/>

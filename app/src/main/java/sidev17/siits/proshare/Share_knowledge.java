@@ -60,7 +60,7 @@ public class Share_knowledge extends AppCompatActivity {
                     filepath.putFile(uriPhotos).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Photos_url = taskSnapshot.getDownloadUrl().toString();
+//                            Photos_url = taskSnapshot.getDownloadUrl().toString();
                             Toast.makeText(getApplicationContext(), "Problem Added", Toast.LENGTH_LONG).show();
                             db.child("Problems").child(PID).child("Photos").setValue(Photos_url);
                         }

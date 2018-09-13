@@ -8,7 +8,7 @@ public class Pengguna implements Serializable {
     private String password;
     private String negara;
     private String bidang;
-    private String status;
+    private long status;
     private String photoProfile;
     private String keahlian;
     private String rating;
@@ -16,7 +16,7 @@ public class Pengguna implements Serializable {
 
     }
 
-    public Pengguna(String nama, String email, String password, String negara, String bidang, String status, String photoProfile, String keahlian, String rating) {
+    public Pengguna(String nama, String email, String password, String negara, String bidang, long status, String photoProfile, String keahlian, String rating) {
         this.nama = nama;
         this.email = email;
         this.password = password;
@@ -68,11 +68,11 @@ public class Pengguna implements Serializable {
         this.bidang = bidang;
     }
 
-    public String getStatus() {
+    public long getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(long status) {
         this.status = status;
     }
 

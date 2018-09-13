@@ -7,7 +7,7 @@
         android:id="@+id/chat_bar_status"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/chat_bar_status_foto"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/chat_wadah"
         android:layout_below="@id/chat_bar_status"
         android:layout_above="@id/chat_bar_isi"

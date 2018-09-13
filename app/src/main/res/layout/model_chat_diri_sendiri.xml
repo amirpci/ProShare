@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_kita"
+    android:visibility="gone"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="10dp"
@@ -16,7 +18,7 @@
             android:layout_width="50dp"
             android:layout_height="20dp"
             android:src="@drawable/obj_chat_pucuk_kanan"
-            android:tint="#ABABAB"/>
+            android:tint="@color/colorPrimaryDark"/>
 
         <RelativeLayout
             android:id="@+id/chat_latar"
@@ -29,15 +31,15 @@
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
             android:background="@drawable/latar_kotak_tumpul"
-            android:backgroundTint="#ABABAB">
-            <EditText
-                android:id="@+id/chat_teks"
+            android:backgroundTint="@color/colorPrimaryDark">
+            <TextView
+                android:id="@+id/chat_teks_kita"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
                 android:layout_marginRight="5dp"
                 android:text="Di sinilah tempat penjelasan"
-                android:textColor="#000000"
+                android:textColor="#ffffff"
                 android:textSize="15sp"
                 android:scrollHorizontally="false"
                 android:singleLine="false"
@@ -56,7 +58,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"/>
             <TextView
-                android:id="@+id/chat_waktu"
+                android:id="@+id/chat_waktu_kita"
                 android:layout_toRightOf="@id/chat_dibaca"
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"

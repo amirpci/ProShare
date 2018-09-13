@@ -250,7 +250,7 @@ public class TimelineActExprt extends Fragment {
                     uploadPhoto.setVisibility(View.GONE);
                     uploadPhotoProgress.setVisibility(View.GONE);
                     photoDiambil=true;
-                    Photo_url = taskSnapshot.getDownloadUrl().toString();
+//                    Photo_url = taskSnapshot.getDownloadUrl().toString();
                     Glide.with(getActivity()).load(Photo_url).into(uploadedPhoto);
                     uploadedPhoto.setVisibility(View.VISIBLE);
                     //Toast.makeText(getActivity(), "Question Added", Toast.LENGTH_LONG).show();

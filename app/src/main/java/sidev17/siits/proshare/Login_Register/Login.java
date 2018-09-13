@@ -49,16 +49,22 @@ public class Login extends AppCompatActivity {
         Password=(EditText)findViewById(R.id.pass_login);
         Login=(Button)findViewById(R.id.btn_login);
         Register=(TextView) findViewById(R.id.register_login);
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         //Utilities.getUserBidang(getApplicationContext())!=null
-        if(Utilities.getUserBidang(getApplicationContext())!=null){
+        if(Utilities.getUserBidang(getApplicationContext())!=0){
             //Utilities.getUserBidang(getApplicationContext())
-            switch (Utilities.getUserBidang(getApplicationContext())){
-                case "Expert":{
+            switch ((int)Utilities.getUserBidang(getApplicationContext())){
+                case 201:{
                     progress.dismiss();
                     startActivity(new Intent(Login.this, MainActivityExprt.class));
                     break;
                 }
-                case "Worker":{
+                case 202:{
+                    progress.dismiss();
+                    startActivity(new Intent(Login.this, MainActivityExprt.class));
+                    break;
+                }
+                case 200:{
                     progress.dismiss();
                     startActivity(new Intent(Login.this, MainActivityWkr.class));
                     break;
@@ -98,16 +104,16 @@ public class Login extends AppCompatActivity {
                                         // untuk menyimpan email dalam aplikasi
                                         SharedPreferences.Editor editor = getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE).edit();
                                         editor.putString("user", user.getEmail());
-                                        editor.putString("bidang", user.getStatus());
+                                        editor.putLong("bidang", user.getStatus());
                                         editor.apply();
-                                        switch (user.getStatus()){
-                                            case "Expert":{
+                                        switch ((int)user.getStatus()){
+                                            case 201:{
                                                 progress.dismiss();
                                                 Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_LONG).show();
                                                 startActivity(new Intent(Login.this, MainActivityExprt.class));
                                                 break;
                                             }
-                                            case "Worker":{
+                                            case 200:{
                                                 progress.dismiss();
                                                 Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_LONG).show();
                                                 startActivity(new Intent(Login.this, MainActivityWkr.class));
