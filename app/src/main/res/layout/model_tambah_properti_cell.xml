@@ -21,6 +21,19 @@
         android:backgroundTint="#33000000"
         android:src="@drawable/latar_lingkaran_bolong"
         android:tint="#EEFFFFFF"/>
+    <TextView
+        android:id="@+id/tambah_cell_centang_no"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="5dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:background="@drawable/latar_lingkaran"
+        android:backgroundTint="#00000000"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:textSize="12sp"
+        android:gravity="center"/>
     <ImageView
         android:id="@+id/tambah_cell_indek_video"
         android:layout_alignParentRight="true"

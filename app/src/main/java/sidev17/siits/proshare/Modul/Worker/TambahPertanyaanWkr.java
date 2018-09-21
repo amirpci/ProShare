@@ -2,8 +2,8 @@ package sidev17.siits.proshare.Modul.Worker;
 
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -12,17 +12,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridView;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.GaleriLoader;
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
 
@@ -40,15 +46,36 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private final String WARNA_TAK_DITEKAN= "#ADADAD"; //ambilWarna(R.color.abuLebihTua)
 
     private String pathFoto[];
-    private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
+    private GaleriLoader loader;
+
+//    private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
+//    private ArrayList<String> pathFotoDipilih = new ArrayList<String>();
+
+/*
     private int dipilih[];
-    private ArrayList<String> pathFotoDipilih = new ArrayList<String>();
     private ArrayList<Bitmap> filePhotoDipilih = new ArrayList<Bitmap>();
+    private ArrayList<Integer> intDipilih= new ArrayList<Integer>();
+*/
+    private ArrayList<View> viewDipilih = new ArrayList<View>();
+
+    private final int JML_BUFFER_FOTO= 12;
+    private final int JML_MAKS_FOTO= JML_BUFFER_FOTO *2;
+    private int cursorGaleri= 1;
+
+    private int batasDipilih= 20;
+    private int batasBufferUdahDiload = 0;
 
     private int idHalaman;
 
+    private TextView tmbVerify;
+    private boolean verifiedQuestion= false;
+
     protected void setIdHalaman(int idHalaman){
         this.idHalaman= idHalaman;
+    }
+
+    void verifyQuestion(boolean verify){
+        verifiedQuestion= verify;
     }
 
     @Override
@@ -59,20 +86,95 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         parentUtama= getLayoutInflater().inflate(idHalaman, null);
         setContentView(parentUtama);
 
+        if(idHalaman== R.layout.activity_tambah_jawaban_exprt) {
+            tmbVerify = findViewById(R.id.tambah_verify);
+            tmbVerify.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (!tmbVerify.isSelected()) {
+                        tmbVerify.setSelected(true);
+                        tmbVerify.setBackgroundColor(getResources().getColor(R.color.biruLaut));
+                        tmbVerify.setTextColor(Color.parseColor("#FFFFFF"));
+                        verifyQuestion(true);
+                    } else {
+                        tmbVerify.setSelected(false);
+//                        tmbVerify.getBackground().setTint(getResources().getColor(R.color.abuSangatTua));
+                        tmbVerify.setBackgroundResource(R.drawable.latar_bingkai_kotak);
+                        tmbVerify.setTextColor(getResources().getColor(R.color.biruLaut));
+                        verifyQuestion(false);
+                    }
+                }
+            });
+        }
         wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
         tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
                 (View) findViewById(R.id.tambah_properti_icon));
         tabBarIcon.setTabIcon(tabIcon);
         tabBarIcon.setIdWarnaDitekan(WARNA_DITEKAN);
         tabBarIcon.setIdWarnaTakDitekan(WARNA_TAK_DITEKAN);
+        initAksiTekan();
 
         teksJudul= findViewById(R.id.tambah_judul);
+        teksJudul.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(tabBarIcon.getTrahirDitekan() > -1)
+                    tabBarIcon.tekanItem(tabBarIcon.getTrahirDitekan());
+                teksJudul.requestFocus();
+                final InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
+                imm.showSoftInput(teksJudul, InputMethodManager.SHOW_IMPLICIT);
+                tmbCentang.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        imm.hideSoftInputFromWindow(teksJudul.getWindowToken(), 0);
+                        teksJudul.clearFocus();
+                        tmbCentang.setImageResource(R.drawable.icon_kirim);
+                        tmbCentang.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                kirimPertanyaan();
+                            }
+                        });
+                    }
+                });
+                tmbCentang.setImageResource(R.drawable.obj_centang);
+                return true;
+            }
+        });
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
+        teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(tabBarIcon.getTrahirDitekan() > -1)
+                    tabBarIcon.tekanItem(tabBarIcon.getTrahirDitekan());
+                teksDeskripsi.requestFocus();
+                final InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
+                imm.showSoftInput(teksDeskripsi, InputMethodManager.SHOW_IMPLICIT);
+                tmbCentang.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        imm.hideSoftInputFromWindow(teksDeskripsi.getWindowToken(), 0);
+                        teksDeskripsi.clearFocus();
+                        tmbCentang.setImageResource(R.drawable.icon_kirim);
+                        tmbCentang.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                kirimPertanyaan();
+                            }
+                        });
+                    }
+                });
+                tmbCentang.setImageResource(R.drawable.obj_centang);
+                return true;
+            }
+        });
         tmbCentang= findViewById(R.id.tambah_ok);
 
         pathFoto= ambilPathGambar();
-        isiFileFoto(pathFoto);
-        inisiasiArrayDipilih();
+//        isiFileFoto(pathFoto, 0, 12);
+//        inisiasiFileFoto();
+        inisiasiOk();
+        initLoader();
     }
     int ambilWarna(int id){
         return getResources().getColor(id);
@@ -81,6 +183,35 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     void tekan(View v){
         tabBarIcon.tekanItem(v);
 //        wadahCell.setY(tabBarIcon.ambilLetakY());
+    }
+    void initAksiTekan(){
+        View.OnClickListener l[]= {
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tabBarIcon.tekanItem(0);
+                        InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                },
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tabBarIcon.tekanItem(1);
+                        InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                },
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tabBarIcon.tekanItem(2);
+                        InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    }
+                }
+        };
+        tabBarIcon.setClickListenerTab(l);
     }
 
     class TabBarIcon {
@@ -125,6 +256,13 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             return trahirDitekan;
         }
 
+        void setClickListenerTab(View.OnClickListener l[]){
+            for(int i= 0; i< tabIcon.length; i++) {
+                View v= view.findViewById(tabIcon[i]);
+                v.setOnClickListener(l[i]);
+            }
+        }
+
         public void tekanItem(View v){
             View icon;
             for(int i= 0; i< tabIcon.length; i++) {
@@ -150,7 +288,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                     wadahCell.setNumColumns(3);
 
                 int lebar = wadahCell.getWidth() / wadahCell.getNumColumns();
-                AdapterPropertiCell adpCell = new AdapterPropertiCell(lebar, ind, view, filePhoto);
+                AdapterPropertiCell adpCell = new AdapterPropertiCell(lebar, ind, view);
                 wadahCell.setAdapter(adpCell);
             } else if(ditekanKah && ind == trahirDitekan){
                 int tinggiAwal= viewIcon.getHeight();
@@ -192,13 +330,16 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                 }
                 iconDitekanSkrg.setColorFilter(Color.parseColor(idWarnaDitekan));
                 trahirDitekan= ind;
-                ditekanKah= true;
+                aturDitekan(true);
             } else{
                 ImageView iconDitekanTadi = view.findViewById(tabIcon[trahirDitekan]);
                 iconDitekanTadi.setColorFilter(Color.parseColor(idWarnaTakDitekan));
                 trahirDitekan= -1;
-                ditekanKah= false;
+                aturDitekan(false);
             }
+        }
+        void aturDitekan(boolean ditekan){
+            ditekanKah= ditekan;
         }
     }
 
@@ -234,14 +375,127 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         return listOfAllImages;
     }
 
-    void isiFileFoto(String photoDir[]){
-        for(int i= 0; i<20; i++) {
+    void initLoader(){
+//        inisiasiArrayDipilih(pathFoto.length);
+        loader= new GaleriLoader(getBaseContext(), pathFoto, 18);
+        loader.aturUkuranPratinjau(250);
+        loader.aturSumberBg(R.drawable.obj_gambar_kotak);
+        loader.aturSumberBgTakBisa(R.drawable.obj_tanda_seru_lingkaran_garis);
+        loader.aturIdElemenImg(R.id.tambah_cell_pratinjau);
+
+        loader.aturModeBg(false);
+
+        loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
+            @Override
+            public void pilihFoto(View v, int posisi) {
+                TextView indDipilih = v.findViewById(R.id.tambah_cell_centang_no);
+                indDipilih.setText(Integer.toString(loader.ambilUrutanDipilih(posisi)));
+                indDipilih.getBackground().setTint(getResources().getColor(R.color.biruLaut));
+                indDipilih.getBackground().setAlpha(255);
+            }
+            @Override
+            public void batalPilihFoto(View v, int posisi) {
+                TextView indDipilih = v.findViewById(R.id.tambah_cell_centang_no);
+                indDipilih.setText("");
+                indDipilih.getBackground().setAlpha(0);
+            }
+        });
+
+        loader.aturAksiBuffer(new GaleriLoader.AksiBuffer() {
+            @Override
+            public void bufferThumbnail(final int posisi, final int jmlBuffer) {
+                View view= loader.ambilView(posisi);
+                final int lebar= view.getLayoutParams().width;
+
+                final TextView indDipilih = view.findViewById(R.id.tambah_cell_centang_no);
+                final GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
+                indDipilih.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (!indDipilih.isSelected()) {
+                            loader.pilihFoto(posisi);
+                            indDipilih.setSelected(true);
+                            AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
+                            liveQuestion.setAdapter(adpDipilih);
+                            if(loader.ambilFotoDipilih().size() <= 3)
+                                aturTinggiGrid(liveQuestion, lebar);
+                            else
+                                aturTinggiGrid(liveQuestion, lebar+90);
+                        } else {
+                            loader.batalPilihFoto(posisi);
+                            indDipilih.setSelected(false);
+                            AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
+                            liveQuestion.setAdapter(adpDipilih);
+                            if(loader.ambilFotoDipilih().size() == 0)
+                                aturTinggiGrid(liveQuestion, 0);
+                            else if(loader.ambilFotoDipilih().size() <= 3)
+                                aturTinggiGrid(liveQuestion, lebar);
+                            else
+                                aturTinggiGrid(liveQuestion, lebar+90);
+                        }
+                    }
+                });
+/*
+                if(dipilih[posisi]== 1)
+                    pilihGambar(posisi, indDipilih);
+                else
+                    batalPilihGambar(posisi, indDipilih);
+*/
+            }
+            @Override
+            public void bufferUtama(int posisi, int jmlBuffer) {
+
+            }
+        });
+    }
+
+    void aturTinggiGrid(GridView grid, int tinggi){
+//        HorizontalScrollView.LayoutParams lpGrid= new HorizontalScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tinggi);
+//        grid.setLayoutParams(lpGrid);
+        grid.getLayoutParams().height= tinggi;
+    }
+/*
+    void inisiasiFileFoto(){
+        filePhoto= new ArrayList<Bitmap>();
+    }
+    void cekIsiFileFoto(int position){
+        if(position % JML_BUFFER_FOTO == 0){
+            Bitmap bitmapSmt[]= new Bitmap[JML_BUFFER_FOTO];
+            if(position > cursorGaleri){
+                if(filePhoto.size() == JML_MAKS_FOTO){
+                    for(int i= JML_BUFFER_FOTO-1; i<JML_MAKS_FOTO; i++)
+                        bitmapSmt[i]= filePhoto.get(i);
+                    inisiasiFileFoto();
+                    for(int i= 0; i<JML_BUFFER_FOTO; i++)
+                        filePhoto.add(bitmapSmt[i]);
+                }
+                isiFileFoto(pathFoto, position, JML_BUFFER_FOTO);
+                cursorGaleri= position;
+            }
+            else if(position < cursorGaleri){
+                if(filePhoto.size() == JML_MAKS_FOTO){
+                    for(int i= 0; i<JML_BUFFER_FOTO; i++)
+                        bitmapSmt[i]= filePhoto.get(i);
+                    inisiasiFileFoto();
+                    isiFileFoto(pathFoto, position - JML_BUFFER_FOTO, JML_BUFFER_FOTO);
+                    for(int i= 0; i<JML_BUFFER_FOTO; i++)
+                        filePhoto.add(bitmapSmt[i]);
+                }
+                cursorGaleri= position;
+            }
+            else if(position == 0)
+                isiFileFoto(pathFoto, position, JML_BUFFER_FOTO);
+        }
+    }
+    void isiFileFoto(String photoDir[], int mulai, int sebanyak){
+        for(int i= mulai; i<mulai +sebanyak; i++) {
             Bitmap rawBitmap= BitmapFactory.decodeFile(photoDir[i]);
             rawBitmap= skalaFoto(rawBitmap, (float) 0.2);
             rawBitmap= kropFoto(rawBitmap);
 //            rawBitmap= skalaFoto(rawBitmap, 10);
             filePhoto.add(rawBitmap);
         }
+//        inisiasiArrayDipilih();
     }
 
     public Bitmap skalaFoto(Bitmap bm, float skala){
@@ -268,21 +522,44 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         return Bitmap.createBitmap(bm, mulaiX, mulaiY, pjg, pjg);
     }
 
-    public void inisiasiArrayDipilih(){
-        dipilih= new int[filePhoto.size()];
+    //untuk menambahkan img
+    void updateImgDipilih(ImageView img){
+        viewDipilih.add(img);
     }
-    public void pilihGambar(int ind, ImageView centang) {
-        centang.setImageResource(R.drawable.obj_centang_lingkaran_bolong);
-        centang.setColorFilter(Color.parseColor(WARNA_DITEKAN));
-        centang.setSelected(true);
-        dipilih[ind] = 1;
+    void updateBufferDiload(int batasBaru){
+        if(batasBufferUdahDiload < batasBaru)
+            batasBufferUdahDiload = batasBaru;
+    }
+
+    public void inisiasiArrayDipilih(int jml){
+        dipilih= new int[jml];
+    }
+    //saat dipilih[] berkurang
+    void updateDipilih(int cursor){
+        for (int i = 0; i < batasBufferUdahDiload; i++){
+            if(dipilih[i]== cursor++)
+                dipilih[i]--;
+            if(cursor== batasDipilih)
+                return;
+        }
+    }
+    public void pilihGambar(int ind, TextView teks) {
+        teks.getBackground().setTint(getResources().getColor(R.color.biruLaut));
+        teks.setText(Integer.toString(dipilih[ind]));
+//        centang.setImageResource(R.drawable.obj_centang_lingkaran_bolong);
+//        centang.setColorFilter(Color.parseColor(WARNA_DITEKAN));
+//        centang.setSelected(true);
+        dipilih[ind] = cursorGaleri++;
+
     } public void batalPilihGambar(int ind, ImageView centang){
         centang.setImageResource(R.drawable.latar_lingkaran_bolong);
         centang.setColorFilter(Color.parseColor("#EEFFFFFF"));
         centang.setSelected(false);
+        updateDipilih(dipilih[ind]);
         dipilih[ind]= 0;
+        cursorGaleri--;
     }
-
+/*
     public void buatPathFotoDipilih(){
         pathFotoDipilih= new ArrayList<String>();
         for(int i= 0; i<dipilih.length; i++)
@@ -295,18 +572,22 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             if(dipilih[i] == 1)
                 filePhotoDipilih.add(filePhoto.get(i));
     }
-
+*/
     public void inisiasiOk(){
         tmbCentang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                kirimPertanyaan();
             }
         });
     }
-    public void pertanyaanOk(){
+    public void kirimPertanyaan(){
         //simpan pertanyaan.
-        buatPathFotoDipilih();
+        String pathFotoDipilih[]= loader.ambilPathDipilih();
+        String judul= teksJudul.getText().toString();
+        String deskripsi= teksDeskripsi.getText().toString();
+        boolean verified= verifiedQuestion;
+//        buatPathFotoDipilih();
 
         //lakukan sesuatu...
     }
@@ -315,15 +596,15 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
         int lebar;
         int indPosisi;
-        private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
+//        private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
 
         View parent;
 
-        AdapterPropertiCell(int lebar, int indPosisi, View parent, ArrayList<Bitmap> filePhoto){
+        AdapterPropertiCell(int lebar, int indPosisi, View parent){
             this.lebar= lebar;
             this.indPosisi= indPosisi;
             this.parent= parent;
-            this.filePhoto= filePhoto;
+//            this.filePhoto= filePhoto;
         }
 
         @Override
@@ -331,7 +612,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             if(indPosisi== 2)
                 return 1;
             else
-                return 20;
+                return pathFoto.length;
         }
 
         @Override
@@ -348,11 +629,17 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         public View getView(final int position, View convertView, ViewGroup parentInn) {
 
             if(indPosisi!= 2) {
-                final View view= getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
+                View view= getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
                 view.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
 
-                ImageView bg= view.findViewById(R.id.tambah_cell_pratinjau);
-                bg.setImageBitmap(filePhoto.get(position));
+                view= loader.buatFoto(view, position);
+
+//                updateBufferDiload(position);
+
+//                cekIsiFileFoto(position);
+/*
+                ViewGroup vg= (ViewGroup) view.getParent();
+                vg.addView(loader.buatFoto(position));
 
                 final ImageView centang = view.findViewById(R.id.tambah_cell_centang);
                 final GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
@@ -363,14 +650,14 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                             pilihGambar(position, centang);
 
                             buatFotoDipilih();
-                            AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar, indPosisi, parentUtama, filePhotoDipilih);
-                            liveQuestion.setAdapter(adpDipilih);
+//                            AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar, indPosisi, parentUtama, filePhotoDipilih);
+//                            liveQuestion.setAdapter(adpDipilih);
                         } else {
                             batalPilihGambar(position, centang);
 
                             buatFotoDipilih();
-                            AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar, indPosisi, parentUtama, filePhotoDipilih);
-                            liveQuestion.setAdapter(adpDipilih);
+//                            AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar, indPosisi, parentUtama, filePhotoDipilih);
+//                            liveQuestion.setAdapter(adpDipilih);
                         }
                     }
                 });
@@ -379,13 +666,15 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                     indiVideo.setImageResource(R.drawable.obj_indek_video_lingkaran);
                 }
 
+                ImageView img= loader.buatFoto(position);
+                img.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
+/*
                 if(dipilih[position]== 1)
                     pilihGambar(position, centang);
                 else
                     batalPilihGambar(position, centang);
-
-
-                return  view;
+*/
+                return view;
             } else{
 
                 EditText teksLink= new EditText(getBaseContext());
@@ -409,28 +698,26 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     }
 
     class AdapterPropertiDipilih extends BaseAdapter{
+        private int lebar;
+//        private int indPosisi;
+        private ArrayList<Bitmap> fotoDipilih;
 
-        int lebar;
-        int indPosisi;
-        private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
-
-        View parent;
-
-        AdapterPropertiDipilih(int lebar, int indPosisi, View parent, ArrayList<Bitmap> filePhoto){
+        AdapterPropertiDipilih(int lebar, ArrayList<Bitmap> fotoDipilih){
             this.lebar= lebar;
-            this.indPosisi= indPosisi;
-            this.parent= parent;
-            this.filePhoto= filePhoto;
+            this.fotoDipilih= fotoDipilih;
+//            this.indPosisi= indPosisi;
+//            this.parent= parent;
+//            this.filePhoto= filePhoto;
         }
 
         @Override
         public int getCount() {
-            return filePhoto.size();
+            return fotoDipilih.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return filePhoto.get(position);
+            return fotoDipilih.get(position);
         }
 
         @Override
@@ -440,14 +727,16 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parentInn) {
-            final View view= getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
+            View view= getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
             view.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
 
             ImageView bg= view.findViewById(R.id.tambah_cell_pratinjau);
-            bg.setImageBitmap(filePhoto.get(position));
+            bg.setImageBitmap(fotoDipilih.get(position));
 
             ImageView centang = view.findViewById(R.id.tambah_cell_centang);
-            centang.setImageDrawable(null);
+
+            ViewGroup vg= (ViewGroup) view;
+            vg.removeView(centang);
 
             return view;
         }

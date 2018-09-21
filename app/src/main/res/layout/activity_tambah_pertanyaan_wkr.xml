@@ -56,24 +56,21 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:src="@drawable/tab_tambah_gambar"
-                android:tint="@color/abuLebihTua"
-                android:onClick="tekan"/>
+                android:tint="@color/abuLebihTua"/>
             <ImageView
                 android:id="@+id/tambah_video"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:src="@drawable/tab_tambah_video"
-                android:tint="@color/abuLebihTua"
-                android:onClick="tekan"/>
+                android:tint="@color/abuLebihTua"/>
             <ImageView
                 android:id="@+id/tambah_link"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:src="@drawable/tab_tambah_link"
-                android:tint="@color/abuLebihTua"
-                android:onClick="tekan"/>
+                android:tint="@color/abuLebihTua"/>
         </LinearLayout>
         <GridView
             android:id="@+id/tambah_properti_cell_wadah"

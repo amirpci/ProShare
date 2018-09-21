@@ -3,15 +3,23 @@ package sidev17.siits.proshare.Modul.Expert.Tab;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.Selection;
+import android.text.method.KeyListener;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,12 +44,15 @@ import sidev17.siits.proshare.Login_Register.Login;
 import sidev17.siits.proshare.R;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class ProfileActExprt extends Fragment {
 
     private DatabaseReference dataRef;
     private StorageReference storageRef;
-    private TextView nama, bidang, status, terjawab, rating, penilai;
+    private EditText nama;
+    private ImageView editNama;
+    private TextView bidang, status, terjawab, rating, penilai;
     private String idUser,pp_url;
     private ImageView signout,pp_view, addPhoto;
     private ProgressDialog loading,uploading;
@@ -61,7 +72,9 @@ public class ProfileActExprt extends Fragment {
         dataRef = FirebaseDatabase.getInstance().getReference("User");
         storageRef = FirebaseStorage.getInstance().getReference("User");
         uploading = new ProgressDialog(getActivity());
-        nama = (TextView)v.findViewById(R.id.nama_profile);
+        nama = (EditText)v.findViewById(R.id.nama_profile);
+        editNama= v.findViewById(R.id.edit);
+        initEditNama();
         bidang = (TextView)v.findViewById(R.id.bidang_profile);
         status = (TextView)v.findViewById(R.id.status_profile);
         terjawab = (TextView)v.findViewById(R.id.answered_profile);
@@ -95,6 +108,67 @@ public class ProfileActExprt extends Fragment {
         return v;
     }
 
+    void initEditNama(){
+        editNama.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!editNama.isSelected()) {
+                    editNama.setSelected(true);
+                    enableEditText(nama, InputType.TYPE_TEXT_FLAG_CAP_WORDS, true);
+                    editNama.setImageResource(R.drawable.obj_centang);
+                    editNama.setColorFilter(getResources().getColor(R.color.biruLaut));
+                } else{
+                    //Saat simpan perubahan
+                    editNama.setSelected(false);
+                    enableEditText(nama, InputType.TYPE_NULL, false);
+                    editNama.setImageResource(R.drawable.obj_pensil);
+                    editNama.setColorFilter(getResources().getColor(R.color.abuLebihTua));
+                }
+            }
+        });
+        enableEditText(nama, InputType.TYPE_NULL, false);
+    }
+    void enableEditText(EditText ed, final int inputType, boolean enable){
+        if(enable){
+            ed.setKeyListener(new KeyListener() {
+                @Override
+                public int getInputType() {
+                    return inputType;
+                }
+
+                @Override
+                public boolean onKeyDown(View view, Editable text, int keyCode, KeyEvent event) {
+                    return true;
+                }
+
+                @Override
+                public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
+                    return true;
+                }
+
+                @Override
+                public boolean onKeyOther(View view, Editable text, KeyEvent event) {
+                    return true;
+                }
+
+                @Override
+                public void clearMetaKeyState(View view, Editable content, int states) {
+
+                }
+            });
+            ed.getBackground().setAlpha(255);
+            ed.getBackground().setTint(Color.parseColor("#000000"));
+            InputMethodManager imm= (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+            imm.showSoftInput(ed, InputMethodManager.SHOW_IMPLICIT);
+            Selection.setSelection(ed.getText(), ed.length());
+        } else{
+            ed.setInputType(InputType.TYPE_NULL);
+            ed.setKeyListener(null);
+            ed.getBackground().setAlpha(0);
+            InputMethodManager imm= (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(ed.getWindowToken(), 0);
+        }
+    }
     void loadUploadedPP(){
         dataRef.child(idUser).addValueEventListener(new ValueEventListener() {
             @Override

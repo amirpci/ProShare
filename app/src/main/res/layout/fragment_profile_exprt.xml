@@ -61,16 +61,30 @@
                         android:src="@drawable/obj_logout"
                         android:tint="@color/hitam"/>
                 </RelativeLayout>
-                <TextView
-                    android:id="@+id/nama_profile"
-                    android:text="Nama Anda"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/hitam"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5sp"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <EditText
+                        android:id="@+id/nama_profile"
+                        android:text="Nama Anda"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/hitam"
+                        android:layout_centerHorizontal="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="5sp"/>
+                    <ImageView
+                        android:id="@+id/edit"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@id/nama_profile"
+                        android:layout_centerVertical="true"
+                        android:clickable="true"
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:src="@drawable/obj_pensil"
+                        android:tint="@color/abuLebihTua"/>
+                </RelativeLayout>
                 <TextView
                     android:id="@+id/bidang_profile"
                     android:text="Bidang Anda"
