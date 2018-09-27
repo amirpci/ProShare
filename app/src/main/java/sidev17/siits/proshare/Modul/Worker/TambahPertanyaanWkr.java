@@ -9,9 +9,13 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.InputType;
 import android.text.SpannableString;
+import android.text.method.KeyListener;
 import android.text.style.UnderlineSpan;
 import android.util.TypedValue;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +28,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -141,6 +146,8 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                 return true;
             }
         });
+        initTeksJudul();
+        teksJudul.clearFocus();
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
         teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -341,6 +348,35 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         void aturDitekan(boolean ditekan){
             ditekanKah= ditekan;
         }
+    }
+
+    void initTeksJudul(){
+        teksJudul.setKeyListener(new KeyListener() {
+            @Override
+            public int getInputType() {
+                return InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+            }
+
+            @Override
+            public boolean onKeyDown(View view, Editable text, int keyCode, KeyEvent event) {
+                return true;
+            }
+
+            @Override
+            public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
+                return true;
+            }
+
+            @Override
+            public boolean onKeyOther(View view, Editable text, KeyEvent event) {
+                return true;
+            }
+
+            @Override
+            public void clearMetaKeyState(View view, Editable content, int states) {
+
+            }
+        });
     }
 
 
@@ -584,6 +620,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     public void kirimPertanyaan(){
         //simpan pertanyaan.
         String pathFotoDipilih[]= loader.ambilPathDipilih();
+        Toast.makeText(getBaseContext(), "dir 0: " +pathFotoDipilih[0], Toast.LENGTH_LONG).show();
         String judul= teksJudul.getText().toString();
         String deskripsi= teksDeskripsi.getText().toString();
         boolean verified= verifiedQuestion;

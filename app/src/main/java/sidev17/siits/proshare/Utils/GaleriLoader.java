@@ -423,10 +423,15 @@ public class GaleriLoader {
     }
 
     public String[] ambilPathDipilih(){
-        String pathDipilih[]= new String[viewDipilih.size()];
-        for(int i= 0; i< pathDipilih.length; i++)
-            if(dipilih[i] > 0)
-                pathDipilih[dipilih[i]-1]= pathFoto[i];
+        int batas= viewDipilih.size();
+        int hitung= 0;
+        String pathDipilih[]= new String[batas];
+        for(int i= 0; i< pathFoto.length; i++)
+            if(dipilih[i] > 0) {
+                pathDipilih[dipilih[i] - 1] = pathFoto[i];
+                hitung++;
+            } else if(hitung == batas)
+                break;
         return pathDipilih;
     }
 }

@@ -7,40 +7,14 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:layout_marginTop="10dp">
-        <ImageView
-            android:id="@+id/tl_gambar_1"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_margin="10dp"
-            android:src="@drawable/obj_gambar_kotak"/>
-        <ImageView
-            android:id="@+id/tl_gambar_2"
-            android:layout_toRightOf="@id/tl_gambar_1"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_margin="10dp"
-            android:src="@drawable/obj_gambar"/>
-        <ImageView
-            android:id="@+id/tl_gambar_3"
-            android:layout_toRightOf="@id/tl_gambar_1"
-            android:layout_below="@id/tl_gambar_2"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:src="@drawable/obj_gambar_kotak"/>
-        <ImageView
-            android:id="@+id/tl_gambar_4"
-            android:layout_toRightOf="@id/tl_gambar_3"
-            android:layout_below="@id/tl_gambar_2"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:src="@drawable/obj_gambar_kotak"/>
+        <GridView
+            android:id="@+id/tl_gambar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="3"/>
     </RelativeLayout>
 
     <LinearLayout
@@ -82,7 +56,8 @@
                 android:layout_height="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
-                android:src="@drawable/tab_orang" />
+                android:src="@drawable/tab_orang"
+                android:tint="@color/abuSangatTua"/>
 
             <TextView
                 android:id="@+id/tl_orang_angka"
