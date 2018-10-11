@@ -1,5 +1,7 @@
 package sidev17.siits.proshare.Modul.Worker;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import sidev17.siits.proshare.Modul.Expert.Tab.ProfileActExprt;
 import sidev17.siits.proshare.R;
 
 public class DetailPertanyaanActivityWkr extends AppCompatActivity {
@@ -34,6 +37,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     private String judulSolusi[]= {"What should I do whe this happen?", "How to gain inspiration?", "How to else?", "Stay cool"};
     private String descSolusi[]= {"I do this everyday, but somehow...", "When it happens, I don't know what to do. I need inspiration.", "bla bla bla...", "Just bel cool bro!"};
 
+    private ViewGroup viewLatar;
     private ListView detailPertanyaan;
     private GridView gambarPertanyaan;
     private AlertDialog dialog;
@@ -55,6 +59,8 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
         DetailPertanyaanAdapter adpSolusi= new DetailPertanyaanAdapter();
         detailPertanyaan.setAdapter(adpSolusi);
 
+        viewLatar= (ViewGroup) detailPertanyaan.getParent();
+/*
         gambarPertanyaan= (GridView) findViewById(R.id.tl_gambar);
         int lebar= gambarPertanyaan.getWidth() /gambarPertanyaan.getNumColumns();
         AdapterGambar adpGambar= new AdapterGambar(lebar);
@@ -64,7 +70,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
             aturTinggiGrid(gambarPertanyaan, lebar);
         else
             aturTinggiGrid(gambarPertanyaan, lebar+90);
-
+*/
         int jmlBuffer= (orang.length > BATAS_BUFFER_VIEW) ? BATAS_BUFFER_VIEW : orang.length;
         initViewKomentar(jmlBuffer);
         initIndViewKomentar(jmlBuffer);
@@ -143,7 +149,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     }
 
     private void munculkanAlertDialog(int idHalaman, int indUser){
-        View view= getLayoutInflater().inflate(idHalaman, null, false);
+        final View view= getLayoutInflater().inflate(idHalaman, null, false);
         ImageView viewFoto= view.findViewById(R.id.user_profil);
         TextView viewNama= view.findViewById(R.id.user_nama);
         TextView viewStatus= view.findViewById(R.id.user_status);
@@ -151,6 +157,13 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
         viewNama.setText(orang[indUser]);
         viewStatus.setText(job[indUser]);
 
+        View latarBel= view.findViewById(R.id.user_latar);
+        latarBel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewLatar.removeView(view);
+            }
+        });
         ImageView aksiChat= view.findViewById(R.id.user_aksi_chat);
         aksiChat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,14 +171,27 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                 //inten ke chat orang itu
             }
         });
-
+        ImageView aksiProfil= view.findViewById(R.id.user_aksi_lihat);
+        aksiProfil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //inten ke profil orang itu
+            }
+        });
+/*
         AlertDialog.Builder builder= new AlertDialog.Builder(getBaseContext());
         builder.setView(view);
 
         dialog= builder.create();
         dialog.show();
 
-        Toast.makeText(getBaseContext(), "OY!", Toast.LENGTH_LONG).show();
+        Dialog dialog= new Dialog(getBaseContext());
+        dialog.setContentView(view);
+        dialog.show();
+*/
+        viewLatar.addView(view);
+
+        Toast.makeText(getBaseContext(), orang[indUser], Toast.LENGTH_LONG).show();
     }
 
 

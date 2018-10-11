@@ -4,14 +4,24 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
 import java.io.File;
 import java.util.ArrayList;
 
 public class GaleriLoader {
+    public static final int JENIS_FOTO= 10;
+    public static final int JENIS_VIDEO_THUMBNAIL= 11;
+    public static final int JENIS_VIDEO= 12;
+
+    private int jenisFoto;
+
     private Context konteks;
 
     private AksiBuffer aksiBuffer;
@@ -33,6 +43,9 @@ public class GaleriLoader {
     private int sumberBgTakBisa= -1;
     private String warnaTintBgTakBisa= "#A3A3A3";
 
+    private ArrayList<Integer> sumberAksesoris;
+    private ArrayList<RelativeLayout.LayoutParams> lpAksesoris;
+
     private int idElemenImg= -1;
     private boolean elemenImg= true;
 
@@ -46,20 +59,26 @@ public class GaleriLoader {
     private int jmlUdahDiload= -1;
 
 
-    public GaleriLoader(Context k, String pathFoto[], int jmlBuffer){
+    public GaleriLoader(Context k, String pathFoto[], int jmlBuffer, int jenisFoto){
         konteks= k;
+        this.jenisFoto= jenisFoto;
         this.pathFoto= pathFoto;
         batasBuffer= jmlBuffer;
         inisiasiBuffer(jmlBuffer);
         ukuranPratinjau = 400;
         ukuranThumbnail = 100;
-    } public GaleriLoader(Context k, String pathFoto[], int jmlBuffer, int ukuranPratinjau){
+        sumberAksesoris= new ArrayList<Integer>();
+        lpAksesoris= new ArrayList<RelativeLayout.LayoutParams>();
+    } public GaleriLoader(Context k, String pathFoto[], int jmlBuffer, int ukuranPratinjau, int jenisFoto){
         konteks= k;
+        this.jenisFoto= jenisFoto;
         this.pathFoto= pathFoto;
         batasBuffer= jmlBuffer;
         inisiasiBuffer(jmlBuffer);
         this.ukuranPratinjau = ukuranPratinjau;
         ukuranThumbnail = 100;
+        sumberAksesoris= new ArrayList<Integer>();
+        lpAksesoris= new ArrayList<RelativeLayout.LayoutParams>();
     }
 
     public interface AksiBuffer{
@@ -104,6 +123,26 @@ public class GaleriLoader {
     }
     public int ambilJmlBatasDipilih(){
         return batasMaksDipilih;
+    }
+
+    public void tambahAksesoris(int sumber, RelativeLayout.LayoutParams lp){
+        sumberAksesoris.add(sumber);
+        lpAksesoris.add(lp);
+    }
+    public void tambahAksesoris(int sumber){
+        tambahAksesoris(sumber, new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+    public void kurangiAksesoris(int sumberYgDihilangkan){
+        int indDihilangkan= sumberAksesoris.size()-1;
+        for(int i= 0; i<sumberAksesoris.size(); i++)
+            if(sumberAksesoris.get(i) == sumberYgDihilangkan){
+                indDihilangkan= i;
+                break;
+            }
+        sumberAksesoris.remove(indDihilangkan);
+    }
+    public int ambilAksesoris(int ind){
+        return sumberAksesoris.get(ind);
     }
 
     public void aturModeBg(boolean mode){
@@ -182,22 +221,35 @@ public class GaleriLoader {
     }
 
     private void isiFileFoto(int mulai, int sebanyak, int ukuranPokok){
-        int jalan= 0;
         File file;
-        for(int i= mulai; i< mulai +sebanyak; i++){
+        for(int i= mulai; i< mulai +sebanyak && i<pathFoto.length; i++){
             file= new File(pathFoto[pathFoto.length-1-i]);
-            if(file.length() /1024 < (10*1024)) {
-                Bitmap bm = BitmapFactory.decodeFile(pathFoto[pathFoto.length - 1 - i]);
+            Bitmap bm= null;
+            if(jenisFoto == JENIS_FOTO) {
+                if(file.length() /1024 < (10*1024))
+                    bm = BitmapFactory.decodeFile(pathFoto[i]);
+            }
+            else if(jenisFoto == JENIS_VIDEO_THUMBNAIL)
+                bm= ThumbnailUtils.createVideoThumbnail(pathFoto[i], MediaStore.Video.Thumbnails.MICRO_KIND);
+
+            if(bm != null) {
                 bm = skalaFoto(bm, ukuranPokok);
                 bm = kropFotoKotak(bm);
-                bufferFoto[jalan++] = bm;
+                bufferFoto[i % batasBuffer] = bm;
             } else
-                aturBgTakBisa(jalan++);
+                aturBgTakBisa(i % batasBuffer);
         }
     } private void isiFileFoto(int posisi, int ukuranPokok){
         File file= new File(pathFoto[pathFoto.length-1-posisi]);
-        if(file.length() /1024 < (10*1024)) {
-            Bitmap bm = BitmapFactory.decodeFile(pathFoto[pathFoto.length - 1 - posisi]);
+        Bitmap bm= null;
+        if(jenisFoto == JENIS_FOTO) {
+            if(file.length() /1024 < (10*1024))
+                bm = BitmapFactory.decodeFile(pathFoto[posisi]);
+        }
+        else if(jenisFoto == JENIS_VIDEO_THUMBNAIL)
+            bm= ThumbnailUtils.createVideoThumbnail(pathFoto[posisi], MediaStore.Video.Thumbnails.MINI_KIND);
+
+        if(bm != null) {
             bm = skalaFoto(bm, ukuranPokok);
             bm = kropFotoKotak(bm);
             bufferFoto[posisi % batasBuffer] = bm;
@@ -298,6 +350,17 @@ public class GaleriLoader {
         return ukuranPratinjau;
     }
 
+    public void pasangAksesoris(View v){
+        if(sumberAksesoris.size() > 0) {
+            ViewGroup vg = (ViewGroup) v;
+            for(int i= 0; i<sumberAksesoris.size(); i++) {
+                ImageView imgAksesoris = new ImageView(konteks);
+                imgAksesoris.setLayoutParams(lpAksesoris.get(i));
+                imgAksesoris.setImageResource(sumberAksesoris.get(i));
+                vg.addView(imgAksesoris);
+            }
+        }
+    }
     public View buatFoto(int posisi){
         return buatFoto(new ImageView(konteks), posisi);
     }
@@ -309,8 +372,10 @@ public class GaleriLoader {
             ImageView img;
             if(elemenImg)
                 img= (ImageView) v;
-            else
+            else {
                 img= v.findViewById(idElemenImg);
+                pasangAksesoris(v);
+            }
             pasangThumbnail(img, posisi);
         }
         return pilahView(posisi);
@@ -359,6 +424,7 @@ public class GaleriLoader {
                 isiFileFoto(posisi, ukuranPratinjau);
                 if(aksiBuffer != null)
                     aksiBuffer.bufferUtama(posisi, batasBuffer);
+                updateJmlFotoDiload(posisi);
                 return bufferFoto[ind];
             }
 
@@ -392,19 +458,32 @@ public class GaleriLoader {
     }
     //update ind foto dipilih saat yg dipilih berkurang
     private void updateFotoDipilih(int cursor){
-        for(int i= 0; i< jmlUdahDiload; i++){
-            if(cursor == cursorDipilih)
+        int hitungan= cursor;
+        for(int i= 0; i< jmlUdahDiload; i++)
+            if(hitungan == cursorDipilih)
                 return;
-            if(dipilih[i] == cursor++)
+            else if(dipilih[i] > cursor){
                 dipilih[i]--;
-        }
+                hitungan++;
+            }
     }
     public int ambilUrutanDipilih(int posisi){
         return dipilih[posisi];
     }
+    public int[] ambilSemuaUrutanDipilih(){
+        int batas= viewDipilih.size();
+        int hitung= 0;
+        int indDipilih[]= new int[batas];
+        for(int i= 0; i< dipilih.length; i++)
+            if(dipilih[i] > 0)
+                indDipilih[hitung++] = dipilih[i];
+            else if(hitung == batas)
+                break;
+        return indDipilih;
+    }
 
     private void updateJmlFotoDiload(int posisi){
-        if(posisi > jmlUdahDiload)
+        if(posisi > jmlUdahDiload -1)
             jmlUdahDiload = posisi+1;
     }
 
@@ -433,5 +512,12 @@ public class GaleriLoader {
             } else if(hitung == batas)
                 break;
         return pathDipilih;
+    }
+
+    public int ambilJmlDipilih(){
+        return cursorDipilih;
+    }
+    public int ambilJmlUdahDiload(){
+        return jmlUdahDiload;
     }
 }

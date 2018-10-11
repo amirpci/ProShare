@@ -3,7 +3,7 @@ package sidev17.siits.proshare.Modul.Worker;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -22,9 +22,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.GridView;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -51,6 +49,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private final String WARNA_TAK_DITEKAN= "#ADADAD"; //ambilWarna(R.color.abuLebihTua)
 
     private String pathFoto[];
+    private String pathVideo[];
     private GaleriLoader loader;
 
 //    private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
@@ -178,10 +177,10 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         tmbCentang= findViewById(R.id.tambah_ok);
 
         pathFoto= ambilPathGambar();
+        pathVideo= ambilPathVideo();
 //        isiFileFoto(pathFoto, 0, 12);
 //        inisiasiFileFoto();
         inisiasiOk();
-        initLoader();
     }
     int ambilWarna(int id){
         return getResources().getColor(id);
@@ -289,10 +288,19 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                     lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                     view.setLayoutParams(lp);
                 }
-                if(ind== 2)
-                    wadahCell.setNumColumns(1);
-                else
+                if(ind== 0) {
                     wadahCell.setNumColumns(3);
+                    initLoader(pathFoto, GaleriLoader.JENIS_FOTO);
+                } else if(ind== 1){
+                    wadahCell.setNumColumns(3);
+                    initLoader(pathVideo, GaleriLoader.JENIS_VIDEO_THUMBNAIL);
+                    RelativeLayout.LayoutParams lp= new RelativeLayout.LayoutParams(50, 50);
+                    lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                    lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                    lp.setMargins(10, 10, 10, 10);
+                    loader.tambahAksesoris(R.drawable.obj_indek_video_lingkaran, lp);
+                } else if(ind== 2)
+                    wadahCell.setNumColumns(1);
 
                 int lebar = wadahCell.getWidth() / wadahCell.getNumColumns();
                 AdapterPropertiCell adpCell = new AdapterPropertiCell(lebar, ind, view);
@@ -305,28 +313,6 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                 view.setLayoutParams(lp);
             }
             tekanGantiWarna(ind);
-/*
-            if(tinggiAwal <batasTinggi) {
-                Thread thread = new Thread() {
-                    @Override
-                    public void run() {
-                        float tinggiUbah= tinggiAwal;
-                        float lebar = view.getWidth();
-                        while (tinggiUbah <= batasTinggi) {
-                            try {
-                                sleep(5);
-                            } catch (Exception e) {
-                            } finally {
-                                view.setLayoutParams(new RelativeLayout.LayoutParams((int) lebar, (int) tinggiUbah));
-                            }
-                            tinggiUbah++;
-                        }
-                        super.run();
-                    }
-                };
-                thread.run();
-            }
-*/
         }
         void tekanGantiWarna(int ind){
             if(ind != trahirDitekan) {
@@ -383,8 +369,9 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     public String[] ambilPathGambar(){
         ArrayList<String> arrayList= getImagesPath();
         String array[]= new String[arrayList.size()];
-        for(int i=0; i< array.length; i++)
-            array[i]= arrayList.get(i);
+        int indJalan= 0;
+        for(int i= array.length-1; i >= 0; i--)
+            array[indJalan++]= arrayList.get(i);
         return array;
     } public ArrayList<String> getImagesPath() {
         Uri uri;
@@ -392,7 +379,10 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         Cursor cursor;
         int column_index_data, column_index_folder_name;
         String PathOfImage = null;
-        uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+        uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+
+        ThumbnailUtils aka= new ThumbnailUtils();
+        Bitmap bm= ThumbnailUtils.createVideoThumbnail("asas", MediaStore.Video.Thumbnails.MICRO_KIND);
 
         String[] projection = { MediaStore.MediaColumns.DATA,
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
@@ -410,10 +400,43 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         }
         return listOfAllImages;
     }
+    public String[] ambilPathVideo(){
+        ArrayList<String> arrayList= getVideoPath();
+        String array[]= new String[arrayList.size()];
+        int indJalan= 0;
+        for(int i= array.length-1; i >= 0; i--)
+            array[indJalan++]= arrayList.get(i);
+        return array;
+    } public ArrayList<String> getVideoPath() {
+        Uri uri;
+        ArrayList<String> listOfAllVideo = new ArrayList<String>();
+        Cursor cursor;
+        int column_index_data, column_index_folder_name;
+        String PathOfVideo = null;
+        uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
-    void initLoader(){
+        Bitmap bm= ThumbnailUtils.createVideoThumbnail("asas", MediaStore.Video.Thumbnails.MICRO_KIND);
+
+        String[] projection = { MediaStore.MediaColumns.DATA,
+                MediaStore.Video.Media.BUCKET_DISPLAY_NAME };
+
+        cursor = getContentResolver().query(uri, projection, null,
+                null, null);
+
+        column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+        column_index_folder_name = cursor
+                .getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+        while (cursor.moveToNext()) {
+            PathOfVideo = cursor.getString(column_index_data);
+
+            listOfAllVideo.add(PathOfVideo);
+        }
+        return listOfAllVideo;
+    }
+
+    void initLoader(String pathFile[], int jenisFoto){
 //        inisiasiArrayDipilih(pathFoto.length);
-        loader= new GaleriLoader(getBaseContext(), pathFoto, 18);
+        loader= new GaleriLoader(getBaseContext(), pathFile, 18, jenisFoto);
         loader.aturUkuranPratinjau(250);
         loader.aturSumberBg(R.drawable.obj_gambar_kotak);
         loader.aturSumberBgTakBisa(R.drawable.obj_tanda_seru_lingkaran_garis);
@@ -424,16 +447,28 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
             @Override
             public void pilihFoto(View v, int posisi) {
-                TextView indDipilih = v.findViewById(R.id.tambah_cell_centang_no);
-                indDipilih.setText(Integer.toString(loader.ambilUrutanDipilih(posisi)));
-                indDipilih.getBackground().setTint(getResources().getColor(R.color.biruLaut));
-                indDipilih.getBackground().setAlpha(255);
+                TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
+                noUrut.setText(Integer.toString(loader.ambilUrutanDipilih(posisi)));
+                noUrut.getBackground().setTint(getResources().getColor(R.color.biruLaut));
+                noUrut.getBackground().setAlpha(255);
             }
             @Override
             public void batalPilihFoto(View v, int posisi) {
-                TextView indDipilih = v.findViewById(R.id.tambah_cell_centang_no);
-                indDipilih.setText("");
-                indDipilih.getBackground().setAlpha(0);
+                int indDipilih[]= loader.ambilSemuaUrutanDipilih();
+                ArrayList<View> viewDipilih= loader.ambilViewDipilih();
+                int indYgDibatalkan= loader.ambilUrutanDipilih(posisi) -1;
+                int indBaru= indYgDibatalkan +1;
+
+                TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
+                noUrut.setText("");
+                noUrut.getBackground().setAlpha(0);
+
+                for(int i= 0; i< indDipilih.length; i++) {
+                    if(i > indYgDibatalkan) {
+                        noUrut = viewDipilih.get(i).findViewById(R.id.tambah_cell_centang_no);
+                        noUrut.setText(Integer.toString(indBaru++));
+                    }
+                }
             }
         });
 
@@ -471,12 +506,6 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                         }
                     }
                 });
-/*
-                if(dipilih[posisi]== 1)
-                    pilihGambar(posisi, indDipilih);
-                else
-                    batalPilihGambar(posisi, indDipilih);
-*/
             }
             @Override
             public void bufferUtama(int posisi, int jmlBuffer) {
@@ -486,129 +515,9 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     }
 
     void aturTinggiGrid(GridView grid, int tinggi){
-//        HorizontalScrollView.LayoutParams lpGrid= new HorizontalScrollView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tinggi);
-//        grid.setLayoutParams(lpGrid);
         grid.getLayoutParams().height= tinggi;
     }
-/*
-    void inisiasiFileFoto(){
-        filePhoto= new ArrayList<Bitmap>();
-    }
-    void cekIsiFileFoto(int position){
-        if(position % JML_BUFFER_FOTO == 0){
-            Bitmap bitmapSmt[]= new Bitmap[JML_BUFFER_FOTO];
-            if(position > cursorGaleri){
-                if(filePhoto.size() == JML_MAKS_FOTO){
-                    for(int i= JML_BUFFER_FOTO-1; i<JML_MAKS_FOTO; i++)
-                        bitmapSmt[i]= filePhoto.get(i);
-                    inisiasiFileFoto();
-                    for(int i= 0; i<JML_BUFFER_FOTO; i++)
-                        filePhoto.add(bitmapSmt[i]);
-                }
-                isiFileFoto(pathFoto, position, JML_BUFFER_FOTO);
-                cursorGaleri= position;
-            }
-            else if(position < cursorGaleri){
-                if(filePhoto.size() == JML_MAKS_FOTO){
-                    for(int i= 0; i<JML_BUFFER_FOTO; i++)
-                        bitmapSmt[i]= filePhoto.get(i);
-                    inisiasiFileFoto();
-                    isiFileFoto(pathFoto, position - JML_BUFFER_FOTO, JML_BUFFER_FOTO);
-                    for(int i= 0; i<JML_BUFFER_FOTO; i++)
-                        filePhoto.add(bitmapSmt[i]);
-                }
-                cursorGaleri= position;
-            }
-            else if(position == 0)
-                isiFileFoto(pathFoto, position, JML_BUFFER_FOTO);
-        }
-    }
-    void isiFileFoto(String photoDir[], int mulai, int sebanyak){
-        for(int i= mulai; i<mulai +sebanyak; i++) {
-            Bitmap rawBitmap= BitmapFactory.decodeFile(photoDir[i]);
-            rawBitmap= skalaFoto(rawBitmap, (float) 0.2);
-            rawBitmap= kropFoto(rawBitmap);
-//            rawBitmap= skalaFoto(rawBitmap, 10);
-            filePhoto.add(rawBitmap);
-        }
-//        inisiasiArrayDipilih();
-    }
 
-    public Bitmap skalaFoto(Bitmap bm, float skala){
-        int pjg= bm.getWidth();
-        int lbr= bm.getHeight();
-
-        int pjgBaru= Math.round(pjg *skala);
-        int lbrBaru= Math.round(lbr *skala);
-
-        Bitmap fotoBaru= Bitmap.createScaledBitmap(bm, pjgBaru, lbrBaru, false);
-
-        return fotoBaru;
-    }
-    public Bitmap kropFoto(Bitmap bm){
-        int pjg= bm.getWidth();
-        int lbr= bm.getHeight();
-
-        if(lbr < pjg)
-            pjg= lbr;
-
-        int mulaiX= bm.getWidth()/2 - pjg/2;
-        int mulaiY= bm.getHeight()/2 - lbr/2;
-
-        return Bitmap.createBitmap(bm, mulaiX, mulaiY, pjg, pjg);
-    }
-
-    //untuk menambahkan img
-    void updateImgDipilih(ImageView img){
-        viewDipilih.add(img);
-    }
-    void updateBufferDiload(int batasBaru){
-        if(batasBufferUdahDiload < batasBaru)
-            batasBufferUdahDiload = batasBaru;
-    }
-
-    public void inisiasiArrayDipilih(int jml){
-        dipilih= new int[jml];
-    }
-    //saat dipilih[] berkurang
-    void updateDipilih(int cursor){
-        for (int i = 0; i < batasBufferUdahDiload; i++){
-            if(dipilih[i]== cursor++)
-                dipilih[i]--;
-            if(cursor== batasDipilih)
-                return;
-        }
-    }
-    public void pilihGambar(int ind, TextView teks) {
-        teks.getBackground().setTint(getResources().getColor(R.color.biruLaut));
-        teks.setText(Integer.toString(dipilih[ind]));
-//        centang.setImageResource(R.drawable.obj_centang_lingkaran_bolong);
-//        centang.setColorFilter(Color.parseColor(WARNA_DITEKAN));
-//        centang.setSelected(true);
-        dipilih[ind] = cursorGaleri++;
-
-    } public void batalPilihGambar(int ind, ImageView centang){
-        centang.setImageResource(R.drawable.latar_lingkaran_bolong);
-        centang.setColorFilter(Color.parseColor("#EEFFFFFF"));
-        centang.setSelected(false);
-        updateDipilih(dipilih[ind]);
-        dipilih[ind]= 0;
-        cursorGaleri--;
-    }
-/*
-    public void buatPathFotoDipilih(){
-        pathFotoDipilih= new ArrayList<String>();
-        for(int i= 0; i<dipilih.length; i++)
-            if(dipilih[i] == 1)
-                pathFotoDipilih.add(pathFoto[i]);
-    }
-    public void buatFotoDipilih(){
-        filePhotoDipilih= new ArrayList<Bitmap>();
-        for(int i= 0; i<dipilih.length; i++)
-            if(dipilih[i] == 1)
-                filePhotoDipilih.add(filePhoto.get(i));
-    }
-*/
     public void inisiasiOk(){
         tmbCentang.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -617,10 +526,17 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             }
         });
     }
+    //METHOD DUMMY!
     public void kirimPertanyaan(){
         //simpan pertanyaan.
-        String pathFotoDipilih[]= loader.ambilPathDipilih();
-        Toast.makeText(getBaseContext(), "dir 0: " +pathFotoDipilih[0], Toast.LENGTH_LONG).show();
+//        String pathFotoDipilih[]= loader.ambilPathDipilih();
+        int jmlUdahDiload= loader.ambilJmlUdahDiload();
+        int batas= loader.ambilJmlDipilih();
+        String daftarInd= "";
+        int dipilih[]= loader.ambilSemuaUrutanDipilih();
+        for(int i= 0; i< batas; i++)
+            daftarInd+= Integer.toString(dipilih[i]) +", ";
+        Toast.makeText(getBaseContext(), "dipilih \"" +Integer.toString(jmlUdahDiload) +"\": " +daftarInd, Toast.LENGTH_LONG).show();
         String judul= teksJudul.getText().toString();
         String deskripsi= teksDeskripsi.getText().toString();
         boolean verified= verifiedQuestion;
@@ -633,7 +549,6 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
         int lebar;
         int indPosisi;
-//        private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
 
         View parent;
 
@@ -641,7 +556,6 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             this.lebar= lebar;
             this.indPosisi= indPosisi;
             this.parent= parent;
-//            this.filePhoto= filePhoto;
         }
 
         @Override
@@ -670,47 +584,6 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                 view.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
 
                 view= loader.buatFoto(view, position);
-
-//                updateBufferDiload(position);
-
-//                cekIsiFileFoto(position);
-/*
-                ViewGroup vg= (ViewGroup) view.getParent();
-                vg.addView(loader.buatFoto(position));
-
-                final ImageView centang = view.findViewById(R.id.tambah_cell_centang);
-                final GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
-                centang.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (!centang.isSelected()) {
-                            pilihGambar(position, centang);
-
-                            buatFotoDipilih();
-//                            AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar, indPosisi, parentUtama, filePhotoDipilih);
-//                            liveQuestion.setAdapter(adpDipilih);
-                        } else {
-                            batalPilihGambar(position, centang);
-
-                            buatFotoDipilih();
-//                            AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar, indPosisi, parentUtama, filePhotoDipilih);
-//                            liveQuestion.setAdapter(adpDipilih);
-                        }
-                    }
-                });
-                if (indPosisi == 1) {
-                    ImageView indiVideo = view.findViewById(R.id.tambah_cell_indek_video);
-                    indiVideo.setImageResource(R.drawable.obj_indek_video_lingkaran);
-                }
-
-                ImageView img= loader.buatFoto(position);
-                img.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
-/*
-                if(dipilih[position]== 1)
-                    pilihGambar(position, centang);
-                else
-                    batalPilihGambar(position, centang);
-*/
                 return view;
             } else{
 
@@ -736,25 +609,21 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
     class AdapterPropertiDipilih extends BaseAdapter{
         private int lebar;
-//        private int indPosisi;
-        private ArrayList<Bitmap> fotoDipilih;
+        private ArrayList<Bitmap> itemDipilih;
 
-        AdapterPropertiDipilih(int lebar, ArrayList<Bitmap> fotoDipilih){
+        AdapterPropertiDipilih(int lebar, ArrayList<Bitmap> itemDipilih){
             this.lebar= lebar;
-            this.fotoDipilih= fotoDipilih;
-//            this.indPosisi= indPosisi;
-//            this.parent= parent;
-//            this.filePhoto= filePhoto;
+            this.itemDipilih = itemDipilih;
         }
 
         @Override
         public int getCount() {
-            return fotoDipilih.size();
+            return itemDipilih.size();
         }
 
         @Override
         public Object getItem(int position) {
-            return fotoDipilih.get(position);
+            return itemDipilih.get(position);
         }
 
         @Override
@@ -768,7 +637,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             view.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
 
             ImageView bg= view.findViewById(R.id.tambah_cell_pratinjau);
-            bg.setImageBitmap(fotoDipilih.get(position));
+            bg.setImageBitmap(itemDipilih.get(position));
 
             ImageView centang = view.findViewById(R.id.tambah_cell_centang);
 
