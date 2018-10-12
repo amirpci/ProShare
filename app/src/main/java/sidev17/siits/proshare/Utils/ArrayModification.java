@@ -7,6 +7,67 @@ public class ArrayModification {
     public static final int ARAH_MAJU= 12;
     public static final int ARAH_MUNDUR= 11;
 
+
+
+    public static <Tipe> Tipe[] ubahArray(Tipe array[], int pjg){
+        Tipe arraySalin[]= array;
+        array= (Tipe[]) new Object[pjg];
+        int batas= arraySalin.length;
+        if(pjg < arraySalin.length)
+            batas= pjg;
+        for(int i= 0; i<batas; i++)
+            array[i]= arraySalin[i];
+        return array;
+    }
+    public static <Tipe> Tipe[][] ubahArray(Tipe array[][], int pjg){
+        Tipe arraySalin[][]= array;
+        array= (Tipe[][]) new Object[pjg][];
+        int batas= arraySalin.length;
+        if(pjg < arraySalin.length)
+            batas= pjg;
+        for(int i= 0; i<batas; i++)
+            array[i]= arraySalin[i];
+        return array;
+    }
+
+    public static <Tipe> Tipe[] tambahArray(Tipe array[], Tipe masuk){
+        array= ubahArray(array, array.length+1);
+        array[array.length-1]= masuk;
+        return array;
+    }
+    public static <Tipe> Tipe[][] tambahArray(Tipe array[][], Tipe masuk[]){
+        array= ubahArray(array, array.length+1);
+        array[array.length-1]= masuk;
+        return array;
+    }
+    public static <Tipe> Tipe[] kurangiArray(Tipe array[], Tipe keluar){
+        int ind= cariIndDlmArray(array, keluar);
+        return kurangiArray(array, ind);
+    } public static <Tipe> Tipe[] kurangiArray(Tipe array[], int indKeluar){
+        Tipe arraySalin[]= array;
+        array= (Tipe[]) new Object[array.length-1];
+        int hitung= 0;
+        for(int i= 0; i<arraySalin.length; i++)
+            if(i != indKeluar) {
+                array[hitung]= arraySalin[i];
+                hitung++;
+            }
+        return array;
+    }
+    public static <Tipe> Tipe[][] kurangiArray(Tipe array[][], int indKeluar){
+        Tipe arraySalin[][]= array;
+        array= (Tipe[][]) new Object[array.length-1][];
+        int hitung= 0;
+        for(int i= 0; i<arraySalin.length; i++)
+            if(i != indKeluar) {
+                array[hitung]= arraySalin[i];
+                hitung++;
+            }
+        return array;
+    }
+
+
+
     public static Date[] tambahArray(Date array[], Date masuk){
         array= ubahArray(array, array.length+1);
         array[array.length-1]= masuk;
@@ -149,6 +210,15 @@ public class ArrayModification {
         int ind= -1;
         for(int i= 0; i<array.length; i++)
             if(array[i].toUpperCase().equals(str.toUpperCase())){
+                ind= i;
+                break;
+            }
+        return ind;
+    }
+    public static <Tipe> int cariIndDlmArray(Tipe array[], Tipe obj){
+        int ind= -1;
+        for(int i= 0; i<array.length; i++)
+            if(array[i].equals(obj)){
                 ind= i;
                 break;
             }

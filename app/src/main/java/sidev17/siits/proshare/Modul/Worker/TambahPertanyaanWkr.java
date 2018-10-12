@@ -1,11 +1,13 @@
 package sidev17.siits.proshare.Modul.Worker;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -32,6 +34,8 @@ import java.util.ArrayList;
 
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.GaleriLoader;
+import sidev17.siits.proshare.Utils.ParcelHolder;
+import sidev17.siits.proshare.Utils.UnserializableHolder;
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
 
@@ -437,6 +441,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     void initLoader(String pathFile[], int jenisFoto){
 //        inisiasiArrayDipilih(pathFoto.length);
         loader= new GaleriLoader(getBaseContext(), pathFile, 18, jenisFoto);
+        loader.aturBentukFoto(GaleriLoader.BENTUK_KOTAK);
         loader.aturUkuranPratinjau(250);
         loader.aturSumberBg(R.drawable.obj_gambar_kotak);
         loader.aturSumberBgTakBisa(R.drawable.obj_tanda_seru_lingkaran_garis);
@@ -632,12 +637,29 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parentInn) {
+        public View getView(final int position, View convertView, ViewGroup parentInn) {
             View view= getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
             view.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
 
             ImageView bg= view.findViewById(R.id.tambah_cell_pratinjau);
             bg.setImageBitmap(itemDipilih.get(position));
+            bg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent kePreview= new Intent(getBaseContext(), PhotoPreview.class);
+/*
+                    Bitmap arrayBm[]= new Bitmap[itemDipilih.size()];
+                    arrayBm= itemDipilih.toArray(arrayBm);
+                    kePreview.putExtra("foto", new ParcelHolder<Bitmap>(arrayBm));
+*/
+//                    kePreview.putParcelableArrayListExtra("foto", itemDipilih);
+                    kePreview.putStringArrayListExtra("judul", loader.ambilJudulDipilih());
+                    kePreview.putExtra("path", loader.ambilPathDipilih());
+                    kePreview.putExtra("indDipilih", position);
+
+                    startActivity(kePreview);
+                }
+            });
 
             ImageView centang = view.findViewById(R.id.tambah_cell_centang);
 

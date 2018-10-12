@@ -9,12 +9,22 @@
         android:layout_margin="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="Judul"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"/>
+
+    <TextView
+        android:id="@+id/preview_judul"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Image View"
         android:textSize="20sp"
         android:textColor="#FFFFFF"/>
 
-    <ImageView
-        android:id="@+id/preview_foto_gambar"
+    <android.support.v4.view.ViewPager
+        android:id="@+id/preview_foto_wadah"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

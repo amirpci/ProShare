@@ -29,6 +29,7 @@
         <activity android:name=".Modul.Worker.MainActivityWkr"></activity>
         <activity android:name=".Modul.Worker.DetailPertanyaanActivityWkr"/>
         <activity android:name=".Modul.Worker.TambahPertanyaanWkr"/>
+        <activity android:name=".Modul.Worker.PhotoPreview"/>
         <activity android:name=".Modul.Worker.ChatActivity"/>
     </application>
 

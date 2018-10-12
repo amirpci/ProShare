@@ -7,6 +7,8 @@ import android.graphics.Color;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -20,7 +22,13 @@ public class GaleriLoader {
     public static final int JENIS_VIDEO_THUMBNAIL= 11;
     public static final int JENIS_VIDEO= 12;
 
+    public static final int BENTUK_KOTAK= 21;
+    public static final int BENTUK_ASLI= 20;
+
+    private int bentukFoto= BENTUK_ASLI;
+
     private int jenisFoto;
+    private boolean bisaDiScale= false;
 
     private Context konteks;
 
@@ -59,6 +67,7 @@ public class GaleriLoader {
     private int jmlUdahDiload= -1;
 
 
+
     public GaleriLoader(Context k, String pathFoto[], int jmlBuffer, int jenisFoto){
         konteks= k;
         this.jenisFoto= jenisFoto;
@@ -79,6 +88,24 @@ public class GaleriLoader {
         ukuranThumbnail = 100;
         sumberAksesoris= new ArrayList<Integer>();
         lpAksesoris= new ArrayList<RelativeLayout.LayoutParams>();
+    } public GaleriLoader(Context k, String pathFoto[], int jmlBuffer, int ukuranPratinjau, int jenisFoto, int bentukFoto){
+        konteks= k;
+        this.jenisFoto= jenisFoto;
+        this.bentukFoto= bentukFoto;
+        this.pathFoto= pathFoto;
+        batasBuffer= jmlBuffer;
+        inisiasiBuffer(jmlBuffer);
+        this.ukuranPratinjau = ukuranPratinjau;
+        ukuranThumbnail = 100;
+        sumberAksesoris= new ArrayList<Integer>();
+        lpAksesoris= new ArrayList<RelativeLayout.LayoutParams>();
+    }
+
+    public void aturBentukFoto(int bentukFoto){
+        this.bentukFoto= bentukFoto;
+    }
+    public void bisaDiScale(boolean bisa){
+        bisaDiScale= bisa;
     }
 
     public interface AksiBuffer{
@@ -220,6 +247,13 @@ public class GaleriLoader {
         }
     }
 
+
+    private void tambahScaleGesture(View v){
+        v.setOnTouchListener(new ScaleGesture(konteks));
+    } public void tambahScaleGesture(View v, ScaleGesture gesture){
+        v.setOnTouchListener(gesture);
+    }
+
     private void isiFileFoto(int mulai, int sebanyak, int ukuranPokok){
         File file;
         for(int i= mulai; i< mulai +sebanyak && i<pathFoto.length; i++){
@@ -234,7 +268,8 @@ public class GaleriLoader {
 
             if(bm != null) {
                 bm = skalaFoto(bm, ukuranPokok);
-                bm = kropFotoKotak(bm);
+                if(bentukFoto== BENTUK_KOTAK)
+                    bm = kropFotoKotak(bm);
                 bufferFoto[i % batasBuffer] = bm;
             } else
                 aturBgTakBisa(i % batasBuffer);
@@ -251,7 +286,8 @@ public class GaleriLoader {
 
         if(bm != null) {
             bm = skalaFoto(bm, ukuranPokok);
-            bm = kropFotoKotak(bm);
+            if(bentukFoto== BENTUK_KOTAK)
+                bm = kropFotoKotak(bm);
             bufferFoto[posisi % batasBuffer] = bm;
         } else
             aturBgTakBisa(posisi % batasBuffer);
@@ -276,10 +312,14 @@ public class GaleriLoader {
         int jalan= 0;
         for(int i= mulai; i< mulai +batasBuffer; i++){
             ImageView img= new ImageView(konteks);
+            if(bisaDiScale)
+                tambahScaleGesture(img);
             bufferView[jalan]= img;
             aturBg(jalan++);
         }
     } private void isiViewFoto(View v, int posisi){
+        if(bisaDiScale)
+            tambahScaleGesture(v);
         bufferView[posisi % batasBuffer]= v;
         aturBg(posisi % batasBuffer);
     }
@@ -364,7 +404,7 @@ public class GaleriLoader {
     public View buatFoto(int posisi){
         return buatFoto(new ImageView(konteks), posisi);
     }
-    public View buatFoto(View v, int posisi){
+    public <TV extends View> View buatFoto(TV v, int posisi){
         int ind= posisi % batasBuffer;
         if(posisi /batasBuffer != indKelihatan[ind]){
             isiViewFoto(v, posisi);
@@ -519,5 +559,15 @@ public class GaleriLoader {
     }
     public int ambilJmlUdahDiload(){
         return jmlUdahDiload;
+    }
+
+    public ArrayList<String> ambilJudulDipilih(){
+        ArrayList<String> judul= new ArrayList<String>();
+        String pathDipilih[]= ambilPathDipilih();
+        for(int i= 0; i<pathDipilih.length; i++){
+            String array[]= pathDipilih[i].split("/");
+            judul.add(array[array.length-1]);
+        }
+        return judul;
     }
 }
