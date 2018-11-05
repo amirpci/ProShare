@@ -42,6 +42,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.Map;
 
+import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Login_Register.Login;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.R;
@@ -111,6 +112,7 @@ public class ProfileActWkr extends Fragment {
                 Utilities.removeDataLogin(getActivity());
                 //FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getActivity(), Login.class);
+                intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_LOGOUT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }

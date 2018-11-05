@@ -15,6 +15,7 @@
         android:background="#FFFFFF">
         <EditText
             android:id="@+id/tambah_judul"
+            android:textIsSelectable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="20dp"
@@ -87,6 +88,7 @@
         android:layout_height="wrap_content"
         android:numColumns="3"/>
     <EditText
+        android:textIsSelectable="true"
         android:id="@+id/tambah_deskripsi"
         android:layout_below="@id/tambah_properti_cell_dipilih"
         android:layout_above="@id/tambah_properti_wadah"

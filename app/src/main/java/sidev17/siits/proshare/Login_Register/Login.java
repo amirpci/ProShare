@@ -49,7 +49,9 @@ public class Login extends AppCompatActivity {
         Password=(EditText)findViewById(R.id.pass_login);
         Login=(Button)findViewById(R.id.btn_login);
         Register=(TextView) findViewById(R.id.register_login);
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        if(getIntent().getIntExtra(Konstanta.LOGIN_INTENT, 0)!=Konstanta.LOGIN_LOGOUT && getIntent().getIntExtra(Konstanta.LOGIN_INTENT, 0)!=Konstanta.LOGIN_REGISTER){
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        }
         //Utilities.getUserBidang(getApplicationContext())!=null
         if(Utilities.getUserBidang(getApplicationContext())!=0){
             //Utilities.getUserBidang(getApplicationContext())
@@ -105,6 +107,7 @@ public class Login extends AppCompatActivity {
                                         SharedPreferences.Editor editor = getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE).edit();
                                         editor.putString("user", user.getEmail());
                                         editor.putLong("bidang", user.getStatus());
+                                        editor.putString("lang", user.getNegara());
                                         editor.apply();
                                         switch ((int)user.getStatus()){
                                             case 201:{
@@ -121,10 +124,13 @@ public class Login extends AppCompatActivity {
                                             }
                                         }
                                         finish();
+                                    }else{
+                                        progress.dismiss();
+                                        Toast.makeText(getApplicationContext(), "email/password is incorrect!", Toast.LENGTH_SHORT).show();
                                     }
                                 }else{
                                     progress.dismiss();
-                                    Toast.makeText(getApplicationContext(), "Email address doesn't exist!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "email/password is incorrect!", Toast.LENGTH_SHORT).show();
                                 }
                             }
 

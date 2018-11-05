@@ -36,7 +36,7 @@ public class JawabActExprt extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_daftar_tanya_wkr, container, false);
+        View view = inflater.inflate(R.layout.fragment_daftar_harus_dijawab, container, false);
 
         daftarTanya = view.findViewById(R.id.daftar_pertanyaan_wadah);
         AdapterDaftarPertanyaan adpTanya = new AdapterDaftarPertanyaan();

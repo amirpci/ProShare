@@ -22,27 +22,37 @@
             android:layout_width="25dp"
             android:layout_height="25dp" />
     </RelativeLayout>
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/daftar_pertanyaan_judul"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="15dp"
-            android:textColor="#000000"
-            android:textSize="20sp"
-            android:text="Problem Text Goes Here"/>
-        <TextView
-            android:id="@+id/daftar_pertanyaan_deskripsi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textColor="#000000"
-            android:textSize="12sp"
-            android:text="Problem description goes here"/>
-    </LinearLayout>
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/daftar_pertanyaan_judul"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:text="Problem Text Goes Here"/>
+            <TextView
+                android:id="@+id/daftar_pertanyaan_deskripsi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:textColor="#000000"
+                android:textSize="12sp"
+                android:text="Problem description goes here"/>
+        </LinearLayout>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:scaleType="fitXY"
+            android:layout_alignParentBottom="true"
+            android:src="@drawable/shadow_transparent"/>
+    </RelativeLayout>
 
 </LinearLayout>

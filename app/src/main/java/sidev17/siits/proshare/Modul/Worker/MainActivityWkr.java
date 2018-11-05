@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import sidev17.siits.proshare.Modul.Worker.Tab.ChatExprt;
 import sidev17.siits.proshare.Modul.Worker.Tab.DaftarTanyaActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ShareActWkr;
@@ -25,7 +26,7 @@ public class MainActivityWkr extends AppCompatActivity {
     private LinearLayout tmb_Tanya;
     private ImageView garis_Tanya;
 
-    private LinearLayout tmb_Jawab;
+    private LinearLayout tmb_Jawab, tmb_Chat;
     private ImageView garis_Jawab;
 
     private ViewPagerAdapter adapter;
@@ -36,8 +37,8 @@ public class MainActivityWkr extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_wkr);
 
-        final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr, R.id.tab_tl_ikon_wkr},
-                {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, R.id.tab_tl_garis_wkr}};
+        final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr, R.id.tab_tl_ikon_wkr, R.id.tab_feedback_ikon_Exprt},
+                {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, R.id.tab_tl_garis_wkr, R.id.tab_feedback_garis_Exprt}};
 
         final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
                 {R.color.colorPrimary, R.color.colorPrimaryDark}};
@@ -47,12 +48,14 @@ public class MainActivityWkr extends AppCompatActivity {
         tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile_wkr);
         tmb_Tanya = (LinearLayout) findViewById(R.id.tab_tanya_wkr);
         tmb_Jawab = (LinearLayout) findViewById(R.id.tab_tl_wkr);
+        tmb_Chat = (LinearLayout) findViewById(R.id.tab_feedback_wkr);
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
         adapter.AddFragment(new ProfileActWkr(), "");
         adapter.AddFragment(new DaftarTanyaActWkr(), "");
         adapter.AddFragment(new ShareActWkr(), "");
+        adapter.AddFragment(new ChatExprt(), "");
         mvPager.setAdapter(adapter);
 
         mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -97,6 +100,12 @@ public class MainActivityWkr extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 tampilkan(mvPager, 2);
+            }
+        });
+        tmb_Chat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tampilkan(mvPager, 3);
             }
         });
     }

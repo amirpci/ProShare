@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Login_Register.RegisterPage.Register1;
 import sidev17.siits.proshare.Login_Register.RegisterPage.Register2;
 import sidev17.siits.proshare.Model.Pengguna;
@@ -131,7 +132,9 @@ public class Register extends AppCompatActivity {
             public void onComplete(@NonNull Task<Void> task) {
                 Toast.makeText(getApplicationContext(), "Sign up successful!", Toast.LENGTH_SHORT).show();
                 progress.dismiss();
-                startActivity(new Intent(Register.this, Login.class));
+                Intent intent = new Intent(Register.this, Login.class);
+                intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_REGISTER);
+                startActivity(intent);
                 finish();
             }
         }).addOnFailureListener(new OnFailureListener() {

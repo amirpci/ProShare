@@ -1,6 +1,7 @@
 package sidev17.siits.proshare.Modul.Worker;
 
 import android.content.Intent;
+import android.app.ProgressDialog;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -9,6 +10,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.speech.tts.UtteranceProgressListener;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -32,10 +34,12 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 
+import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.GaleriLoader;
 import sidev17.siits.proshare.Utils.ParcelHolder;
 import sidev17.siits.proshare.Utils.UnserializableHolder;
+import sidev17.siits.proshare.Utils.Utilities;
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
 
@@ -178,6 +182,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                 return true;
             }
         });
+        teksDeskripsi.setTextIsSelectable(true);
         tmbCentang= findViewById(R.id.tambah_ok);
 
         pathFoto= ambilPathGambar();
@@ -367,6 +372,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
             }
         });
+        teksJudul.setTextIsSelectable(true);
     }
 
 
@@ -512,6 +518,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                     }
                 });
             }
+
             @Override
             public void bufferUtama(int posisi, int jmlBuffer) {
 
@@ -534,20 +541,41 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     //METHOD DUMMY!
     public void kirimPertanyaan(){
         //simpan pertanyaan.
-//        String pathFotoDipilih[]= loader.ambilPathDipilih();
-        int jmlUdahDiload= loader.ambilJmlUdahDiload();
-        int batas= loader.ambilJmlDipilih();
+        String pathFotoDipilih[]= new String[0];
+      //  int jmlUdahDiload= loader.ambilJmlUdahDiload();
+      //  int batas= loader.ambilJmlDipilih();
         String daftarInd= "";
-        int dipilih[]= loader.ambilSemuaUrutanDipilih();
-        for(int i= 0; i< batas; i++)
-            daftarInd+= Integer.toString(dipilih[i]) +", ";
-        Toast.makeText(getBaseContext(), "dipilih \"" +Integer.toString(jmlUdahDiload) +"\": " +daftarInd, Toast.LENGTH_LONG).show();
+       // int dipilih[]= loader.ambilSemuaUrutanDipilih();
+       // for(int i= 0; i< batas; i++)
+       ////     daftarInd+= Integer.toString(dipilih[i]) +", ";
+       // Toast.makeText(getBaseContext(), "dipilih \"" +Integer.toString(jmlUdahDiload) +"\": " +daftarInd, Toast.LENGTH_LONG).show();
         String judul= teksJudul.getText().toString();
         String deskripsi= teksDeskripsi.getText().toString();
         boolean verified= verifiedQuestion;
-//        buatPathFotoDipilih();
+        String PId = Utilities.getUid();
+        Toast.makeText(this, "judul : "+judul, Toast.LENGTH_SHORT).show();
+        Permasalahan problem = new Permasalahan();
+        problem.setproblem_owner(Utilities.getUserID(this).replace(",","."));
+        problem.setpid(PId);
+        problem.setproblem_desc(deskripsi);
+        problem.setproblem_title(judul);
+        problem.setStatus(verified?1:0);
+        problem.setpicture_id("");
+        problem.setmajority_id(String.valueOf(Utilities.getUserBidang(this)));
+//        Toast.makeText(this, String.valueOf(dipilih.length), Toast.LENGTH_SHORT).show();
+        for(int i =0 ; i<pathFotoDipilih.length;i++){
+            Toast.makeText(this, pathFotoDipilih[i], Toast.LENGTH_SHORT).show();
+        }
+        ProgressDialog uploading = new ProgressDialog(this);
+        if(pathFotoDipilih.length>0){
+            String urlFotoTerupload[] = new String[1];
+            Utilities.uploadFoto(0, pathFotoDipilih, urlFotoTerupload, PId, problem, this, uploading);
+        }else{
+            Utilities.tambahkanMasalah(this, PId, problem, uploading, 1);
+        }
+        //for(int i=0;i<pathFotoDipilih.length;i++){
 
-        //lakukan sesuatu...
+       // }
     }
 
     class AdapterPropertiCell extends BaseAdapter{

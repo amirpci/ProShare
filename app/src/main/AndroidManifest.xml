@@ -20,17 +20,39 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Login_Register.Register" />
-        <activity android:name=".Test_For_Database" />
-        <activity android:name=".Share_knowledge" />
-        <activity android:name=".MainActivity" />
-        <activity android:name=".Modul.Expert.MainActivityExprt" />
-        <activity android:name=".Modul.Expert.TambahJawabanExprt" />
-        <activity android:name=".Modul.Worker.MainActivityWkr"></activity>
-        <activity android:name=".Modul.Worker.DetailPertanyaanActivityWkr"/>
-        <activity android:name=".Modul.Worker.TambahPertanyaanWkr"/>
-        <activity android:name=".Modul.Worker.PhotoPreview"/>
-        <activity android:name=".Modul.Worker.ChatActivity"/>
+        <activity android:name=".Login_Register.Register"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".Test_For_Database"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".Share_knowledge"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".Modul.Expert.MainActivityExprt"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".Modul.Expert.TambahJawabanExprt"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".Modul.Worker.MainActivityWkr"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" ></activity>
+        <activity android:name=".Modul.Worker.DetailPertanyaanActivityWkr"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".Modul.Worker.TambahPertanyaanWkr"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".Modul.Worker.PhotoPreview"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name=".Modul.ChatActivity"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden" />
     </application>
 
 </manifest>

@@ -40,6 +40,7 @@ import com.rmtheis.yandtran.language.Language;
 
 import java.util.Map;
 
+import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Login_Register.Login;
 import sidev17.siits.proshare.R;
 
@@ -61,7 +62,7 @@ public class ProfileActExprt extends Fragment {
     private Uri alamatPhoto;
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_profile_exprt, container, false);
         // untuk menghindari kesalahan multithreading dalam network connection
         if (android.os.Build.VERSION.SDK_INT > 9)
@@ -101,6 +102,7 @@ public class ProfileActExprt extends Fragment {
             public void onClick(View v) {
                 FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getActivity(), Login.class);
+                intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_LOGOUT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
@@ -203,12 +205,12 @@ public class ProfileActExprt extends Fragment {
                 String langID = (String) map.get("Negara");
                 Language languageID=null;
                 switch (langID){
-                    case "Indonesia" : languageID=Language.INDONESIAN; break;
-                    case "United States" : languageID=Language.ENGLISH; break;
-                    case "United Kingdom" : languageID=Language.ENGLISH; break;
-                    case "Japan" : languageID=Language.JAPANESE; break;
+                    case "Indonesia" : languageID=Konstanta.BAHASA_INDONESIA; break;
+                    case "United States" : languageID=Konstanta.BAHASA_INGGRIS; break;
+                    case "United Kingdom" : languageID=Konstanta.BAHASA_INGGRIS; break;
+                    case "Japan" : languageID=Konstanta.BAHASA_JEPANG; break;
                 }
-                com.rmtheis.yandtran.translate.Translate.setKey("trnsl.1.1.20180519T160825Z.7299a6aefc25b5ed.686b9fb304f26f1dfa1977702787e8088567146b");
+                com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
                 try {
                     if(bidang_.equals("-")){
                         bidang.setVisibility(View.GONE);
@@ -263,7 +265,12 @@ public class ProfileActExprt extends Fragment {
             uploading.setMessage("uploading...");
             uploading.show();
             alamatPhoto = data.getData();
-            StorageReference filepath = storageRef.child("Photos").child(idUser).child(alamatPhoto.getLastPathSegment());
+            String namaFoto = "wkwkwkwk";
+            int indexNamaFoto = alamatPhoto.getLastPathSegment().lastIndexOf('/');
+            if (indexNamaFoto != -1) {
+                namaFoto = alamatPhoto.toString().substring(indexNamaFoto + 1);
+            }
+            StorageReference filepath = storageRef.child("Photos").child(idUser).child(namaFoto);
             filepath.putFile(alamatPhoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {

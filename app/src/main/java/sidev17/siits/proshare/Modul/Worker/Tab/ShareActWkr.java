@@ -2,6 +2,7 @@ package sidev17.siits.proshare.Modul.Worker.Tab;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,9 +12,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,7 +28,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.eyalbira.loadingdots.LoadingDots;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -35,7 +48,21 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import sidev17.siits.proshare.Konstanta;
+import sidev17.siits.proshare.Model.Permasalahan;
+import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.AlgoritmaKesamaan;
+import sidev17.siits.proshare.Utils.Utilities;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -44,15 +71,22 @@ import static android.app.Activity.RESULT_OK;
  */
 
 public class ShareActWkr extends Fragment {
+    public final int PENGGUNA_EXPERT_TERVERIFIKASI= 402;
+    public final int PENGGUNA_EXPERT= 401;
+    public final int PENGGUNA_BIASA= 400;
     private LinearLayout relatedQuestion, addQuestion, loading;
     private EditText search_input,question_input;
     private TextView fileName;
     private ImageView search_btn, uploadPhoto, uploadedPhoto;
     private Button add_question;
+    private RecyclerView rcTimeline;
     private ProgressBar uploadPhotoProgress;
     private ProgressDialog addQuestionLoading;
+    private LoadingDots loadingDitemukan;
     private DatabaseReference dataRef;
     private StorageReference storageRef;
+    private RC_Masalah adapter;
+    private ArrayList<Permasalahan> Masalah;
     private static final int UpPhotoID = 2;
     private boolean photoDiambil = false, videoDiambil = false;
     private int QuestionID=0;
@@ -66,7 +100,7 @@ public class ShareActWkr extends Fragment {
         dataRef = FirebaseDatabase.getInstance().getReference();
         relatedQuestion = (LinearLayout)v.findViewById(R.id.tanya_related_q);
         addQuestion = (LinearLayout)v.findViewById(R.id.tanya_add_question);
-        search_input = (EditText)v.findViewById(R.id.tanya_search);
+        search_input = (EditText)v.findViewById(R.id.et_search_question);
         question_input = (EditText)v.findViewById(R.id.tanya_desc);
         fileName = (TextView)v.findViewById(R.id.tanya_file_name);
         search_btn = (ImageView)v.findViewById(R.id.tanya_cari_icon);
@@ -75,56 +109,118 @@ public class ShareActWkr extends Fragment {
         add_question = (Button)v.findViewById(R.id.tanya_addQuestion_btn);
         uploadPhotoProgress = (ProgressBar) v.findViewById(R.id.tanya_upPhoto_loading);
         loading = (LinearLayout)v.findViewById(R.id.tanya_progress);
-
-        relatedQuestion.setVisibility(View.GONE);
-        addQuestion.setVisibility(View.GONE);
-        //buat izin storage untuk API 23++
-        ActivityCompat.requestPermissions(getActivity(),
-                new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                1);
-        search_btn.setOnClickListener(new View.OnClickListener() {
+        rcTimeline = (RecyclerView)v.findViewById(R.id.list_timeline);
+        loadingDitemukan = (LoadingDots)v.findViewById(R.id.loading_ditemukan);
+        search_input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onClick(View v) {
-                loading.animate().translationY(0).alpha(0.0f).setDuration(500).setListener(new AnimatorListenerAdapter() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    cariMasalahan(search_input.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+        loadDaftarPertanyaan();
+        return v;
+    }
+    private void bersihkanList(){
+        Masalah.clear();
+        adapter.notifyDataSetChanged();
+    }
+
+    private void cariMasalahan(final String cari) {
+        bersihkanList();
+        loadingDitemukan.setVisibility(View.VISIBLE);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SEARCH_URL,
+                new Response.Listener<String>() {
                     @Override
-                    public void onAnimationEnd(Animator animation) {
-                        loading.setVisibility(View.GONE);
-                    }
-                });
-                searchQuestion(search_input.getText().toString());
-            }
-        });
-
-        uploadPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //buat izin storage untuk API 23++
-                //ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                Intent add = new Intent(Intent.ACTION_PICK);
-                add.setType("image/*");
-                startActivityForResult(add, UpPhotoID);
-            }
-        });
-
-        add_question.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(question_input.getText().toString().matches("")){
-                    Toast.makeText(getActivity(), "Please fill the blank!", Toast.LENGTH_LONG).show();
-                }else{
-                    addQuestionLoading = new ProgressDialog(getActivity());
-                    addQuestionLoading.setMessage("Adding question...");
-                    addQuestionLoading.show();
-                    if(tambahPertanyaan()){
-                        addQuestionLoading.dismiss();
-                        Toast.makeText(getActivity(), "Question added!", Toast.LENGTH_SHORT).show();
-                        transisiFadeOutBawah(addQuestion);
-                        transisiFadeIn(loading);
+                    public void onResponse(String response) {
+                        try {
+                            ArrayList<Permasalahan> semuaPermasalahan = new ArrayList<>();
+                            JSONArray jsonArr = new JSONArray(response);
+                            Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                            for(int i=0; i<jsonArr.length(); i++){
+                                try {
+                                    JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    Permasalahan masalah = new Permasalahan();
+                                    masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                    masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                    masalah.setStatus(jsonObject.getInt("status"));
+                                  //  Log.d("","judul ke "+i+" : "+jsonObject.getString("problem_title"));
+                                    semuaPermasalahan.add(masalah);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                              //      dialog.dismiss();
+                                    loadingDitemukan.setVisibility(View.GONE);
+                                }
+                            }
+                            AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(semuaPermasalahan, cari);
+                            Masalah.addAll(algoSama.listKetemu());
+                            adapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        loadingDitemukan.setVisibility(View.GONE);
                     }
                 }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loadingDitemukan.setVisibility(View.GONE);
+                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
             }
         });
-        return v;
+        Volley.newRequestQueue(getActivity()).add(stringRequest);
+    }
+    void loadDaftarPertanyaan(){
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        rcTimeline.setLayoutManager(linearLayoutManager);
+        rcTimeline.setLayoutManager(new LinearLayoutManager(getActivity()));
+        Masalah = new ArrayList<>();
+        adapter = new RC_Masalah(Masalah, getActivity());
+        rcTimeline.setAdapter(adapter);
+        loadData();
+    }
+    private void loadData() {
+        bersihkanList();
+        loadingDitemukan.setVisibility(View.VISIBLE);
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.TIMELINE_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Masalah.clear();
+                        try {
+                            JSONArray jsonArr = new JSONArray(response);
+                            Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                            for(int i=0; i<jsonArr.length(); i++){
+                                try {
+                                    JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    Permasalahan masalah = new Permasalahan();
+                                    masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                    masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                    masalah.setStatus(jsonObject.getInt("status"));
+                                    Masalah.add(masalah);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    loadingDitemukan.setVisibility(View.GONE);
+                                }
+                            }
+                            adapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        loadingDitemukan.setVisibility(View.GONE);
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loadingDitemukan.setVisibility(View.GONE);
+                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+            }
+        });
+        Volley.newRequestQueue(getActivity()).add(stringRequest);
     }
     //cuma method percobaan
     void searchQuestion(final String input){
@@ -270,6 +366,63 @@ public class ShareActWkr extends Fragment {
                     Toast.makeText(getActivity(), "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
                 }
                 return;
+            }
+        }
+    }
+    public class RC_Masalah extends RecyclerView.Adapter<RC_Masalah.vH>{
+        private List<Permasalahan> masalah;
+        Activity act;
+        public RC_Masalah(List<Permasalahan> masalah, Activity act) {
+            this.masalah = masalah;
+            this.act = act;
+        }
+
+        @NonNull
+        @Override
+        public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull vH holder, int position) {
+            holder.bind(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return masalah.size();
+        }
+
+        public class vH extends RecyclerView.ViewHolder{
+            private TextView judul, isi;
+            private ImageView centang;
+            private View view;
+            public vH(View itemView) {
+                super(itemView);
+                view = itemView;
+                centang = (ImageView) itemView.findViewById(R.id.daftar_pertanyaan_centang);
+                judul = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_judul);
+                isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);
+            }
+            public void bind(final int posisi){
+                if(masalah.get(posisi).getStatus()==PENGGUNA_EXPERT){
+                    centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
+                }else if(masalah.get(posisi).getStatus()==PENGGUNA_BIASA){
+                    centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
+                }
+                judul.setText(masalah.get(posisi).getproblem_title());
+                isi.setText(masalah.get(posisi).getproblem_desc());
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Bundle paketDetailPetanyaan= new Bundle();
+                        paketDetailPetanyaan.putString("judul_pertanyaan", masalah.get(posisi).getproblem_title());
+                        paketDetailPetanyaan.putString("deskripsi_pertanyaan", masalah.get(posisi).getproblem_desc());
+                        Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
+                        inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
+                        startActivity(inten);
+                    }
+                });
             }
         }
     }

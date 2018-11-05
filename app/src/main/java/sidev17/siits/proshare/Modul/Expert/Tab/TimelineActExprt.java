@@ -11,9 +11,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -36,6 +38,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.AlgoritmaKesamaan;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -66,7 +69,7 @@ public class TimelineActExprt extends Fragment {
         dataRef = FirebaseDatabase.getInstance().getReference();
         relatedQuestion = (LinearLayout)v.findViewById(R.id.tanya_related_q);
         addQuestion = (LinearLayout)v.findViewById(R.id.tanya_add_question);
-        search_input = (EditText)v.findViewById(R.id.tanya_search);
+        search_input = (EditText)v.findViewById(R.id.et_search_question);
         question_input = (EditText)v.findViewById(R.id.tanya_desc);
         fileName = (TextView)v.findViewById(R.id.tanya_file_name);
         search_btn = (ImageView)v.findViewById(R.id.tanya_cari_icon);
@@ -76,6 +79,17 @@ public class TimelineActExprt extends Fragment {
         uploadPhotoProgress = (ProgressBar) v.findViewById(R.id.tanya_upPhoto_loading);
         loading = (LinearLayout)v.findViewById(R.id.tanya_progress);
 
+        search_input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    cariMasalahan(search_input.getText().toString());
+                    return true;
+                }
+                return false;
+            }
+        });
+        /*
         relatedQuestion.setVisibility(View.GONE);
         addQuestion.setVisibility(View.GONE);
         //buat izin storage untuk API 23++
@@ -124,8 +138,14 @@ public class TimelineActExprt extends Fragment {
                 }
             }
         });
+        */
         return v;
     }
+
+    private void cariMasalahan(String cari) {
+
+    }
+
     //cuma method percobaan
     void searchQuestion(final String input){
         dataRef.child("search").addValueEventListener(new ValueEventListener() {
