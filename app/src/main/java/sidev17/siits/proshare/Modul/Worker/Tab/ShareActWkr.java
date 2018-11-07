@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -82,6 +83,7 @@ public class ShareActWkr extends Fragment {
     private RecyclerView rcTimeline;
     private ProgressBar uploadPhotoProgress;
     private ProgressDialog addQuestionLoading;
+    private SwipeRefreshLayout refresh;
     private LoadingDots loadingDitemukan;
     private DatabaseReference dataRef;
     private StorageReference storageRef;
@@ -98,6 +100,7 @@ public class ShareActWkr extends Fragment {
         View v = inflater.inflate(R.layout.fragment_tanya_wkr, container, false);
         storageRef = FirebaseStorage.getInstance().getReference();
         dataRef = FirebaseDatabase.getInstance().getReference();
+        refresh = (SwipeRefreshLayout)v.findViewById(R.id.refresh_timeline);
         relatedQuestion = (LinearLayout)v.findViewById(R.id.tanya_related_q);
         addQuestion = (LinearLayout)v.findViewById(R.id.tanya_add_question);
         search_input = (EditText)v.findViewById(R.id.et_search_question);
@@ -111,6 +114,14 @@ public class ShareActWkr extends Fragment {
         loading = (LinearLayout)v.findViewById(R.id.tanya_progress);
         rcTimeline = (RecyclerView)v.findViewById(R.id.list_timeline);
         loadingDitemukan = (LoadingDots)v.findViewById(R.id.loading_ditemukan);
+        refresh.setColorSchemeColors(getResources().getColor(R.color.abuTua), getResources().getColor(R.color.abuLebihTua),
+                getResources().getColor(R.color.abuSangatTua));
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                loadData();
+            }
+        });
         search_input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -184,6 +195,7 @@ public class ShareActWkr extends Fragment {
     }
     private void loadData() {
         bersihkanList();
+        refresh.setRefreshing(false);
         loadingDitemukan.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.TIMELINE_URL,
                 new Response.Listener<String>() {

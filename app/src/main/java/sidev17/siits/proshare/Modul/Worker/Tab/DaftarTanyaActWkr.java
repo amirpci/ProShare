@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.GetChars;
@@ -32,6 +33,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.eyalbira.loadingdots.LoadingDots;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,7 +69,9 @@ public class DaftarTanyaActWkr extends Fragment {
     List<Permasalahan> Masalah;
     private RecyclerView daftarTanya;
     private ImageView tmbTambah;
+    private SwipeRefreshLayout refreshLayout;
     RecyclerView.Adapter adapter;
+    private LoadingDots loadingPertanyaan;
 
     private String Judul[]= {"What should I do whe this happen?", "How to gain inspiration?", "How to else?"};
     private String deskripsi[]= {"I do this everyday, but somehow...", "When it happens, I don't know what to do. I need inspiration.", "bla bla bla..."};
@@ -79,23 +83,18 @@ public class DaftarTanyaActWkr extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.fragment_daftar_tanya_wkr, container, false);
-
+        loadingPertanyaan = (LoadingDots)view.findViewById(R.id.loading_pertanyaan);
         daftarTanya= view.findViewById(R.id.daftar_pertanyaan_wadah);
-        //AdapterDaftarPertanyaan adpTanya= new AdapterDaftarPertanyaan();
+        refreshLayout = view.findViewById(R.id.refresh_pertanyaan);
         loadDaftarPertanyaan();
-        /*daftarTanya.setAdapter(adpTanya);
-
-        daftarTanya.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        refreshLayout.setColorSchemeColors(getResources().getColor(R.color.abuTua), getResources().getColor(R.color.abuLebihTua),
+                getResources().getColor(R.color.abuSangatTua));
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Bundle paketDetailPetanyaan= new Bundle();
-                paketDetailPetanyaan.putString("judul_pertanyaan", judul[position]);
-                paketDetailPetanyaan.putString("deskripsi_pertanyaan", deskripsi[position]);
-                Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
-                inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
-                startActivity(inten);
+            public void onRefresh() {
+                loadData();
             }
-        }); */
+        });
         tmbTambah= view.findViewById(R.id.daftar_pertanyaan_tambah);
         tmbTambah.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -122,17 +121,19 @@ public class DaftarTanyaActWkr extends Fragment {
         daftarTanya.setAdapter(adapter);
         loadData();
     }
-
+    private void bersihkanList(){
+        Masalah.clear();
+        adapter.notifyDataSetChanged();
+    }
     private void loadData() {
-        final ProgressDialog dialog = new ProgressDialog(getActivity());
-        dialog.setMessage("Memuat Data");
-        dialog.show();
+        bersihkanList();
+        refreshLayout.setRefreshing(false);
+        loadingPertanyaan.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(Method.POST, Konstanta.PERTANYAAN_SAYA_URL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         try {
-                            Masalah.clear();
                             JSONArray jsonArr = new JSONArray(response);
                             Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
                             for(int i=0; i<jsonArr.length(); i++){
@@ -145,20 +146,19 @@ public class DaftarTanyaActWkr extends Fragment {
                                     Masalah.add(masalah);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
-                                    dialog.dismiss();
                                 }
                             }
                             adapter.notifyDataSetChanged();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        dialog.dismiss();
+                        loadingPertanyaan.setVisibility(View.GONE);
                     }
                 }
                 , new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                dialog.dismiss();
+                loadingPertanyaan.setVisibility(View.GONE);
                 Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
             }
         }){
