@@ -134,6 +134,7 @@ public class DaftarTanyaActWkr extends Fragment {
                     @Override
                     public void onResponse(String response) {
                         try {
+                            Masalah.clear();
                             JSONArray jsonArr = new JSONArray(response);
                             Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
                             for(int i=0; i<jsonArr.length(); i++){

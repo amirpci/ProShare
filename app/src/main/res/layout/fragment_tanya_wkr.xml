@@ -44,13 +44,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <LinearLayout
-                    android:id="@+id/jumlah_ditemukan"
-                    android:visibility="gone"
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
                     <RelativeLayout
-                        android:id="@+id/notif_banyak_ditemukan"
+                        android:id="@+id/jumlah_ditemukan"
+                        android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:background="@color/colorPrimaryDark">
@@ -62,34 +61,21 @@
                             android:textColor="@android:color/white"
                             android:layout_centerInParent="true"/>
                     </RelativeLayout>
-                    <RelativeLayout
+                    <android.support.v4.widget.SwipeRefreshLayout
+                        android:id="@+id/refresh_timeline"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
-                        <ScrollView
-                            android:visibility="gone"
+                        <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:background="@color/colorAccent">
+                            android:layout_height="match_parent">
                             <android.support.v7.widget.RecyclerView
-                                android:id="@+id/pertanyaan_ditemukan_wadah"
+                                android:id="@+id/list_timeline"
                                 android:layout_width="match_parent"
-                                android:layout_height="wrap_content">
-
-                            </android.support.v7.widget.RecyclerView>
-                        </ScrollView>
-                        <include layout="@layout/model_hasil_tak_diemukan"/>
-                    </RelativeLayout>
+                                android:layout_height="match_parent"/>
+                            <include layout="@layout/model_hasil_tak_diemukan"/>
+                        </RelativeLayout>
+                    </android.support.v4.widget.SwipeRefreshLayout>
                 </LinearLayout>
-                <android.support.v4.widget.SwipeRefreshLayout
-                    android:id="@+id/refresh_timeline"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/list_timeline"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-                </android.support.v4.widget.SwipeRefreshLayout>
             </RelativeLayout>
         </LinearLayout>
         <com.eyalbira.loadingdots.LoadingDots

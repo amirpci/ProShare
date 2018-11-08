@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Layout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,6 +63,7 @@ import java.util.Map;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
+import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.AlgoritmaKesamaan;
 import sidev17.siits.proshare.Utils.Utilities;
@@ -89,6 +92,8 @@ public class ShareActWkr extends Fragment {
     private StorageReference storageRef;
     private RC_Masalah adapter;
     private ArrayList<Permasalahan> Masalah;
+    private RelativeLayout layoutTidakDitemukan;
+    private RelativeLayout jumlahDitemukan;
     private static final int UpPhotoID = 2;
     private boolean photoDiambil = false, videoDiambil = false;
     private int QuestionID=0;
@@ -114,6 +119,8 @@ public class ShareActWkr extends Fragment {
         loading = (LinearLayout)v.findViewById(R.id.tanya_progress);
         rcTimeline = (RecyclerView)v.findViewById(R.id.list_timeline);
         loadingDitemukan = (LoadingDots)v.findViewById(R.id.loading_ditemukan);
+        layoutTidakDitemukan = v.findViewById(R.id.layout_tambah_pertanyaan);
+        jumlahDitemukan = v.findViewById(R.id.jumlah_ditemukan);
         refresh.setColorSchemeColors(getResources().getColor(R.color.abuTua), getResources().getColor(R.color.abuLebihTua),
                 getResources().getColor(R.color.abuSangatTua));
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -140,8 +147,25 @@ public class ShareActWkr extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
+    private void tetapkanJumlahKetemu(int ketemu){
+        jumlahDitemukan.setVisibility(View.VISIBLE);
+        TextView total = (TextView)jumlahDitemukan.findViewById(R.id.txt_total_ditemukan);
+        total.setText(String.valueOf(ketemu)+" found");
+    }
+
+    private void initTambahPertanyaan(){
+        layoutTidakDitemukan.setVisibility(View.VISIBLE);
+        layoutTidakDitemukan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getActivity(), TambahPertanyaanWkr.class));
+            }
+        });
+    }
     private void cariMasalahan(final String cari) {
+        jumlahDitemukan.setVisibility(View.GONE);
         bersihkanList();
+        layoutTidakDitemukan.setVisibility(View.GONE);
         loadingDitemukan.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SEARCH_URL,
                 new Response.Listener<String>() {
@@ -158,17 +182,20 @@ public class ShareActWkr extends Fragment {
                                     masalah.setproblem_desc(jsonObject.getString("problem_desc"));
                                     masalah.setproblem_title(jsonObject.getString("problem_title"));
                                     masalah.setStatus(jsonObject.getInt("status"));
-                                  //  Log.d("","judul ke "+i+" : "+jsonObject.getString("problem_title"));
                                     semuaPermasalahan.add(masalah);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
-                              //      dialog.dismiss();
                                     loadingDitemukan.setVisibility(View.GONE);
                                 }
                             }
                             AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(semuaPermasalahan, cari);
                             Masalah.addAll(algoSama.listKetemu());
                             adapter.notifyDataSetChanged();
+                            if(Masalah.size()==0){
+                                initTambahPertanyaan();
+                            }else {
+                                tetapkanJumlahKetemu(Masalah.size());
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -194,7 +221,9 @@ public class ShareActWkr extends Fragment {
         loadData();
     }
     private void loadData() {
+        jumlahDitemukan.setVisibility(View.GONE);
         bersihkanList();
+        layoutTidakDitemukan.setVisibility(View.GONE);
         refresh.setRefreshing(false);
         loadingDitemukan.setVisibility(View.VISIBLE);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.TIMELINE_URL,

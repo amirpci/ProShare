@@ -35,6 +35,7 @@ public class AlgoritmaKesamaan {
 
     public ArrayList<Permasalahan> listKetemu() {
         ArrayList<Permasalahan> listKetemu = new ArrayList<>();
+        ArrayList<Double> listKetemuIndex = new ArrayList<>();
         String cari = searchKalimat;
         ArrayList<Keyword> listSemuaKeyword = keywordKejadian();
         ArrayList<ArrayList<CVektor>> cvList = listFaqCV(listSemuaKeyword);
@@ -66,6 +67,7 @@ public class AlgoritmaKesamaan {
                 D += cvList.get(i).get(keySamaQ[j]).getWeight() * pertanyaan.get(keySamaPertanyaan[j]).getWeight();
             }
             if(D>0.0){
+                listKetemuIndex.add(D);
                 listKetemu.add(permasalahan.get(i));
                 Log.d("judul ",listKetemu.get(listKetemuCounter++).getproblem_title());
             }
@@ -85,6 +87,35 @@ public class AlgoritmaKesamaan {
             System.out.println(permasalahan.get(jawabanTercocok).getproblem_title());
         } else {
             System.out.println("Mohon maaf pertanyaan anda tidak ditemukan :(");
+        }
+        int panjangKetemu = listKetemu.size();
+        for(int i=0;i<panjangKetemu-1;i++){
+            int indexSekarang = i;
+            double terbesar = listKetemuIndex.get(i);
+            for(int j=i+1;j<panjangKetemu;j++){
+                if(terbesar<listKetemuIndex.get(j)){
+                    indexSekarang = j;
+                    terbesar = listKetemuIndex.get(j);
+                }else if(terbesar==listKetemuIndex.get(j)){
+                    if(listKetemu.get(j).getproblem_title().length()<listKetemu.get(i).getproblem_title().length()){
+                        double temp = listKetemuIndex.get(j);
+                        listKetemuIndex.set(j, listKetemuIndex.get(i));
+                        listKetemuIndex.set(i, temp);
+                        Permasalahan temp1 = listKetemu.get(j);
+                        listKetemu.set(j, listKetemu.get(i));
+                        listKetemu.set(i, temp1);
+                    }
+                }
+            }
+            if(indexSekarang!=i){
+                double temp = listKetemuIndex.get(indexSekarang);
+                listKetemuIndex.set(indexSekarang, listKetemuIndex.get(i));
+                listKetemuIndex.set(i, temp);
+
+                Permasalahan temp1 = listKetemu.get(indexSekarang);
+                listKetemu.set(indexSekarang, listKetemu.get(i));
+                listKetemu.set(i, temp1);
+            }
         }
         return listKetemu;
     }
