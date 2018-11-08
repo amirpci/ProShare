@@ -297,12 +297,15 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                     lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                     view.setLayoutParams(lp);
                 }
+                int jmlCell= 0;
                 if(ind== 0) {
                     wadahCell.setNumColumns(3);
                     initLoader(pathFoto, GaleriLoader.JENIS_FOTO);
+                    jmlCell= pathFoto.length;
                 } else if(ind== 1){
                     wadahCell.setNumColumns(3);
                     initLoader(pathVideo, GaleriLoader.JENIS_VIDEO_THUMBNAIL);
+                    jmlCell= pathVideo.length;
                     RelativeLayout.LayoutParams lp= new RelativeLayout.LayoutParams(50, 50);
                     lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
                     lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
@@ -312,7 +315,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                     wadahCell.setNumColumns(1);
 
                 int lebar = wadahCell.getWidth() / wadahCell.getNumColumns();
-                AdapterPropertiCell adpCell = new AdapterPropertiCell(lebar, ind, view);
+                AdapterPropertiCell adpCell = new AdapterPropertiCell(lebar, ind, jmlCell, view);
                 wadahCell.setAdapter(adpCell);
             } else if(ditekanKah && ind == trahirDitekan){
                 int tinggiAwal= viewIcon.getHeight();
@@ -446,7 +449,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
     void initLoader(String pathFile[], int jenisFoto){
 //        inisiasiArrayDipilih(pathFoto.length);
-        loader= new GaleriLoader(getBaseContext(), pathFile, 18, jenisFoto);
+        loader= new GaleriLoader(getBaseContext(), this, pathFile, 18, jenisFoto);
         loader.aturBentukFoto(GaleriLoader.BENTUK_KOTAK);
         loader.aturUkuranPratinjau(250);
         loader.aturSumberBg(R.drawable.obj_gambar_kotak);
@@ -582,13 +585,15 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
         int lebar;
         int indPosisi;
+        int jml;
 
         View parent;
 
-        AdapterPropertiCell(int lebar, int indPosisi, View parent){
+        AdapterPropertiCell(int lebar, int indPosisi, int jml, View parent){
             this.lebar= lebar;
             this.indPosisi= indPosisi;
             this.parent= parent;
+            this.jml= jml;
         }
 
         @Override
@@ -596,7 +601,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             if(indPosisi== 2)
                 return 1;
             else
-                return pathFoto.length;
+                return jml;
         }
 
         @Override

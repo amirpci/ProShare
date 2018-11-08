@@ -1,5 +1,6 @@
 package sidev17.siits.proshare.Utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,6 +32,7 @@ public class GaleriLoader {
     private boolean bisaDiScale= false;
 
     private Context konteks;
+    private Activity activity;
 
     private AksiBuffer aksiBuffer;
     private AksiPilihFoto aksiPilihFoto;
@@ -68,7 +70,7 @@ public class GaleriLoader {
 
 
 
-    public GaleriLoader(Context k, String pathFoto[], int jmlBuffer, int jenisFoto){
+    public GaleriLoader(Context k, Activity act, String pathFoto[], int jmlBuffer, int jenisFoto){
         konteks= k;
         this.jenisFoto= jenisFoto;
         this.pathFoto= pathFoto;
@@ -78,7 +80,7 @@ public class GaleriLoader {
         ukuranThumbnail = 100;
         sumberAksesoris= new ArrayList<Integer>();
         lpAksesoris= new ArrayList<RelativeLayout.LayoutParams>();
-    } public GaleriLoader(Context k, String pathFoto[], int jmlBuffer, int ukuranPratinjau, int jenisFoto){
+    } public GaleriLoader(Context k, Activity act, String pathFoto[], int jmlBuffer, int ukuranPratinjau, int jenisFoto){
         konteks= k;
         this.jenisFoto= jenisFoto;
         this.pathFoto= pathFoto;
@@ -88,7 +90,7 @@ public class GaleriLoader {
         ukuranThumbnail = 100;
         sumberAksesoris= new ArrayList<Integer>();
         lpAksesoris= new ArrayList<RelativeLayout.LayoutParams>();
-    } public GaleriLoader(Context k, String pathFoto[], int jmlBuffer, int ukuranPratinjau, int jenisFoto, int bentukFoto){
+    } public GaleriLoader(Context k, Activity act, String pathFoto[], int jmlBuffer, int ukuranPratinjau, int jenisFoto, int bentukFoto){
         konteks= k;
         this.jenisFoto= jenisFoto;
         this.bentukFoto= bentukFoto;
@@ -286,11 +288,10 @@ public class GaleriLoader {
 
         if(bm != null) {
             bm = skalaFoto(bm, ukuranPokok);
-            if(bentukFoto== BENTUK_KOTAK)
+            if (bentukFoto == BENTUK_KOTAK)
                 bm = kropFotoKotak(bm);
             bufferFoto[posisi % batasBuffer] = bm;
-        } else
-            aturBgTakBisa(posisi % batasBuffer);
+        }
     }
 
     public void aturIdElemenImg(int id){
@@ -444,8 +445,12 @@ public class GaleriLoader {
 
             @Override
             protected void onPostExecute(Bitmap bitmap) {
-                img.setImageBitmap(bitmap);
-                pasangFoto(img, posisi);
+                if(bitmap != null) {
+                    img.setImageBitmap(bitmap);
+                    pasangFoto(img, posisi);
+                }
+                else
+                    aturBgTakBisa(posisi % batasBuffer);
                 super.onPostExecute(bitmap);
             }
         };
@@ -470,7 +475,10 @@ public class GaleriLoader {
 
             @Override
             protected void onPostExecute(Bitmap bitmap) {
-                img.setImageBitmap(bitmap);
+                if(bitmap != null)
+                    img.setImageBitmap(bitmap);
+                else
+                    aturBgTakBisa(posisi % batasBuffer);
                 super.onPostExecute(bitmap);
             }
         };

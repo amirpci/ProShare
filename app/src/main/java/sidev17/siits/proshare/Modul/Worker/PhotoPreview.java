@@ -106,7 +106,7 @@ public class PhotoPreview extends AppCompatActivity {
 
     void initLoader(String pathFile[], int jenisFoto){
 //        inisiasiArrayDipilih(pathFoto.length);
-        loader= new GaleriLoader(getBaseContext(), pathFile, 18, jenisFoto);
+        loader= new GaleriLoader(getBaseContext(), this, pathFile, 18, jenisFoto);
 //        loader.bisaDiScale(true);
         loader.aturUkuranPratinjau(1000);
         loader.aturSumberBg(R.drawable.obj_gambar_kotak);
@@ -248,6 +248,14 @@ public class PhotoPreview extends AppCompatActivity {
             RelativeLayout induk= new RelativeLayout(getBaseContext());
             induk.setLayoutParams(lpInduk);
 */
+            RelativeLayout.LayoutParams lpPanel= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            ImageView panel= new ImageView(getBaseContext());
+            panel.setLayoutParams(lpPanel);
+//            panel.setImageBitmap(foto.get(position));
+            panel.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+            panel= (ImageView) loader.buatFoto(panel, position);
+
             ScaleGesture gestur= new ScaleGesture(getBaseContext());
             gestur.aturAksiZoom(new ScaleGesture.AksiZoom() {
                 @Override
@@ -260,14 +268,6 @@ public class PhotoPreview extends AppCompatActivity {
                     zoomIn= false;
                 }
             });
-
-            RelativeLayout.LayoutParams lpPanel= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            ImageView panel= new ImageView(getBaseContext());
-            panel.setLayoutParams(lpPanel);
-//            panel.setImageBitmap(foto.get(position));
-            panel.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-            panel= (ImageView) loader.buatFoto(panel, position);
             panel.setOnTouchListener(gestur);
 /*
             RelativeLayout.LayoutParams lpJudul= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
