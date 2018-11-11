@@ -27,6 +27,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     public final int PENGGUNA_BIASA= 0;
 
     private String judulPertanyaan;
+    private String majorityPertanyaan;
     private String deskripsiPertanyaan;
     private ArrayList<Bitmap> gambar;
 
@@ -130,6 +131,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     private void isiViewPertanyaan(){
         viewPertanyaan= getLayoutInflater().inflate(R.layout.model_timeline_pertanyaan, null, false);
         TextView teksJudul= viewPertanyaan.findViewById(R.id.tl_judul);
+        TextView teksMajority= viewPertanyaan.findViewById(R.id.tl_majority);
         TextView teksDeskripsi= viewPertanyaan.findViewById(R.id.tl_deskripsi);
 
         TextView jmlSuka= viewPertanyaan.findViewById(R.id.tl_orang_angka);
@@ -142,6 +144,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
         });
 
         teksJudul.setText(judulPertanyaan);
+        teksMajority.setText(majorityPertanyaan);
         teksDeskripsi.setText(deskripsiPertanyaan);
     }
     private void tambahSuka(){

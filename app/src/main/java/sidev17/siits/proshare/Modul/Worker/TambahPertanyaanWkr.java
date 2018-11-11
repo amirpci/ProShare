@@ -8,9 +8,8 @@ import android.graphics.Color;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.speech.tts.UtteranceProgressListener;
+import android.renderscript.ScriptGroup;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -19,6 +18,7 @@ import android.text.SpannableString;
 import android.text.method.KeyListener;
 import android.text.style.UnderlineSpan;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +29,7 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,8 +38,7 @@ import java.util.ArrayList;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.GaleriLoader;
-import sidev17.siits.proshare.Utils.ParcelHolder;
-import sidev17.siits.proshare.Utils.UnserializableHolder;
+import sidev17.siits.proshare.Utils.Ukuran;
 import sidev17.siits.proshare.Utils.Utilities;
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
@@ -48,6 +48,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private TabBarIcon tabBarIcon;
 
     private EditText teksJudul;
+    private Spinner pilihanMajority;
     private EditText teksDeskripsi;
 
     private ImageView tmbCentang;
@@ -118,6 +119,12 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                 }
             });
         }
+        else{
+            //==============================================
+            //inisialkan Spinner Minggu, 11 Nov 2018, 21:05
+            //==============================================
+            initPilihanMajority(DUMY_initArrayListMajority());
+        }
         wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
         tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
                 (View) findViewById(R.id.tambah_properti_icon));
@@ -153,7 +160,8 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                 return true;
             }
         });
-        initTeksJudul();
+       // initTeksJudul();
+        teksJudul.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         teksJudul.clearFocus();
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
         teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
@@ -182,7 +190,10 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
                 return true;
             }
         });
-        teksDeskripsi.setTextIsSelectable(true);
+//        teksDeskripsi.setTextIsSelectable(true);
+        teksDeskripsi.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        teksDeskripsi.setMaxLines(1000);
+        teksDeskripsi.setSingleLine(false);
         tmbCentang= findViewById(R.id.tambah_ok);
 
         pathFoto= ambilPathGambar();
@@ -345,6 +356,61 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         }
         void aturDitekan(boolean ditekan){
             ditekanKah= ditekan;
+        }
+    }
+
+    ArrayList<String> DUMY_initArrayListMajority(){
+        ArrayList<String> majority= new ArrayList<>();
+        majority.add("Batu");
+        majority.add("Beton");
+        majority.add("Teknik Lingkungan");
+        majority.add("Psychiatrist");
+        majority.add("Artist");
+        return majority;
+    }
+    void initPilihanMajority(ArrayList<String> majority){
+        pilihanMajority= findViewById(R.id.tambah_majority);
+        SpinnerAdp adpMajority= new SpinnerAdp(majority);
+        pilihanMajority.setAdapter(adpMajority);
+    }
+    class SpinnerAdp extends BaseAdapter{
+
+        int jmlElemen;
+        ArrayList<String> elemen;
+
+        SpinnerAdp(ArrayList<String> elemen){
+            this.elemen = elemen;
+            jmlElemen = elemen.size();
+        }
+
+        @Override
+        public int getCount() {
+            return jmlElemen;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return elemen.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewGroup.LayoutParams lpElemen= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Ukuran.DpKePx(30, getResources().getDisplayMetrics()));
+
+            TextView teksElemen= new TextView(getBaseContext());
+            teksElemen.setGravity(Gravity.LEFT);
+            teksElemen.setTextColor(Color.parseColor("#000000"));
+            teksElemen.setTextSize(19);
+            teksElemen.setText(elemen.get(position));
+
+            teksElemen.setLayoutParams(lpElemen);
+
+            return teksElemen;
         }
     }
 

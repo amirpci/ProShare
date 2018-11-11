@@ -78,8 +78,8 @@ public class ChatExprt extends Fragment {
             prevChat = (TextView)itemView.findViewById(R.id.feedback_orang_chat);
             nama = (TextView)itemView.findViewById(R.id.feedback_orang_nama);
             waktu = (TextView)itemView.findViewById(R.id.feedback_waktu);
-            centang = (ImageView)itemView.findViewById(R.id.feedback_orang_centang);
-            foto = (CircleImageView)itemView.findViewById(R.id.feedback_orang_gambar);
+            centang = (ImageView)itemView.findViewById(R.id.tl_orang_centang);
+            foto = (CircleImageView)itemView.findViewById(R.id.tl_orang_gambar);
         }
 
         public void initList(final ChatListItem listPesan) {

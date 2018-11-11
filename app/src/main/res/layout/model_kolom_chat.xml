@@ -12,12 +12,12 @@
         android:layout_height="wrap_content"
         android:layout_weight="5">
         <RelativeLayout
-            android:id="@+id/feedback_orang_dp"
+            android:id="@+id/tl_orang_dp"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_margin="10dp">
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/feedback_orang_gambar"
+                android:id="@+id/tl_orang_gambar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
@@ -27,7 +27,7 @@
                 android:background="@drawable/latar_lingkaran"
                 android:backgroundTint="@color/abuLebihTua"/>
             <ImageView
-                android:id="@+id/feedback_orang_centang"
+                android:id="@+id/tl_orang_centang"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:layout_width="25dp"
@@ -35,7 +35,7 @@
         </RelativeLayout>
         <TextView
             android:id="@+id/feedback_orang_nama"
-            android:layout_toRightOf="@id/feedback_orang_dp"
+            android:layout_toRightOf="@id/tl_orang_dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
@@ -44,7 +44,7 @@
             android:text="Mr. Your Name Here"/>
         <TextView
             android:id="@+id/feedback_orang_chat"
-            android:layout_toRightOf="@id/feedback_orang_dp"
+            android:layout_toRightOf="@id/tl_orang_dp"
             android:layout_below="@id/feedback_orang_nama"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

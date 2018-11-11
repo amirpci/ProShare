@@ -53,13 +53,20 @@
                     </android.support.constraint.ConstraintLayout>
                     <ImageView
                         android:id="@+id/signOut"
+                        android:paddingBottom="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:layout_marginRight="5dp"
                         android:clickable="true"
-                        android:layout_width="30dp"
-                        android:layout_height="30dp"
+                        android:layout_width="50dp"
+                        android:layout_height="40dp"
                         android:layout_alignParentRight="true"
                         android:layout_alignParentTop="true"
-                        android:src="@drawable/obj_logout"
-                        android:tint="@color/hitam"/>
+                        android:src="@drawable/obj_titik_tiga_horizontal"
+                        android:background="@drawable/latar_kotak_tumpul_bawah"
+                        android:tint="#FFFFFF"
+                        android:backgroundTint="@color/abuTua"/>
                 </RelativeLayout>
                 <RelativeLayout
                     android:layout_width="match_parent"

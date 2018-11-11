@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,6 +37,7 @@ public class MainActivityWkr extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_wkr);
+
 
         final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr, R.id.tab_tl_ikon_wkr, R.id.tab_feedback_ikon_Exprt},
                 {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, R.id.tab_tl_garis_wkr, R.id.tab_feedback_garis_Exprt}};
