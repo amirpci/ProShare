@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -16,10 +17,17 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.rmtheis.yandtran.language.Language;
+
 import java.util.ArrayList;
 
+import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Modul.Expert.Tab.ProfileActExprt;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Utilities;
 
 public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     public final int PENGGUNA_EXPERT_TERVERIFIKASI= 2;
@@ -29,6 +37,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     private String judulPertanyaan;
     private String majorityPertanyaan;
     private String deskripsiPertanyaan;
+    private String emailOrang;
     private ArrayList<Bitmap> gambar;
 
     private String orang[]= {"Mr. A", "Mr. B", "Mrs. C", "Will Smith"};
@@ -83,6 +92,8 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
 
         judulPertanyaan= paketDetailPertanyaan.getString("judul_pertanyaan");
         deskripsiPertanyaan= paketDetailPertanyaan.getString("deskripsi_pertanyaan");
+        emailOrang = paketDetailPertanyaan.getString("owner");
+
         gambar= ambilGambarDariServer();
     }
     ArrayList<Bitmap> ambilGambarDariServer(){
@@ -133,6 +144,9 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
         TextView teksJudul= viewPertanyaan.findViewById(R.id.tl_judul);
         TextView teksMajority= viewPertanyaan.findViewById(R.id.tl_majority);
         TextView teksDeskripsi= viewPertanyaan.findViewById(R.id.tl_deskripsi);
+        TextView teksNama = viewPertanyaan.findViewById(R.id.tl_nama_orang);
+        TextView teksStatusOrang = viewPertanyaan.findViewById(R.id.tl_status_orang);
+        initOrang(teksNama, teksStatusOrang);
 
         TextView jmlSuka= viewPertanyaan.findViewById(R.id.tl_orang_angka);
         ImageView tmbSuka= viewPertanyaan.findViewById(R.id.tl_suka_gambar);
@@ -146,6 +160,38 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
         teksJudul.setText(judulPertanyaan);
         teksMajority.setText(majorityPertanyaan);
         teksDeskripsi.setText(deskripsiPertanyaan);
+    }
+
+    private void initOrang(final TextView nama, final TextView status){
+        Utilities.getUserRef(emailOrang).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Pengguna user = dataSnapshot.getValue(Pengguna.class);
+                nama.setText(user.getNama());
+                Language languageID=null;
+                switch (user.getNegara()){
+                    case "Indonesia" : languageID=Language.INDONESIAN; break;
+                    case "United States" : languageID=Language.ENGLISH; break;
+                    case "United Kingdom" : languageID=Language.ENGLISH; break;
+                    case "Japan" : languageID=Language.JAPANESE; break;
+                }
+                com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
+                try {
+                    switch ((int)user.getStatus()){
+                        case 200 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Worker", Language.ENGLISH, languageID)); break;
+                        case 201 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Expert", Language.ENGLISH, languageID)); break;
+                        case 202 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Verified Expert", Language.ENGLISH, languageID)); break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
     private void tambahSuka(){
         //lakukan sesuatu jika orang kamu menyukai postingan itu

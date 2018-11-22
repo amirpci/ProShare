@@ -143,7 +143,9 @@ public class DaftarTanyaActWkr extends Fragment {
                                     Permasalahan masalah = new Permasalahan();
                                     masalah.setproblem_desc(jsonObject.getString("problem_desc"));
                                     masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
                                     masalah.setStatus(jsonObject.getInt("status"));
+                                    masalah.setpid(jsonObject.getString("pid"));
                                     Masalah.add(masalah);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -205,7 +207,7 @@ public class DaftarTanyaActWkr extends Fragment {
 
         public class vH extends RecyclerView.ViewHolder{
             private TextView judul, isi;
-            private ImageView centang;
+            private ImageView centang, foto;
             private View view;
             public vH(View itemView) {
                 super(itemView);
@@ -213,6 +215,7 @@ public class DaftarTanyaActWkr extends Fragment {
                 centang = (ImageView) itemView.findViewById(R.id.daftar_pertanyaan_centang);
                 judul = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_judul);
                 isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);
+                foto = (ImageView)itemView.findViewById(R.id.daftar_pertanyaan_gambar);
             }
             public void bind(final int posisi){
                 if(masalah.get(posisi).getStatus()==PENGGUNA_EXPERT){
@@ -222,12 +225,15 @@ public class DaftarTanyaActWkr extends Fragment {
                 }
                 judul.setText(masalah.get(posisi).getproblem_title());
                 isi.setText(masalah.get(posisi).getproblem_desc());
+                Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
+                Utilities.updateFoto(masalah.get(posisi).getpid(), foto, act);
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Bundle paketDetailPetanyaan= new Bundle();
                         paketDetailPetanyaan.putString("judul_pertanyaan", masalah.get(posisi).getproblem_title());
                         paketDetailPetanyaan.putString("deskripsi_pertanyaan", masalah.get(posisi).getproblem_desc());
+                        paketDetailPetanyaan.putString("owner", masalah.get(posisi).getproblem_owner());
                         Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                         startActivity(inten);

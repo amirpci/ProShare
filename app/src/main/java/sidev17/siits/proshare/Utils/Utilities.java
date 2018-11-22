@@ -6,10 +6,14 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimatedVectorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -24,6 +28,7 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -39,6 +44,10 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.rmtheis.yandtran.language.Language;
 
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -67,32 +76,76 @@ public class Utilities {
                 .getReference(Konstanta.penggunaKey);
     }
 
-    public static void uploadFoto(final int urutanFile, final String[] alamatFile, final String[] urlFile, final String id, final Permasalahan masalah, final Context c, final ProgressDialog uploading){
+    public static void updateFoto(final String id_problem, final ImageView gambar, final Context c){
+        Toast.makeText(c, "behasil load foto", Toast.LENGTH_SHORT).show();
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        JSONArray jsonArr = null;
+                        try {
+                            jsonArr = new JSONArray(response);
+                            for(int i=0; i<1; i++){
+                                try {
+                                    Toast.makeText(c, "behasil load foto", Toast.LENGTH_SHORT).show();
+                                    JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    Glide.with(c).load(jsonObject.getString("url_foto")).into(gambar);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(c, "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("id_problem", id_problem);
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(c).add(stringRequest);
+    }
+
+    public static void uploadFoto(final int urutanFile, final String[] alamatFile, final String[] urlFile, final String id, final Permasalahan masalah, final Activity c, final ProgressDialog uploading){
         uploading.setMessage("uploading..."+" "+String.valueOf(urutanFile+1)+"/"+String.valueOf(alamatFile.length)+" 0%");
         uploading.show();
         Uri file = Uri.fromFile(new File(alamatFile[urutanFile]));
-        StorageReference filepath = getProblemImagesRef(id, urutanFile);
+        final StorageReference filepath = getProblemImagesRef(id, urutanFile);
         filepath.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                 String alamatUrl = taskSnapshot.getMetadata().getReference().getPath();
-                Toast.makeText(c, "tes alamat : "+alamatUrl, Toast.LENGTH_SHORT).show();
-                 int urutanSekarang = urutanFile+1;
-                    String[] url = new String[urutanSekarang];
-                    url[urutanFile]=alamatUrl;
-                 if(urutanFile<alamatFile.length){
-                     for(int i=0; i<urutanFile; i++){
-                         url[i]=urlFile[i];
-                     }
-                     if(urutanFile==alamatFile.length-1){
-                         tambahkanMasalah(c, id, masalah, uploading, 0);
-                         tambahkanFotoMasalah(c, id, url);
-                     }else{
-                         uploadFoto(urutanSekarang, alamatFile, url, id, masalah, c, uploading);
-                     }
-                 }else{
-                     Toast.makeText(c, "Photos succesfully uploaded!", Toast.LENGTH_SHORT).show();
-                 }
+                filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String alamatUrl = uri.toString();
+                        Toast.makeText(c, "tes alamat : "+alamatUrl, Toast.LENGTH_SHORT).show();
+                        int urutanSekarang = urutanFile+1;
+                        String[] url = new String[urutanSekarang];
+                        url[urutanFile]=alamatUrl;
+                        if(urutanFile<alamatFile.length){
+                            for(int i=0; i<urutanFile; i++){
+                                url[i]=urlFile[i];
+                            }
+                            if(urutanFile!=alamatFile.length-1){
+                                uploadFoto(urutanSekarang, alamatFile, url, id, masalah, c, uploading);
+                            }else{
+                                tambahkanMasalah(c, id, masalah, uploading, 0);
+                                tambahkanFotoMasalah(c, id, url);
+                            }
+                        }else{
+                            Toast.makeText(c, "Photos succesfully uploaded!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -139,7 +192,7 @@ public class Utilities {
         }
     }
 
-    public static void tambahkanMasalah(final Context c, final String id_masalah, final Permasalahan problem, final ProgressDialog uploading, final int status_foto){
+    public static void tambahkanMasalah(final Activity c, final String id_masalah, final Permasalahan problem, final ProgressDialog uploading, final int status_foto){
         if(status_foto==1) {
             uploading.setMessage("Adding problem to the server!");
             uploading.show();
@@ -150,6 +203,7 @@ public class Utilities {
                     public void onResponse(String response) {
                         uploading.dismiss();
                         Toast.makeText(c, response, Toast.LENGTH_SHORT).show();
+                        c.finish();
                     }
                 }
                 , new Response.ErrorListener() {
@@ -236,6 +290,16 @@ public class Utilities {
     public static DatabaseReference getSolusiVoteRef(String solusiId){
         return FirebaseDatabase.getInstance()
                 .getReference(Konstanta.voteSolusi+"/"+solusiId);
+    }
+    public static int getIntSharePref(String key, Context c){
+        SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
+        int val = prefs.getInt(key, 0);
+        return val;
+    }
+    public static String getStringSharePref(String key, Context c){
+        SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
+        String val = prefs.getString(key, null);
+        return val;
     }
     //untuk mendapatkan id user/email pengguna
     public static String getUserID(Context c){
@@ -342,4 +406,16 @@ public class Utilities {
         });
     }
 
+    static class URL{
+        private String url;
+        public URL(){
+
+        }
+        public void setUrl(String url){
+            this.url = url;
+        }
+        public String getUrl(){
+            return url;
+        }
+    }
 }

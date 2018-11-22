@@ -46,6 +46,7 @@ import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Login_Register.Login;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.PackBahasa;
 import sidev17.siits.proshare.Utils.Utilities;
 
 import com.rmtheis.yandtran.language.Language;
@@ -63,6 +64,7 @@ public class ProfileActWkr extends Fragment {
     private EditText nama;
     private ImageView editNama;
     private TextView bidang, status, terjawab, rating, penilai;
+    private TextView[] textProfile;
     private String idUser,pp_url;
     private ImageView signout,pp_view, addPhoto;
     private ProgressDialog loading,uploading;
@@ -79,6 +81,11 @@ public class ProfileActWkr extends Fragment {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+        textProfile = new TextView[4];
+        textProfile[0] = v.findViewById(R.id.txt_profile_0);
+        textProfile[1] = v.findViewById(R.id.txt_profile_1);
+        textProfile[2] = v.findViewById(R.id.txt_profile_2);
+        textProfile[3] = v.findViewById(R.id.txt_profile_3);
         //dataRef = FirebaseDatabase.getInstance().getReference("User");
         //storageRef = FirebaseStorage.getInstance().getReference("User");
         uploading = new ProgressDialog(getActivity());
@@ -97,6 +104,7 @@ public class ProfileActWkr extends Fragment {
         profile_photo.setVisibility(View.GONE);
         idUser = FirebaseAuth.getInstance().getUid();
         loadData();
+        gantiBahasa(getActivity());
         addPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,6 +128,11 @@ public class ProfileActWkr extends Fragment {
         return v;
     }
 
+    void gantiBahasa(Context c){
+        for(int i=0;i<textProfile.length;i++){
+            textProfile[i].setText(Utilities.ubahBahasa(PackBahasa.BahasaProfile[i], Utilities.getUserNegara(c), c));
+        }
+    }
     void initEditNama(){
         editNama.setOnClickListener(new View.OnClickListener() {
             @Override

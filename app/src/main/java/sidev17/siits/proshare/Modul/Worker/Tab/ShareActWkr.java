@@ -67,6 +67,7 @@ import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.AlgoritmaKesamaan;
 import sidev17.siits.proshare.Utils.Utilities;
+import java.sql.Timestamp;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -158,7 +159,8 @@ public class ShareActWkr extends Fragment {
         layoutTidakDitemukan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), TambahPertanyaanWkr.class));
+                if(Utilities.isStoragePermissionGranted(getActivity()))
+                   startActivity(new Intent(getActivity(), TambahPertanyaanWkr.class));
             }
         });
     }
@@ -181,6 +183,7 @@ public class ShareActWkr extends Fragment {
                                     Permasalahan masalah = new Permasalahan();
                                     masalah.setproblem_desc(jsonObject.getString("problem_desc"));
                                     masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
                                     masalah.setStatus(jsonObject.getInt("status"));
                                     semuaPermasalahan.add(masalah);
                                 } catch (JSONException e) {
@@ -240,6 +243,7 @@ public class ShareActWkr extends Fragment {
                                     Permasalahan masalah = new Permasalahan();
                                     masalah.setproblem_desc(jsonObject.getString("problem_desc"));
                                     masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
                                     masalah.setStatus(jsonObject.getInt("status"));
                                     Masalah.add(masalah);
                                 } catch (JSONException e) {
@@ -459,6 +463,7 @@ public class ShareActWkr extends Fragment {
                         Bundle paketDetailPetanyaan= new Bundle();
                         paketDetailPetanyaan.putString("judul_pertanyaan", masalah.get(posisi).getproblem_title());
                         paketDetailPetanyaan.putString("deskripsi_pertanyaan", masalah.get(posisi).getproblem_desc());
+                        paketDetailPetanyaan.putString("owner", masalah.get(posisi).getproblem_owner());
                         Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                         startActivity(inten);

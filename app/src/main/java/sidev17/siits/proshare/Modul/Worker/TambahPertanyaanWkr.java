@@ -24,6 +24,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -33,8 +34,20 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonObject;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
+import sidev17.siits.proshare.Konstanta;
+import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.GaleriLoader;
@@ -49,6 +62,8 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
     private EditText teksJudul;
     private Spinner pilihanMajority;
+    private SpinnerAdp adpMajority;
+    private int idBidang=0;
     private EditText teksDeskripsi;
 
     private ImageView tmbCentang;
@@ -123,7 +138,26 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             //==============================================
             //inisialkan Spinner Minggu, 11 Nov 2018, 21:05
             //==============================================
-            initPilihanMajority(DUMY_initArrayListMajority());
+            ArrayList<Bidang> bdg = new ArrayList<>();
+            ArrayList<String> bidang = DUMY_initArrayListMajority();
+            for(int i = 0 ; i<bidang.size(); i++){
+                Bidang bdang = new Bidang();
+                bdang.setBidang(bidang.get(i));
+                bdg.add(bdang);
+            }
+            initPilihanMajority(bdg);
+            loadPilihanMajorityServer();
+            pilihanMajority.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    idBidang = position + 1;
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
         }
         wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
         tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
@@ -361,24 +395,52 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
     ArrayList<String> DUMY_initArrayListMajority(){
         ArrayList<String> majority= new ArrayList<>();
-        majority.add("Batu");
-        majority.add("Beton");
-        majority.add("Teknik Lingkungan");
-        majority.add("Psychiatrist");
-        majority.add("Artist");
+        majority.add("Set majority");
+       // majority.add("Beton");
+        //majority.add("Teknik Lingkungan");
+       // majority.add("Psychiatrist");
+       // majority.add("Artist");
         return majority;
     }
-    void initPilihanMajority(ArrayList<String> majority){
+    void initPilihanMajority(ArrayList<Bidang> majority){
         pilihanMajority= findViewById(R.id.tambah_majority);
-        SpinnerAdp adpMajority= new SpinnerAdp(majority);
+        adpMajority= new SpinnerAdp(majority);
         pilihanMajority.setAdapter(adpMajority);
+    }
+
+    void loadPilihanMajorityServer(){
+        final ArrayList<Bidang> bdg = new ArrayList<>();
+        JsonArrayRequest request = new JsonArrayRequest(Konstanta.DAFTAR_BIDANG, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                bdg.clear();
+                for(int i=0;i<response.length();i++){
+                    try {
+                        JSONObject obj = response.getJSONObject(i);
+                        Bidang bidang = new Bidang();
+                        bidang.setId(obj.getString("id"));
+                        bidang.setBidang(obj.getString("bidang"));
+                        bdg.add(bidang);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                initPilihanMajority(bdg);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        Volley.newRequestQueue(this).add(request);
     }
     class SpinnerAdp extends BaseAdapter{
 
         int jmlElemen;
-        ArrayList<String> elemen;
+        ArrayList<Bidang> elemen;
 
-        SpinnerAdp(ArrayList<String> elemen){
+        SpinnerAdp(ArrayList<Bidang> elemen){
             this.elemen = elemen;
             jmlElemen = elemen.size();
         }
@@ -406,7 +468,8 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             teksElemen.setGravity(Gravity.LEFT);
             teksElemen.setTextColor(Color.parseColor("#000000"));
             teksElemen.setTextSize(19);
-            teksElemen.setText(elemen.get(position));
+            teksElemen.setPadding(15,0,15,0);
+            teksElemen.setText(elemen.get(position).getBidang());
 
             teksElemen.setLayoutParams(lpElemen);
 
@@ -610,7 +673,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     //METHOD DUMMY!
     public void kirimPertanyaan(){
         //simpan pertanyaan.
-        String pathFotoDipilih[]= new String[0];
+        String pathFotoDipilih[]= loader.ambilPathDipilih();
       //  int jmlUdahDiload= loader.ambilJmlUdahDiload();
       //  int batas= loader.ambilJmlDipilih();
         String daftarInd= "";
@@ -630,7 +693,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         problem.setproblem_title(judul);
         problem.setStatus(verified?1:0);
         problem.setpicture_id("");
-        problem.setmajority_id(String.valueOf(Utilities.getUserBidang(this)));
+        problem.setmajority_id(String.valueOf(idBidang));
 //        Toast.makeText(this, String.valueOf(dipilih.length), Toast.LENGTH_SHORT).show();
         for(int i =0 ; i<pathFotoDipilih.length;i++){
             Toast.makeText(this, pathFotoDipilih[i], Toast.LENGTH_SHORT).show();
