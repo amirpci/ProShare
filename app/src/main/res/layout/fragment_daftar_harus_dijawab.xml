@@ -98,6 +98,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:divider="#00000000"/>
+<!--
     <ImageView
         android:id="@+id/daftar_pertanyaan_tambah"
         android:layout_alignParentBottom="true"
@@ -106,4 +107,5 @@
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:src="@drawable/obj_tambah_lingkaran_full"/>
+-->
 </RelativeLayout>

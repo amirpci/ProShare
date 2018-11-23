@@ -49,17 +49,28 @@
                     android:layout_height="match_parent">
                     <RelativeLayout
                         android:id="@+id/jumlah_ditemukan"
-                        android:visibility="gone"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
-                        android:background="@color/colorPrimaryDark">
+                        android:orientation="horizontal">
                         <TextView
                             android:id="@+id/txt_total_ditemukan"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="right"
+                            android:paddingRight="100dp"
+                            android:paddingLeft="50dp"
+                            android:paddingTop="5dp"
                             android:text="23 found"
+                            android:layout_centerVertical="true"
                             android:textColor="@android:color/white"
-                            android:layout_centerInParent="true"/>
+                            android:background="@color/colorPrimaryDark"/>
+                        <Spinner
+                            android:id="@+id/timeline_pilihan_majority"
+                            android:layout_width="180dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/latar_kotak_tumpul_satu_titik"
+                            android:backgroundTint="#ffffff"/>
                     </RelativeLayout>
                     <android.support.v4.widget.SwipeRefreshLayout
                         android:id="@+id/refresh_timeline"
