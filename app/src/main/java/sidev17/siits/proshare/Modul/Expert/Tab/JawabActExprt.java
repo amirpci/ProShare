@@ -53,7 +53,7 @@ public class JawabActExprt extends Fragment {
                 startActivity(inten);
             }
         });
-
+    /*
         tmbTambah = view.findViewById(R.id.daftar_pertanyaan_tambah);
         tmbTambah.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,6 +63,7 @@ public class JawabActExprt extends Fragment {
                 startActivity(inten);
             }
         });
+        */
         return view;
     }
 

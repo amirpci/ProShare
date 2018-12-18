@@ -673,7 +673,9 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     //METHOD DUMMY!
     public void kirimPertanyaan(){
         //simpan pertanyaan.
-        String pathFotoDipilih[]= loader.ambilPathDipilih();
+        String pathFotoDipilih[] = new String[0];
+        if(loader != null)
+            pathFotoDipilih= loader.ambilPathDipilih();
       //  int jmlUdahDiload= loader.ambilJmlUdahDiload();
       //  int batas= loader.ambilJmlDipilih();
         String daftarInd= "";

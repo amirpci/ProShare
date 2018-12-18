@@ -6,7 +6,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.AnimatedVectorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -43,6 +51,7 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.rmtheis.yandtran.language.Language;
+import com.squareup.picasso.Picasso;
 
 
 import org.json.JSONArray;
@@ -50,12 +59,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.lang.annotation.Target;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import sidev17.siits.proshare.Konstanta;
+import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.R;
@@ -76,6 +87,36 @@ public class Utilities {
                 .getReference(Konstanta.penggunaKey);
     }
 
+    public static String[] listBidangkeArray(ArrayList<Bidang> list){
+        String arr[] = new String[list.size()];
+        for(int i =0 ; i<arr.length;i++){
+            arr[i] = list.get(i).getBidang();
+        }
+        return arr;
+    }
+
+    public static Bitmap getRoundedCornerBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectF = new RectF(rect);
+        final float roundPx = 12;
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+
+        return output;
+    }
+
     public static void updateFoto(final String id_problem, final ImageView gambar, final Context c){
         Toast.makeText(c, "behasil load foto", Toast.LENGTH_SHORT).show();
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO,
@@ -89,7 +130,22 @@ public class Utilities {
                                 try {
                                     Toast.makeText(c, "behasil load foto", Toast.LENGTH_SHORT).show();
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
-                                    Glide.with(c).load(jsonObject.getString("url_foto")).into(gambar);
+                                    Picasso.get().load(jsonObject.getString("url_foto")).resize(100,100).into(new com.squareup.picasso.Target() {
+                                        @Override
+                                        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                            gambar.setImageBitmap(getRoundedCornerBitmap(bitmap));
+                                        }
+
+                                        @Override
+                                        public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                                        }
+
+                                        @Override
+                                        public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                        }
+                                    });
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }

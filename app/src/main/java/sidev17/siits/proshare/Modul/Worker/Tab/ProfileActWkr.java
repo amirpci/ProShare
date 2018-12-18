@@ -117,8 +117,8 @@ public class ProfileActWkr extends Fragment {
         signout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Utilities.removeDataLogin(getActivity());
-                //FirebaseAuth.getInstance().signOut();
+              //  Utilities.removeDataLogin(getActivity());
+                FirebaseAuth.getInstance().signOut();
                 Intent intent = new Intent(getActivity(), Login.class);
                 intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_LOGOUT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

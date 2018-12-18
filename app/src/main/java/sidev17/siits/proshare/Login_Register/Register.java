@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -116,9 +117,9 @@ public class Register extends AppCompatActivity {
     public void Register(final String Nama_,final String Email_,final String Negara_,final String Bidang_,final String Pass_, final boolean expert){
         progress.setMessage("Signing Up...");
         progress.show();
-        Pengguna user = new Pengguna();
+        final Pengguna user = new Pengguna();
         user.setNama(Nama_);
-        user.setEmail(Email_.replace(".",","));
+        user.setEmail(Email_.replace(".",",").toLowerCase());
         user.setPassword(Pass_);
         user.setNegara(Negara_);
         user.setBidang(Bidang_);
@@ -127,52 +128,33 @@ public class Register extends AppCompatActivity {
         }else{
             user.setStatus(200);
         }
-        Utilities.getUserRef(user.getEmail()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                Toast.makeText(getApplicationContext(), "Sign up successful!", Toast.LENGTH_SHORT).show();
-                progress.dismiss();
-                Intent intent = new Intent(Register.this, Login.class);
-                intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_REGISTER);
-                startActivity(intent);
-                finish();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(), "Sign up failed!", Toast.LENGTH_SHORT).show();
-                progress.dismiss();
-            }
-        });
-
-            /*
-        authUser.createUserWithEmailAndPassword(Email_, Pass_).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+        authUser.createUserWithEmailAndPassword(Email_, Pass_).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    AlertDialog.Builder builder_ = new AlertDialog.Builder(Register.this);
-                    String id_user = authUser.getCurrentUser().getUid();
-                    DatabaseReference idRef =  db.child(id_user);
-                    idRef.child("Nama").setValue(Nama_);
-                    idRef.child("Email").setValue(Email_);
-                    idRef.child("Negara").setValue(Negara_);
-                    idRef.child("Specialization").setValue(Bidang_);
-                    if(expert){
-                        idRef.child("Type").setValue("Expert");
-                    }else{
-                        idRef.child("Type").setValue("Worker");
-                    }
-                    idRef.child("Score").child("Answered").setValue(0);
-                    idRef.child("Score").child("Rater").setValue(0);
-                    idRef.child("Score").child("Rating").setValue(0);
-                    idRef.child("Photo").setValue("-");
-                    progress.dismiss();
-                }else {
-                    progress.dismiss();
-                    Toast.makeText(Register.this, "Register failed!", Toast.LENGTH_LONG).show();
+                    Utilities.getUserRef(user.getEmail()).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            Toast.makeText(getApplicationContext(), "Sign up successful!", Toast.LENGTH_SHORT).show();
+                            progress.dismiss();
+                            Intent intent = new Intent(Register.this, Login.class);
+                            intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_REGISTER);
+                            startActivity(intent);
+                            finish();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(getApplicationContext(), "Sign up failed!", Toast.LENGTH_SHORT).show();
+                            progress.dismiss();
+                        }
+                    });
+                }else{
+                    Toast.makeText(Register.this, "Sign up failed!", Toast.LENGTH_SHORT).show();
                 }
             }
-        });*/
+        });
+
 
     }
 

@@ -21,11 +21,23 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Login_Register.Register;
+import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Benar;
 import sidev17.siits.proshare.Utils.Utilities;
@@ -73,13 +85,16 @@ public class Register1 extends Fragment {
         Next = (Button)v.findViewById(R.id.next_reg);
         Nama = (EditText)v.findViewById(R.id.nama_reg);
         Email = (EditText)v.findViewById(R.id.email_reg);
-        PilihanBidang = (Spinner)v.findViewById(R.id.specialization_option);
+      //  PilihanBidang = (Spinner)v.findViewById(R.id.specialization_option);
         PilihanNegara = (Spinner)v.findViewById(R.id.pil_negara);
         PasswordStrong = (ImageView)v.findViewById(R.id.passStrong);
-        ArrayAdapter<String> spPilihanBidang = new ArrayAdapter<String>(getActivity(),
-                R.layout.spinner_item,registerRef1.specialization);
-        spPilihanBidang.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        PilihanBidang.setAdapter(spPilihanBidang);
+      //  ArrayAdapter<String> spPilihanBidang = new ArrayAdapter<String>(getActivity(),
+       //         R.layout.spinner_item,registerRef1.specialization);
+       // spPilihanBidang.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+      //  PilihanBidang.setAdapter(spPilihanBidang);
+        ArrayList<Bidang> lsBdg = new ArrayList<>();
+        initPilihanMajority(lsBdg, v);
+        loadPilihanMajorityServer(v);
         ArrayAdapter<String> spPilihanNegara = new ArrayAdapter<String>(getActivity(),
                 R.layout.spinner_item,registerRef1.negara);
         spPilihanNegara.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -189,6 +204,42 @@ public class Register1 extends Fragment {
     }
     */
 
+    void initPilihanMajority(ArrayList<Bidang> majority, View v){
+        PilihanBidang = (Spinner)v.findViewById(R.id.specialization_option);
+        ArrayAdapter<String> spPilihanBidang = new ArrayAdapter<String>(getActivity(),
+                R.layout.spinner_item, Utilities.listBidangkeArray(majority));
+        spPilihanBidang.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        PilihanBidang.setAdapter(spPilihanBidang);
+    }
+
+    void loadPilihanMajorityServer(final View v){
+        final ArrayList<sidev17.siits.proshare.Model.Bidang> bdg = new ArrayList<>();
+        JsonArrayRequest request = new JsonArrayRequest(Konstanta.DAFTAR_BIDANG, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                bdg.clear();
+                for(int i=0;i<response.length();i++){
+                    try {
+                        JSONObject obj = response.getJSONObject(i);
+                        Bidang bidang = new Bidang();
+                        bidang.setId(obj.getString("id"));
+                        bidang.setBidang(obj.getString("bidang"));
+                        bdg.add(bidang);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                initPilihanMajority(bdg, v);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        Volley.newRequestQueue(getActivity()).add(request);
+    }
+
     public boolean next(){
         boolean returnVal=false;
         if(cekKosong()){
@@ -275,7 +326,7 @@ public class Register1 extends Fragment {
             }
         }
 
-        if(isEmail==1 && (mail_char.length-position-1)>4 && mail_char[position+1]!='.'){
+        if(isEmail==1 && (mail_char.length-position-1)>4 && mail_char[position+1]!='.' && mail_char[mail_char.length-1]!='.'){
             int pointChar=0;
             int[] titikPosisi = new int[mail_char.length-position-1];
             for(int i=position+1; i<mail_char.length;i++){

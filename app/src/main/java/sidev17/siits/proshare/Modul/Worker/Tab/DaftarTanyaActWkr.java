@@ -34,6 +34,8 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.eyalbira.loadingdots.LoadingDots;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,6 +74,7 @@ public class DaftarTanyaActWkr extends Fragment {
     private SwipeRefreshLayout refreshLayout;
     RecyclerView.Adapter adapter;
     private LoadingDots loadingPertanyaan;
+    private FirebaseUser user;
 
     private String Judul[]= {"What should I do whe this happen?", "How to gain inspiration?", "How to else?"};
     private String deskripsi[]= {"I do this everyday, but somehow...", "When it happens, I don't know what to do. I need inspiration.", "bla bla bla..."};
@@ -86,6 +89,7 @@ public class DaftarTanyaActWkr extends Fragment {
         loadingPertanyaan = (LoadingDots)view.findViewById(R.id.loading_pertanyaan);
         daftarTanya= view.findViewById(R.id.daftar_pertanyaan_wadah);
         refreshLayout = view.findViewById(R.id.refresh_pertanyaan);
+        user = FirebaseAuth.getInstance().getCurrentUser();
         loadDaftarPertanyaan();
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.abuTua), getResources().getColor(R.color.abuLebihTua),
                 getResources().getColor(R.color.abuSangatTua));
@@ -168,7 +172,7 @@ public class DaftarTanyaActWkr extends Fragment {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> masalah = new HashMap<>();
-                masalah.put("problem_owner", Utilities.getUserID(getActivity()).replace(",","."));
+                masalah.put("problem_owner", user.getEmail().replace(",","."));
                 return masalah;
             }
         };
