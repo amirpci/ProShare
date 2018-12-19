@@ -246,44 +246,4 @@ public class DaftarTanyaActWkr extends Fragment {
             }
         }
     }
-   /* private class AdapterDaftarPertanyaan extends BaseAdapter {
-
-        AdapterDaftarPertanyaan(){
-        }
-
-        @Override
-        public int getCount() {
-            return judul.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return judul[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view= getLayoutInflater().inflate(R.layout.model_daftar_pertanyaan, parent, false);
-
-            TextView teksJudul= view.findViewById( R.id.daftar_pertanyaan_judul);
-            TextView teksDesc= view.findViewById(R.id.daftar_pertanyaan_deskripsi);
-            ImageView centang= view.findViewById(R.id.daftar_pertanyaan_centang);
-
-            teksJudul.setText(judul[position]);
-            teksDesc.setText(deskripsi[position]);
-
-            if(kategoriSoal[position]== PENGGUNA_EXPERT)
-                centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
-            else if(kategoriSoal[position]== PENGGUNA_EXPERT_TERVERIFIKASI)
-                centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
-
-            return view;
-        }
-    }
-*/
 }

@@ -378,6 +378,12 @@ public class Utilities {
         long bidang = prefs.getLong("bidang", 0);
         return  bidang;
     }
+    //untuk majority/bidang pengguna
+    public static String getUserMajor(Context c){
+        SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
+        String major = prefs.getString("major", null);
+        return  major;
+    }
     //untuk mendapatkan status negara pengguna
     public static String getUserNegara(Context c){
         SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);

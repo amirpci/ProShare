@@ -257,6 +257,7 @@ public class ShareActWkr extends Fragment {
                                         masalah.setproblem_title(jsonObject.getString("problem_title"));
                                         masalah.setproblem_owner(jsonObject.getString("problem_owner"));
                                         masalah.setStatus(jsonObject.getInt("status"));
+                                        masalah.setpid(jsonObject.getString("pid"));
                                         semuaPermasalahan.add(masalah);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
@@ -302,6 +303,7 @@ public class ShareActWkr extends Fragment {
                                         masalah.setproblem_title(jsonObject.getString("problem_title"));
                                         masalah.setproblem_owner(jsonObject.getString("problem_owner"));
                                         masalah.setStatus(jsonObject.getInt("status"));
+                                        masalah.setpid(jsonObject.getString("pid"));
                                         semuaPermasalahan.add(masalah);
                                     } catch (JSONException e) {
                                         e.printStackTrace();

@@ -1,111 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/refresh_pertanyaan"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<!--
-    <ScrollView
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorAccent">
-        <LinearLayout
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/daftar_pertanyaan_wadah_expert"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="#00000000"/>
+        <com.eyalbira.loadingdots.LoadingDots
+            android:visibility="gone"
+            android:id="@+id/loading_pertanyaan"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-            <TextView
-                android:gravity="center"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#000000"
-                android:text="Halaman Jawab"
-                android:textColor="#FFFFFF"
-                android:textSize="50sp"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="7dp"
-                android:layout_marginTop="10dp"
-                android:layout_marginLeft="15dp"
-                android:background="@drawable/shape_rounded_rectangle"
-                android:text="What should be answered?"
-                android:textColor="@color/hitam"
-                android:textSize="22sp"/>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:layout_marginTop="15dp"
-                android:background="@color/abu">
+            android:layout_centerInParent="true"
+            app:LoadingDots_dots_color="@color/abu"
+            app:LoadingDots_dots_size="18dp"
+            app:LoadingDots_dots_space="1dp"/>
+    </RelativeLayout>
 
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/obj_gambar"
-                    android:layout_margin="40dp"
-                    android:tint="@color/colorAccent"/>
-            </RelativeLayout>
-            <LinearLayout
-                android:layout_marginTop="5dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@color/abu">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="New question............"
-                    android:textColor="@color/hitam"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginTop="10dp"
-                    android:textSize="22sp"/>
-
-                <RelativeLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:paddingBottom="10dp">
-
-                    <ImageView
-                        android:id="@+id/tanya_orang"
-                        android:layout_width="20dp"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="10dp"
-                        android:src="@drawable/tab_orang" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerVertical="true"
-                        android:layout_marginLeft="5dp"
-                        android:layout_toRightOf="@id/tanya_orang"
-                        android:text="123"
-                        android:textSize="12sp" />
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_centerVertical="true"
-                        android:layout_marginRight="20dp"
-                        android:src="@drawable/obj_tambah_lingkaran"
-                        android:tint="@color/blue" />
-                </RelativeLayout>
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
-   -->
-    <ListView
-        android:id="@+id/daftar_pertanyaan_wadah"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:divider="#00000000"/>
-<!--
-    <ImageView
-        android:id="@+id/daftar_pertanyaan_tambah"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="30dp"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/obj_tambah_lingkaran_full"/>
--->
-</RelativeLayout>
+</android.support.v4.widget.SwipeRefreshLayout>

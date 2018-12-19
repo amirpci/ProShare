@@ -113,6 +113,7 @@ public class Login extends AppCompatActivity {
                                     SharedPreferences.Editor editor = getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE).edit();
                                     editor.putString("user", user.getEmail());
                                     editor.putLong("bidang", user.getStatus());
+                                    editor.putString("major", user.getBidang());
                                     editor.putString("lang", user.getNegara());
                                     editor.apply();
                                     Toast.makeText(Login.this, String.valueOf((int)Utilities.getUserBidang(getApplicationContext())), Toast.LENGTH_SHORT).show();
