@@ -158,11 +158,6 @@ public class Register extends AppCompatActivity {
 
     }
 
-    public void buatAkun(){
-
-    }
-
-
     public Boolean cekEmail(char[] mail_char){
         int isEmail=0;
         Boolean isEmailBisa=false;

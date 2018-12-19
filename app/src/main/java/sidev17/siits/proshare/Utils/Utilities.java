@@ -118,7 +118,7 @@ public class Utilities {
     }
 
     public static void updateFoto(final String id_problem, final ImageView gambar, final Context c){
-        Toast.makeText(c, "behasil load foto", Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(c, "behasil load foto", Toast.LENGTH_SHORT).show();
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO,
                 new Response.Listener<String>() {
                     @Override
@@ -128,7 +128,7 @@ public class Utilities {
                             jsonArr = new JSONArray(response);
                             for(int i=0; i<1; i++){
                                 try {
-                                    Toast.makeText(c, "behasil load foto", Toast.LENGTH_SHORT).show();
+                                   // Toast.makeText(c, "behasil load foto", Toast.LENGTH_SHORT).show();
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
                                     Picasso.get().load(jsonObject.getString("url_foto")).resize(100,100).into(new com.squareup.picasso.Target() {
                                         @Override

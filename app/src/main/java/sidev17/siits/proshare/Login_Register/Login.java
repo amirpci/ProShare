@@ -53,9 +53,9 @@ public class Login extends AppCompatActivity {
         Reset = (TextView)findViewById(R.id.btn_forgot_password);
         Register=(TextView) findViewById(R.id.register_login);
         auth = FirebaseAuth.getInstance();
-        if(getIntent().getIntExtra(Konstanta.LOGIN_INTENT, 0)!=Konstanta.LOGIN_LOGOUT && getIntent().getIntExtra(Konstanta.LOGIN_INTENT, 0)!=Konstanta.LOGIN_REGISTER){
-            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-        }
+       // if(getIntent().getIntExtra(Konstanta.LOGIN_INTENT, 0)!=Konstanta.LOGIN_LOGOUT && getIntent().getIntExtra(Konstanta.LOGIN_INTENT, 0)!=Konstanta.LOGIN_REGISTER){
+        //    FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+      //  }
 
         Register.setOnClickListener(new View.OnClickListener() {
             @Override

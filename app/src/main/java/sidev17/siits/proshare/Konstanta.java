@@ -22,6 +22,7 @@ public class Konstanta {
     public static final String PERTANYAAN_SAYA_URL = ROOT_URL+"DaftarDitanyakan.php";
     public static final String DAFTAR_BIDANG = ROOT_URL + "DaftarBidang.php";
     public static final String DAFTAR_FOTO = ROOT_URL + "DaftarFoto.php";
+    public static final String CARI_BIDANG = ROOT_URL + "CariBidang.php";
     public static final String TIMELINE_URL = ROOT_URL+"Timeline.php";
     public static final String SEARCH_URL = ROOT_URL+"SearchProblem.php";
     public static final String LOGIN_INTENT = "login_intent";

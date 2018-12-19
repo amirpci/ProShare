@@ -46,6 +46,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import sidev17.siits.proshare.Adapter.SpinnerAdp;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Permasalahan;
@@ -404,7 +405,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     }
     void initPilihanMajority(ArrayList<Bidang> majority){
         pilihanMajority= findViewById(R.id.tambah_majority);
-        adpMajority= new SpinnerAdp(majority);
+        adpMajority= new SpinnerAdp(majority, getBaseContext());
         pilihanMajority.setAdapter(adpMajority);
     }
 
@@ -434,47 +435,6 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             }
         });
         Volley.newRequestQueue(this).add(request);
-    }
-    class SpinnerAdp extends BaseAdapter{
-
-        int jmlElemen;
-        ArrayList<Bidang> elemen;
-
-        SpinnerAdp(ArrayList<Bidang> elemen){
-            this.elemen = elemen;
-            jmlElemen = elemen.size();
-        }
-
-        @Override
-        public int getCount() {
-            return jmlElemen;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return elemen.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewGroup.LayoutParams lpElemen= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Ukuran.DpKePx(30, getResources().getDisplayMetrics()));
-
-            TextView teksElemen= new TextView(getBaseContext());
-            teksElemen.setGravity(Gravity.LEFT);
-            teksElemen.setTextColor(Color.parseColor("#000000"));
-            teksElemen.setTextSize(19);
-            teksElemen.setPadding(15,0,15,0);
-            teksElemen.setText(elemen.get(position).getBidang());
-
-            teksElemen.setLayoutParams(lpElemen);
-
-            return teksElemen;
-        }
     }
 
     void initTeksJudul(){
@@ -679,6 +639,9 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
       //  int jmlUdahDiload= loader.ambilJmlUdahDiload();
       //  int batas= loader.ambilJmlDipilih();
         String daftarInd= "";
+        for(int i=0;i<pathFotoDipilih.length;i++){
+            Toast.makeText(this, pathFotoDipilih[i], Toast.LENGTH_SHORT).show();
+        }
        // int dipilih[]= loader.ambilSemuaUrutanDipilih();
        // for(int i= 0; i< batas; i++)
        ////     daftarInd+= Integer.toString(dipilih[i]) +", ";
@@ -696,7 +659,6 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         problem.setStatus(verified?1:0);
         problem.setpicture_id("");
         problem.setmajority_id(String.valueOf(idBidang));
-//        Toast.makeText(this, String.valueOf(dipilih.length), Toast.LENGTH_SHORT).show();
         for(int i =0 ; i<pathFotoDipilih.length;i++){
             Toast.makeText(this, pathFotoDipilih[i], Toast.LENGTH_SHORT).show();
         }
@@ -707,9 +669,6 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
         }else{
             Utilities.tambahkanMasalah(this, PId, problem, uploading, 1);
         }
-        //for(int i=0;i<pathFotoDipilih.length;i++){
-
-       // }
     }
 
     class AdapterPropertiCell extends BaseAdapter{

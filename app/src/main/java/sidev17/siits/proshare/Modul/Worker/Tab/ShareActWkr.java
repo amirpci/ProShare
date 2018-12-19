@@ -22,12 +22,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,6 +37,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
@@ -60,7 +63,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sidev17.siits.proshare.Adapter.SpinnerAdp;
 import sidev17.siits.proshare.Konstanta;
+import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
@@ -100,6 +105,11 @@ public class ShareActWkr extends Fragment {
     private int QuestionID=0;
     private Uri uriPhoto;
     private String Photo_url;
+
+    private Spinner pilihanMajority;
+    private int idBidang = 0;
+    private SpinnerAdp adpMajority;
+    private boolean useMajority = false;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -140,9 +150,69 @@ public class ShareActWkr extends Fragment {
                 return false;
             }
         });
+        ArrayList<Bidang> bdg = new ArrayList<>();
+        initPilihanMajority(bdg, v);
+        loadPilihanMajorityServer(v);
+        pilihanMajority.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                idBidang = position + 1;
+                if(position == 0){
+                    useMajority = false;
+                }else{
+                    useMajority = true;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
         loadDaftarPertanyaan();
         return v;
     }
+
+    void initPilihanMajority(ArrayList<Bidang> majority, View v){
+
+        pilihanMajority= v.findViewById(R.id.timeline_pilihan_majority);
+        adpMajority= new SpinnerAdp(majority, getContext());
+        pilihanMajority.setAdapter(adpMajority);
+    }
+
+    void loadPilihanMajorityServer(final View v){
+        final ArrayList<Bidang> bdg = new ArrayList<>();
+        JsonArrayRequest request = new JsonArrayRequest(Konstanta.DAFTAR_BIDANG, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                bdg.clear();
+                for(int i=0;i<response.length();i++){
+                    try {
+                        JSONObject obj = response.getJSONObject(i);
+                        Bidang bidang = new Bidang();
+                        bidang.setId(obj.getString("id"));
+                        bidang.setBidang(obj.getString("bidang"));
+                        bdg.add(bidang);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Bidang all = new Bidang();
+                all.setId(String.valueOf(0));
+                all.setBidang("All");
+                bdg.set(0, all);
+                initPilihanMajority(bdg, v);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        Volley.newRequestQueue(getActivity()).add(request);
+    }
+
     private void bersihkanList(){
         Masalah.clear();
         adapter.notifyDataSetChanged();
@@ -169,50 +239,105 @@ public class ShareActWkr extends Fragment {
         bersihkanList();
         layoutTidakDitemukan.setVisibility(View.GONE);
         loadingDitemukan.setVisibility(View.VISIBLE);
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SEARCH_URL,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            ArrayList<Permasalahan> semuaPermasalahan = new ArrayList<>();
-                            JSONArray jsonArr = new JSONArray(response);
-                            Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
-                            for(int i=0; i<jsonArr.length(); i++){
-                                try {
-                                    JSONObject jsonObject = jsonArr.getJSONObject(i);
-                                    Permasalahan masalah = new Permasalahan();
-                                    masalah.setproblem_desc(jsonObject.getString("problem_desc"));
-                                    masalah.setproblem_title(jsonObject.getString("problem_title"));
-                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
-                                    masalah.setStatus(jsonObject.getInt("status"));
-                                    semuaPermasalahan.add(masalah);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                    loadingDitemukan.setVisibility(View.GONE);
+
+        if(!useMajority){
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SEARCH_URL,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                ArrayList<Permasalahan> semuaPermasalahan = new ArrayList<>();
+                                JSONArray jsonArr = new JSONArray(response);
+                                Toast.makeText(getActivity(), "Berhasil loading! dengan panjang "+String.valueOf(jsonArr.length()), Toast.LENGTH_SHORT).show();
+                                for(int i=0; i<jsonArr.length(); i++){
+                                    try {
+                                        JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                        Permasalahan masalah = new Permasalahan();
+                                        masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                        masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                        masalah.setproblem_owner(jsonObject.getString("problem_owner"));
+                                        masalah.setStatus(jsonObject.getInt("status"));
+                                        semuaPermasalahan.add(masalah);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        loadingDitemukan.setVisibility(View.GONE);
+                                    }
                                 }
+                                AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(semuaPermasalahan, cari);
+                                Masalah.addAll(algoSama.listKetemu());
+                                adapter.notifyDataSetChanged();
+                                if(Masalah.size()==0){
+                                    initTambahPertanyaan();
+                                }else {
+                                    tetapkanJumlahKetemu(Masalah.size());
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-                            AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(semuaPermasalahan, cari);
-                            Masalah.addAll(algoSama.listKetemu());
-                            adapter.notifyDataSetChanged();
-                            if(Masalah.size()==0){
-                                initTambahPertanyaan();
-                            }else {
-                                tetapkanJumlahKetemu(Masalah.size());
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+                            loadingDitemukan.setVisibility(View.GONE);
                         }
-                        loadingDitemukan.setVisibility(View.GONE);
                     }
+                    , new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    loadingDitemukan.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
                 }
-                , new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                loadingDitemukan.setVisibility(View.GONE);
-                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
-            }
-        });
-        Volley.newRequestQueue(getActivity()).add(stringRequest);
+            });
+            Volley.newRequestQueue(getActivity()).add(stringRequest);
+        }else{
+            StringRequest stringRequestBidang = new StringRequest(Request.Method.POST, Konstanta.CARI_BIDANG,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                ArrayList<Permasalahan> semuaPermasalahan = new ArrayList<>();
+                                JSONArray jsonArr = new JSONArray(response);
+                                Toast.makeText(getActivity(), "Berhasil loading! dengan panjang "+String.valueOf(jsonArr.length())+" bidang "+String.valueOf(idBidang), Toast.LENGTH_SHORT).show();
+                                for(int i=0; i<jsonArr.length(); i++){
+                                    try {
+                                        JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                        Permasalahan masalah = new Permasalahan();
+                                        masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                        masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                        masalah.setproblem_owner(jsonObject.getString("problem_owner"));
+                                        masalah.setStatus(jsonObject.getInt("status"));
+                                        semuaPermasalahan.add(masalah);
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                        loadingDitemukan.setVisibility(View.GONE);
+                                    }
+                                }
+                                AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(semuaPermasalahan, cari);
+                                Masalah.addAll(algoSama.listKetemu());
+                                adapter.notifyDataSetChanged();
+                                if(Masalah.size()==0){
+                                    initTambahPertanyaan();
+                                }else {
+                                    tetapkanJumlahKetemu(Masalah.size());
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            loadingDitemukan.setVisibility(View.GONE);
+                        }
+                    }
+                    , new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    loadingDitemukan.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> cari = new HashMap<>();
+                    cari.put("majority", String.valueOf(idBidang));
+                    return cari;
+                }
+            };
+            Volley.newRequestQueue(getActivity()).add(stringRequestBidang);
+        }
     }
     void loadDaftarPertanyaan(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());

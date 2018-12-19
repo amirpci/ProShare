@@ -140,7 +140,7 @@ public class DaftarTanyaActWkr extends Fragment {
                         try {
                             Masalah.clear();
                             JSONArray jsonArr = new JSONArray(response);
-                            Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                          //  Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
                             for(int i=0; i<jsonArr.length(); i++){
                                 try {
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
