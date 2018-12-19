@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Login_Register.Register;
 import sidev17.siits.proshare.Model.Bidang;
+import sidev17.siits.proshare.Model.Country;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Benar;
 import sidev17.siits.proshare.Utils.Utilities;
@@ -86,19 +87,20 @@ public class Register1 extends Fragment {
         Nama = (EditText)v.findViewById(R.id.nama_reg);
         Email = (EditText)v.findViewById(R.id.email_reg);
       //  PilihanBidang = (Spinner)v.findViewById(R.id.specialization_option);
-        PilihanNegara = (Spinner)v.findViewById(R.id.pil_negara);
+       // PilihanNegara = (Spinner)v.findViewById(R.id.pil_negara);
         PasswordStrong = (ImageView)v.findViewById(R.id.passStrong);
       //  ArrayAdapter<String> spPilihanBidang = new ArrayAdapter<String>(getActivity(),
        //         R.layout.spinner_item,registerRef1.specialization);
        // spPilihanBidang.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
       //  PilihanBidang.setAdapter(spPilihanBidang);
+
+        ArrayList<Country> lsCtry = new ArrayList<>();
+        initPilihanNegara(lsCtry, v);
+        loadPilihanNegaraServer(v);
+
         ArrayList<Bidang> lsBdg = new ArrayList<>();
         initPilihanMajority(lsBdg, v);
         loadPilihanMajorityServer(v);
-        ArrayAdapter<String> spPilihanNegara = new ArrayAdapter<String>(getActivity(),
-                R.layout.spinner_item,registerRef1.negara);
-        spPilihanNegara.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        PilihanNegara.setAdapter(spPilihanNegara);
 
         registerRef1.halamanPertama=true;
         //set untuk inisiasi savedState
@@ -149,8 +151,8 @@ public class Register1 extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                  if(position!=0) {
-                     Negara = registerRef1.negara[position];
                      negara_ = position;
+                     Negara = String.valueOf(position+1);
                  }
                  registerRef1.contHeight = pDataContainer.getHeight();
             }
@@ -165,8 +167,8 @@ public class Register1 extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if(position!=0) {
-                    Bidang = registerRef1.specialization[position];
                     bidang_ = position;
+                    Bidang = String.valueOf(position+1);
                 }
                 registerRef1.contHeight = pDataContainer.getHeight();
             }
@@ -230,6 +232,42 @@ public class Register1 extends Fragment {
                     }
                 }
                 initPilihanMajority(bdg, v);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        Volley.newRequestQueue(getActivity()).add(request);
+    }
+
+    void initPilihanNegara(ArrayList<Country> country, View v){
+        PilihanNegara = (Spinner)v.findViewById(R.id.pil_negara);
+        ArrayAdapter<String> spPilihanNegara = new ArrayAdapter<String>(getActivity(),
+                R.layout.spinner_item, Utilities.listNegarakeArray(country));
+        spPilihanNegara.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        PilihanNegara.setAdapter(spPilihanNegara);
+    }
+
+    void loadPilihanNegaraServer(final View v){
+        final ArrayList<Country> ctry = new ArrayList<>();
+        JsonArrayRequest request = new JsonArrayRequest(Konstanta.DAFTAR_NEGARA, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                ctry.clear();
+                for(int i=0;i<response.length();i++){
+                    try {
+                        JSONObject obj = response.getJSONObject(i);
+                        Country country = new Country();
+                        country.setId(obj.getString("id"));
+                        country.setNegara(obj.getString("negara"));
+                        ctry.add(country);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                initPilihanNegara(ctry, v);
             }
         }, new Response.ErrorListener() {
             @Override

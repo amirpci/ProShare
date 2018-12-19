@@ -67,6 +67,7 @@ import java.util.Map;
 
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Bidang;
+import sidev17.siits.proshare.Model.Country;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.R;
@@ -91,6 +92,14 @@ public class Utilities {
         String arr[] = new String[list.size()];
         for(int i =0 ; i<arr.length;i++){
             arr[i] = list.get(i).getBidang();
+        }
+        return arr;
+    }
+
+    public static String[] listNegarakeArray(ArrayList<Country> list){
+        String arr[] = new String[list.size()];
+        for(int i =0 ; i<arr.length;i++){
+            arr[i] = list.get(i).getNegara();
         }
         return arr;
     }
@@ -288,10 +297,10 @@ public class Utilities {
     public static  String ubahBahasa(String kata,String langID, Context c){
         Language languageID=null;
         switch (langID){
-            case "Indonesia" : languageID=Language.INDONESIAN; break;
-            case "United States" : languageID=Language.ENGLISH; break;
-            case "United Kingdom" : languageID=Language.ENGLISH; break;
-            case "Japan" : languageID=Language.JAPANESE; break;
+            case "2" : languageID=Language.INDONESIAN; break;
+            case "3" : languageID=Language.ENGLISH; break;
+            case "4" : languageID=Language.ENGLISH; break;
+            case "5" : languageID=Language.JAPANESE; break;
         }
         com.rmtheis.yandtran.translate.Translate.setKey(c.getString(R.string.yandex_api_key));
         try {

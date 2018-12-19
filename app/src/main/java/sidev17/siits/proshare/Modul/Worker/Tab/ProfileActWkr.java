@@ -27,6 +27,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -40,6 +46,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import sidev17.siits.proshare.Konstanta;
@@ -50,6 +57,10 @@ import sidev17.siits.proshare.Utils.PackBahasa;
 import sidev17.siits.proshare.Utils.Utilities;
 
 import com.rmtheis.yandtran.language.Language;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.INPUT_METHOD_SERVICE;
@@ -131,6 +142,7 @@ public class ProfileActWkr extends Fragment {
     void gantiBahasa(Context c){
         for(int i=0;i<textProfile.length;i++){
             textProfile[i].setText(Utilities.ubahBahasa(PackBahasa.BahasaProfile[i], Utilities.getUserNegara(c), c));
+            Toast.makeText(c, "test" + String.valueOf(i), Toast.LENGTH_SHORT).show();
         }
     }
     void initEditNama(){
@@ -233,14 +245,14 @@ public class ProfileActWkr extends Fragment {
                     String langID = user.getNegara();
                     Language languageID=null;
                     switch (langID){
-                        case "Indonesia" : languageID=Language.INDONESIAN; break;
-                        case "United States" : languageID=Language.ENGLISH; break;
-                        case "United Kingdom" : languageID=Language.ENGLISH; break;
-                        case "Japan" : languageID=Language.JAPANESE; break;
+                        case "2" : languageID=Language.INDONESIAN; break;
+                        case "3" : languageID=Language.ENGLISH; break;
+                        case "4" : languageID=Language.ENGLISH; break;
+                        case "5" : languageID=Language.JAPANESE; break;
                     }
                     com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
                     try {
-                        bidang.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang_, Language.ENGLISH, languageID));
+                        loadBidang(bidang, bidang_, languageID);
                         switch ((int)status_){
                             case 200 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Worker", Language.ENGLISH, languageID)); break;
                             case 201 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Expert", Language.ENGLISH, languageID)); break;
@@ -256,7 +268,7 @@ public class ProfileActWkr extends Fragment {
                         addPhoto.setVisibility(View.GONE);
                         profile_photo.setVisibility(View.VISIBLE);
                     }
-
+                    Toast.makeText(getActivity(), "coba", Toast.LENGTH_SHORT).show();
                     loading.dismiss();
                 }
 
@@ -288,6 +300,41 @@ public class ProfileActWkr extends Fragment {
             }
         }); */
     }
+
+    private void loadBidang(final TextView major, final String bidang_, final Language languageID) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.BIDANGKU,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArr = new JSONArray(response);
+                            String bidang = jsonArr.getJSONObject(0).getString("bidang");
+                            try {
+                                major.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang, Language.ENGLISH, languageID));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("majority_id", bidang_);
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(getActivity()).add(stringRequest);
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode==ambilPhoto && resultCode==RESULT_OK){
