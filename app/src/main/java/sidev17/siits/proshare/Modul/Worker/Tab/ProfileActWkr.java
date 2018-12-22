@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -17,13 +18,17 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.method.KeyListener;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,10 +44,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -50,17 +52,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import sidev17.siits.proshare.Konstanta;
-import sidev17.siits.proshare.Login_Register.Login;
 import sidev17.siits.proshare.Model.Pengguna;
+import sidev17.siits.proshare.Model.View.ImgViewTouch;
+import sidev17.siits.proshare.Model.View.MenuBarView;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Modul.SettingAct;
+import sidev17.siits.proshare.Utils.ArrayModification;
 import sidev17.siits.proshare.Utils.PackBahasa;
 import sidev17.siits.proshare.Utils.Utilities;
+import sidev17.siits.proshare.Utils.Warna;
 
 import com.rmtheis.yandtran.language.Language;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.INPUT_METHOD_SERVICE;
@@ -74,7 +79,7 @@ public class ProfileActWkr extends Fragment {
    // private StorageReference storageRef;
     private EditText nama;
     private ImageView editNama;
-    private TextView bidang, status, terjawab, rating, penilai;
+    private TextView status, terjawab, rating, penilai;
     private TextView[] textProfile;
     private String idUser,pp_url;
     private ImageView signout,pp_view, addPhoto;
@@ -82,6 +87,17 @@ public class ProfileActWkr extends Fragment {
     private de.hdodenhof.circleimageview.CircleImageView profile_photo;
     private static final int ambilPhoto=2;
     private Uri alamatPhoto;
+
+    private MenuBarView menuBar;
+
+    private Drawable bgAwalSpinner;
+    private Spinner bidang;
+    private String bidangUser;
+
+    private ListView daftarSkill;
+    private String skill[];
+    private int tingkatRekom[];
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -101,16 +117,18 @@ public class ProfileActWkr extends Fragment {
         //storageRef = FirebaseStorage.getInstance().getReference("User");
         uploading = new ProgressDialog(getActivity());
         nama = (EditText) v.findViewById(R.id.nama_profile);
-        editNama= v.findViewById(R.id.edit);
+        editNama= v.findViewById(R.id.prfile_edit_nama);
         initEditNama();
-        bidang = (TextView)v.findViewById(R.id.bidang_profile);
+        bidang = v.findViewById(R.id.bidang_profile);
         status = (TextView)v.findViewById(R.id.status_profile);
         terjawab = (TextView)v.findViewById(R.id.answered_profile);
         rating = (TextView)v.findViewById(R.id.rating_profile);
         penilai = (TextView)v.findViewById(R.id.rater_profile);
-        signout = (ImageView)v.findViewById(R.id.signOut);
+//        signout = (ImageView)v.findViewById(R.id.signOut);
         pp_view = (ImageView)v.findViewById(R.id.pp_preview);
         addPhoto = (ImageView)v.findViewById(R.id.addphoto_profile);
+        menuBar= v.findViewById(R.id.opsi_profil);
+        daftarSkill= v.findViewById(R.id.skill_daftar);
         profile_photo = (de.hdodenhof.circleimageview.CircleImageView)v.findViewById(R.id.img_profile);
         profile_photo.setVisibility(View.GONE);
         idUser = FirebaseAuth.getInstance().getUid();
@@ -124,7 +142,7 @@ public class ProfileActWkr extends Fragment {
                 startActivityForResult(add, ambilPhoto);
             }
         });
-
+/*
         signout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,7 +154,170 @@ public class ProfileActWkr extends Fragment {
                 startActivity(intent);
             }
         });
+*/
+        initMenuBar();
+        initBidang();
+
         return v;
+    }
+
+    void initBidang(){
+        //ambil semua bidang dari server
+        String bidangSeluruh[]= new String[0];
+
+        bidang.setAdapter(new AdapterBidang(bidangSeluruh));
+        bidang.setSelection(ArrayModification.cariIndDlmArray(bidangSeluruh, bidangUser));
+        bgAwalSpinner= bidang.getBackground();
+        enablePilihBidang(false);
+    }
+    void enablePilihBidang(boolean enable){
+        bidang.setEnabled(enable);
+        if(enable)
+            bidang.setBackground(bgAwalSpinner);
+        else
+            bidang.setBackground(null);
+    }
+
+    class AdapterBidang extends BaseAdapter{
+
+        String bidang[];
+
+        AdapterBidang(String bidang[]){
+            this.bidang= bidang;
+        }
+
+        @Override
+        public int getCount() {
+            return bidang.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return bidang[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewGroup.LayoutParams lp= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+            TextView tv= new TextView(getContext());
+            tv.setLayoutParams(lp);
+            tv.setTextColor(Color.parseColor("#000000"));
+            tv.setGravity(Gravity.CENTER);
+            tv.setText(bidang[position]);
+
+            return tv;
+        }
+    }
+/*
+==========
+Belum selesai masalah untuk menentukan apakah user sudah me-rekom skill user lain
+==========
+*/
+    void initDaftarSkill(){
+
+    }
+    class AdapterSkill extends BaseAdapter{
+        @Override
+        public int getCount() {
+            return skill.length;
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return skill[position];
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View vSkill= getLayoutInflater().inflate(R.layout.model_skill_recom, null);
+            TextView nama= vSkill.findViewById(R.id.skill_nama);
+            TextView tingkat= vSkill.findViewById(R.id.skill_tingkat);
+            ImageView tombolRekom= vSkill.findViewById(R.id.skill_recommend);
+
+            nama.setText(skill[position]);
+            tingkat.setText(Integer.toString(tingkatRekom[position]));
+
+            return vSkill;
+        }
+    }
+
+    void initMenuBar(){
+        int gmbOpsi[]= {R.drawable.icon_edit,
+                R.drawable.icon_setting};
+        int tersedia[]= {menuBar.ITEM_TERSEDIA, menuBar.ITEM_TERSEDIA};
+        menuBar.aturGmbItem(gmbOpsi);
+        menuBar.aturItemTersedia(tersedia);
+//        menuBar.aturArahBar(menuBar.ARAH_VERTICAL);
+        menuBar.aturLetakRelatif(menuBar.BAR_DI_BAWAH);
+        menuBar.aturWarnaTersedia("#FFFFFF");
+        menuBar.aturWarnaTakTersedia();
+        menuBar.aturWarnaKuat(Warna.ambilStringWarna(getResources().getColor(R.color.biruLaut)));
+        menuBar.aturPenungguKlikBar(new MenuBarView.PenungguKlik_BarView() {
+            @Override
+            public void klik(MenuBarView v, boolean menuDitampilkan) {
+                if(!menuDitampilkan) {
+                    v.sembunyikanLatar();
+                    v.setBackgroundColor(getResources().getColor(R.color.abuTua));
+                }
+                else{
+                    v.latarIndukAwal();
+                }
+            }
+        });
+        menuBar.aturAksiKlikItem(0, new ImgViewTouch.PenungguKlik() {
+            @Override
+            public void klik(View v) {
+                if(!menuBar.isSelected()) {
+                    editProfil(true);
+                    menuBar.aturGambarInduk(R.drawable.obj_centang);
+                    menuBar.aturWarnaInduk("#ffffff");
+                    menuBar.aturWarnaLatar("#4972AD");
+                    menuBar.setSelected(true);
+                    menuBar.klik();
+                } else{
+                    editProfil(false);
+                    menuBar.aturGambarInduk(R.drawable.obj_titik_tiga_horizontal);
+                    menuBar.aturWarnaInduk("#ffffff");
+                    menuBar.aturWarnaLatar("#C9C9C9");
+                    menuBar.setSelected(false);
+                    simpanProfil(nama.getText().toString(), (String) bidang.getSelectedItem());
+                }
+            }
+        });
+        menuBar.aturAksiKlikItem(1, new ImgViewTouch.PenungguKlik() {
+            @Override
+            public void klik(View v) {
+/*
+                Utilities.removeDataLogin(getActivity());
+                //FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getActivity(), Login.class);
+                intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_LOGOUT);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+*/
+                startActivity(new Intent(getContext(), SettingAct.class));
+            }
+        });
+        menuBar.latarIndukAwal();
+    }
+    void editProfil(boolean enable){
+        int visibility= (enable) ? View.VISIBLE : View.GONE;
+        editNama.setVisibility(visibility);
+        enablePilihBidang(enable);
+    }
+    void simpanProfil(String nama, String bidang){
+        //lakukan sesuatu
     }
 
     void gantiBahasa(Context c){
@@ -206,6 +387,7 @@ public class ProfileActWkr extends Fragment {
             imm.hideSoftInputFromWindow(ed.getWindowToken(), 0);
         }
     }
+
     void loadUploadedPP(){
         Utilities.getUserRef(Utilities.getUserID(getActivity())).addValueEventListener(new ValueEventListener() {
             @Override
@@ -252,7 +434,7 @@ public class ProfileActWkr extends Fragment {
                     }
                     com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
                     try {
-                        loadBidang(bidang, bidang_, languageID);
+                        loadBidang(bidang_, languageID);
                         switch ((int)status_){
                             case 200 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Worker", Language.ENGLISH, languageID)); break;
                             case 201 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Expert", Language.ENGLISH, languageID)); break;
@@ -301,7 +483,7 @@ public class ProfileActWkr extends Fragment {
         }); */
     }
 
-    private void loadBidang(final TextView major, final String bidang_, final Language languageID) {
+    private void loadBidang(final String bidang_, final Language languageID) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.BIDANGKU,
                 new Response.Listener<String>() {
                     @Override
@@ -310,7 +492,8 @@ public class ProfileActWkr extends Fragment {
                             JSONArray jsonArr = new JSONArray(response);
                             String bidang = jsonArr.getJSONObject(0).getString("bidang");
                             try {
-                                major.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang, Language.ENGLISH, languageID));
+//                                major.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang, Language.ENGLISH, languageID));
+                                bidangUser= com.rmtheis.yandtran.translate.Translate.execute(bidang, Language.ENGLISH, languageID);
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }

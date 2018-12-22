@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Login_Register.Splash"
+        <activity
+            android:name=".Login_Register.Splash"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -67,6 +68,8 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity android:name=".Login_Register.ResetPassword" />
         <activity android:name=".Login_Register.Login" />
+        <activity android:name=".Modul.SettingAct" />
+        <activity android:name=".Modul.AmbilGambarAct"></activity>
     </application>
 
 </manifest>

@@ -26,7 +26,7 @@
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
-                    <android.support.constraint.ConstraintLayout
+                    <RelativeLayout
                         android:layout_width="120dp"
                         android:layout_height="120dp"
                         android:layout_centerHorizontal="true">
@@ -49,10 +49,12 @@
                             android:layout_width="120dp"
                             android:layout_height="120dp"
                             android:src="@drawable/obj_camera"
-                            android:tint="@color/abuLebihTua"/>
-                    </android.support.constraint.ConstraintLayout>
-                    <ImageView
-                        android:id="@+id/signOut"
+                            android:tint="@color/abuLebihTua"
+                            android:layout_alignParentBottom="true"
+                            android:layout_alignParentRight="true"/>
+                    </RelativeLayout>
+                    <sidev17.siits.proshare.Model.View.MenuBarView
+                        android:id="@+id/opsi_profil"
                         android:paddingBottom="10dp"
                         android:paddingTop="5dp"
                         android:paddingLeft="10dp"
@@ -65,6 +67,12 @@
                         android:layout_alignParentTop="true"
                         android:src="@drawable/obj_titik_tiga_horizontal"
                         android:background="@drawable/latar_kotak_tumpul_bawah"
+                        app:latarInduk_AWAL="@drawable/latar_kotak_tumpul_bawah"
+                        app:BAR_latarInduk="@drawable/latar_kotak_tumpul_bawah"
+                        app:warna_latar="@color/abuTua"
+                        app:warna_kuat="@color/biruLaut"
+                        app:warna_induk="#FFFFFF"
+                        app:warna_tersedia="#FFFFFF"
                         android:tint="#FFFFFF"
                         android:backgroundTint="@color/abuTua"/>
                 </RelativeLayout>
@@ -82,17 +90,18 @@
                         android:layout_height="wrap_content"
                         android:padding="5sp"/>
                     <ImageView
-                        android:id="@+id/edit"
+                        android:id="@+id/prfile_edit_nama"
                         android:layout_marginLeft="10dp"
                         android:layout_toRightOf="@id/nama_profile"
                         android:layout_centerVertical="true"
+                        android:visibility="gone"
                         android:clickable="true"
                         android:layout_width="25dp"
                         android:layout_height="25dp"
                         android:src="@drawable/obj_pensil"
                         android:tint="@color/abuLebihTua"/>
                 </RelativeLayout>
-                <TextView
+                <Spinner
                     android:id="@+id/bidang_profile"
                     android:text="Bidang Anda"
                     android:textSize="18sp"
@@ -225,6 +234,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@color/hitam"/>
+                <ListView
+                    android:id="@+id/skill_daftar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+<!--
                 <LinearLayout
                     android:layout_marginTop="2dp"
                     android:layout_marginBottom="2dp"
@@ -303,6 +317,7 @@
                         android:textColor="@color/hitam"/>
                 </LinearLayout>
             </LinearLayout>
+-->
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

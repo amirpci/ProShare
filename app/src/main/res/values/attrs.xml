@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MenuBarView">
+        <attr name="warna_kuat" format="color|string|reference"/>
+        <attr name="warna_lemah" format="color|string|reference"/>
+        <attr name="warna_tersedia" format="color|string|reference"/>
+        <attr name="warna_tak_tersedia" format="color|string|reference"/>
+        <attr name="warna_latar" format="color|string|reference"/>
+        <attr name="warna_induk" format="color|string|reference"/>
+        <attr name="arah_bar" format="enum">
+            <enum name="ARAH_HORIZONTAL" value="11"/>
+            <enum name="ARAH_VERTICAL" value="12"/>
+        </attr>
+        <attr name="PILIHAN_panjangInduk" format="integer|enum">
+            <enum name="match_parent" value="-1"/>
+            <enum name="wrap_content" value="-2"/>
+        </attr>
+        <attr name="PILIHAN_lebarInduk" format="integer|enum">
+            <enum name="match_parent" value="-1"/>
+            <enum name="wrap_content" value="-2"/>
+        </attr>
+        <attr name="BAR_ukuranItem" format="integer"/>
+        <attr name="BAR_jarakAntarItem" format="integer"/>
+        <attr name="BAR_letak" format="enum">
+            <enum name="di_atas" value="511"/>
+            <enum name="di_bawah" value="512"/>
+            <enum name="di_kanan" value="513"/>
+            <enum name="di_kiri" value="514"/>
+        </attr>
+        <attr name="padding" format="integer"/>
+        <attr name="BAR_elevasi" format="integer"/>
+        <attr name="source" format="reference"/>
+        <attr name="gambarInduk" format="reference"/>
+        <attr name="gambarInduk_AWAL" format="reference"/>
+        <attr name="latarInduk" format="reference"/>
+        <attr name="latarInduk_AWAL" format="reference"/>
+        <attr name="BAR_latarInduk" format="reference"/>
+    </declare-styleable>
+</resources>

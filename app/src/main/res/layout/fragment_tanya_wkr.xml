@@ -12,34 +12,39 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/colorPrimary">
-            <RelativeLayout
-                android:layout_margin="10dp"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:background="@drawable/shape_rounded_rectangle">
-                <ImageView
-                    android:id="@+id/ic_search"
-                    android:layout_marginLeft="16dp"
-                    android:layout_centerVertical="true"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:tint="@color/grey"
-                    android:src="@drawable/obj_search"/>
-                <EditText
-                    android:imeOptions="actionSearch"
-                    android:id="@+id/et_search_question"
-                    android:layout_toRightOf="@id/ic_search"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginTop="5dp"
+                android:layout_height="wrap_content"
+                android:background="#FFFFFF">
+                <RelativeLayout
+                    android:layout_margin="10dp"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:hint="search your question"
-                    android:singleLine="true"
-                    android:textColorHint="@color/grey"
-                    android:background="@android:color/transparent"/>
-            </RelativeLayout>
+                    android:layout_height="40dp"
+                    android:background="@drawable/shape_rounded_rectangle">
+                    <ImageView
+                        android:id="@+id/ic_search"
+                        android:layout_marginLeft="16dp"
+                        android:layout_centerVertical="true"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:tint="@color/grey"
+                        android:src="@drawable/obj_search"/>
+                    <EditText
+                        android:imeOptions="actionSearch"
+                        android:id="@+id/et_search_question"
+                        android:layout_toRightOf="@id/ic_search"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:hint="search your question"
+                        android:singleLine="true"
+                        android:textColorHint="@color/grey"
+                        android:background="@android:color/transparent"/>
+                </RelativeLayout>
+            </LinearLayout>
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">

@@ -68,10 +68,10 @@ public class ChatActivity extends AppCompatActivity{
 
         barIsi= findViewById(R.id.chat_bar_isi);
         barIsi.addView((RelativeLayout) getLayoutInflater().inflate(R.layout.model_tab_edit_text, null, false));
-        tmbSisipkan= barIsi.findViewById(R.id.tab_text_gambar);
+        tmbSisipkan= barIsi.findViewById(R.id.tab_text_indikator);
         tmbKirim= barIsi.findViewById(R.id.tab_text_tindakan);
         iconKirim= barIsi.findViewById(R.id.tab_text_tindakan_gambar);
-        isiPesan= barIsi.findViewById(R.id.tab_text_teks);
+        isiPesan= barIsi.findViewById(R.id.tab_text_hint);
         wadahChat= findViewById(R.id.chat_wadah);
         muatChat(getIntent().getStringExtra("idPesan"));
         /*ChatAdapter adp= new ChatAdapter();

@@ -79,7 +79,7 @@
                         android:layout_height="wrap_content"
                         android:padding="5sp"/>
                     <ImageView
-                        android:id="@+id/edit"
+                        android:id="@+id/prfile_edit_nama"
                         android:layout_marginLeft="10dp"
                         android:layout_toRightOf="@id/nama_profile"
                         android:layout_centerVertical="true"

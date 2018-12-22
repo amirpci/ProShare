@@ -92,6 +92,19 @@ public class JawabActExprt extends Fragment {
                     Toast.makeText(getActivity(), "belum", Toast.LENGTH_SHORT).show();
                 }
             }}); */
+
+/*
+        tmbTambah = view.findViewById(R.id.daftar_pertanyaan_tambah);
+        tmbTambah.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent inten = new Intent(getContext(), TambahJawabanExprt.class);
+                inten.putExtra("idHalaman", R.layout.activity_tambah_jawaban_exprt);
+                startActivity(inten);
+            }
+        });
+
+*/
         return view;
     }
 
