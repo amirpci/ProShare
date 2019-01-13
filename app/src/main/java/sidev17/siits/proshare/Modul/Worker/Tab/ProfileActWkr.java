@@ -57,7 +57,7 @@ import sidev17.siits.proshare.Model.View.ImgViewTouch;
 import sidev17.siits.proshare.Model.View.MenuBarView;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Modul.SettingAct;
-import sidev17.siits.proshare.Utils.ArrayModification;
+import sidev17.siits.proshare.Utils.ArrayMod;
 import sidev17.siits.proshare.Utils.PackBahasa;
 import sidev17.siits.proshare.Utils.Utilities;
 import sidev17.siits.proshare.Utils.Warna;
@@ -163,10 +163,10 @@ public class ProfileActWkr extends Fragment {
 
     void initBidang(){
         //ambil semua bidang dari server
-        String bidangSeluruh[]= new String[0];
+        String bidangSeluruh[]= {"Batu", "Tanah", "Udara", "Air", "Api"}; //new String[0];
 
         bidang.setAdapter(new AdapterBidang(bidangSeluruh));
-        bidang.setSelection(ArrayModification.cariIndDlmArray(bidangSeluruh, bidangUser));
+        bidang.setSelection(ArrayMod.cariIndDlmArray(bidangSeluruh, "Udara"));
         bgAwalSpinner= bidang.getBackground();
         enablePilihBidang(false);
     }

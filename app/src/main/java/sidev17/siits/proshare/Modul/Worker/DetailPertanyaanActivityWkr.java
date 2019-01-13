@@ -1,9 +1,7 @@
 package sidev17.siits.proshare.Modul.Worker;
 
-import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,8 +27,9 @@ import java.util.ArrayList;
 
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
-import sidev17.siits.proshare.Modul.Expert.Tab.ProfileActExprt;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Array;
+import sidev17.siits.proshare.Utils.ArrayMod;
 import sidev17.siits.proshare.Utils.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
 
@@ -69,7 +68,13 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     private View viewPertanyaan;
     private View viewSolusi;
     private View viewKomentar[];
+
     private View viewBarKomen;
+    private GaleriLoader loader;
+    private int urutanDipilih[]; //urutan item yg dipilih
+    private int posisiDipilih[]; //posisi item yg dipilih
+    private int lbrBarKomen= -3;
+
     private final int BATAS_BUFFER_VIEW= 7;
 
 
@@ -269,38 +274,64 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
 //        lpBar.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
         viewBarKomen= getLayoutInflater().inflate(R.layout.model_tab_edit_text, null, false);
 //        viewBarKomen.setLayoutParams(lpBar);
-        viewBarKomen.setMinimumHeight(60);
+//        viewBarKomen.setMinimumHeight(60);
+
+        RelativeLayout.LayoutParams lpSilang= new RelativeLayout.LayoutParams(30, 30);
+        lpSilang.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+        lpSilang.setMargins(0, 20, 20, 0);
+
+        int aksesoris[]= {R.drawable.icon_silang};
+        RelativeLayout.LayoutParams lpAksesoris[]= {lpSilang};
+
+        loader= initLoader(new String[0], aksesoris, lpAksesoris);
+        urutanDipilih = new int[0];
+        posisiDipilih= new int[0];
 
         View klip= viewBarKomen.findViewById(R.id.tab_text_indikator);
-        TextView hint= viewBarKomen.findViewById(R.id.tab_text_hint);
+        final TextView teksKomentar= viewBarKomen.findViewById(R.id.tab_text_hint);
         View kirim= viewBarKomen.findViewById(R.id.tab_text_tindakan);
 
         ((ImageView) klip.findViewById(R.id.tab_text_indikator_gambar)).setImageResource(R.drawable.icon_klip);
-        hint.setHint("Masukan komentar Anda");
-        hint.setMaxLines(4);
+        teksKomentar.setHint("Masukan komentar Anda");
+        teksKomentar.setMaxLines(4);
         ((ImageView) kirim.findViewById(R.id.tab_text_tindakan_gambar)).setImageResource(R.drawable.icon_kirim);
 
         klip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent keAmbilGambar= new Intent(DetailPertanyaanActivityWkr.this, AmbilGambarAct.class);
+                keAmbilGambar.putExtra("urutanDipilih", urutanDipilih);
+                keAmbilGambar.putExtra("posisiDipilih", posisiDipilih);
                 startActivityForResult(keAmbilGambar, AMBIL_GAMBAR);
             }
         });
+        kirim.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String komentar= teksKomentar.getText().toString();
+                String pathFoto[]= loader.ambilDaftarPathFoto();
+                String id= "sesuatu";
+
+                kirimKomentar(id, komentar, pathFoto);
+            }
+        });
     }
-    private void kirimKomentar(String idKomentator, String komentar, Bitmap gambar[]){
+    private void kirimKomentar(String idKomentator, String komentar, String pathFoto[]){
         //lakukan sesuatu
     }
-    private GaleriLoader initLoader(String pathFile[]){
-        final GaleriLoader loader= new GaleriLoader(getBaseContext(), this, pathFile, 18, GaleriLoader.JENIS_FOTO);
+    private GaleriLoader initLoader(String pathFile[], int aksesoris[], RelativeLayout.LayoutParams lpAksesoris[]){
+        final GaleriLoader loader= new GaleriLoader(this, pathFile, 18, GaleriLoader.JENIS_FOTO,
+                R.layout.model_tambah_properti_cell, R.id.tambah_cell_pratinjau);
         loader.aturBentukFoto(GaleriLoader.BENTUK_KOTAK);
-        loader.aturUkuranPratinjau(250);
+        loader.aturAksesoris(aksesoris, lpAksesoris);
+        loader.aturOffsetItem(20);
+        loader.aturJmlItemPerGaris(3);
+        loader.aturUkuranPratinjau(loader.UKURAN_MENYESUAIKAN_LBR_INDUK);
         loader.aturSumberBg(R.drawable.obj_gambar_kotak);
         loader.aturSumberBgTakBisa(R.drawable.obj_tanda_seru_lingkaran_garis);
-        loader.aturIdElemenImg(R.id.tambah_cell_pratinjau);
 
         loader.aturModeBg(false);
-
+/*
         loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
             @Override
             public void pilihFoto(View v, int posisi) {
@@ -311,20 +342,20 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
             }
             @Override
             public void batalPilihFoto(View v, int posisi) {
-                int indDipilih[]= loader.ambilSemuaUrutanDipilih();
-                ArrayList<View> viewDipilih= loader.ambilViewDipilih();
-                int indYgDibatalkan= loader.ambilUrutanDipilih(posisi) -1;
-                int indBaru= indYgDibatalkan +1;
+                int indDipilih[][]= loader.ambilUrutanDipilih();
+                Array<View> viewDipilih= loader.ambilViewDipilih();
+//                int indYgDibatalkan= loader.ambilUrutanDipilih(posisi) -1;
+                int mulai= ArrayMod.cariIndDlmArray(indDipilih[0], posisi);
+                int indBaru= indDipilih[1][mulai];
+                int batas= indDipilih[0].length;
 
                 TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
                 noUrut.setText("");
                 noUrut.getBackground().setAlpha(0);
 
-                for(int i= 0; i< indDipilih.length; i++) {
-                    if(i > indYgDibatalkan) {
-                        noUrut = viewDipilih.get(i).findViewById(R.id.tambah_cell_centang_no);
-                        noUrut.setText(Integer.toString(indBaru++));
-                    }
+                for(int i= indBaru; i< batas; i++) {
+                    noUrut = viewDipilih.ambil(i).findViewById(R.id.tambah_cell_centang_no);
+                    noUrut.setText(Integer.toString(indBaru++));
                 }
             }
         });
@@ -335,14 +366,14 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                 View view= loader.ambilView(posisi);
                 final int lebar= view.getLayoutParams().width;
 /*
-                final TextView indDipilih = view.findViewById(R.id.tambah_cell_centang_no);
+                final TextView urutanDipilih = view.findViewById(R.id.tambah_cell_centang_no);
                 final GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
-                indDipilih.setOnClickListener(new View.OnClickListener() {
+                urutanDipilih.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (!indDipilih.isSelected()) {
+                        if (!urutanDipilih.isSelected()) {
                             loader.pilihFoto(posisi);
-                            indDipilih.setSelected(true);
+                            urutanDipilih.setSelected(true);
                             TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
                             liveQuestion.setAdapter(adpDipilih);
                             if(loader.ambilFotoDipilih().size() <= 3)
@@ -351,7 +382,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                                 aturTinggiGrid(liveQuestion, lebar+90);
                         } else {
                             loader.batalPilihFoto(posisi);
-                            indDipilih.setSelected(false);
+                            urutanDipilih.setSelected(false);
                             TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
                             liveQuestion.setAdapter(adpDipilih);
                             if(loader.ambilFotoDipilih().size() == 0)
@@ -363,7 +394,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                         }
                     }
                 });
-*/
+* /
             }
 
             @Override
@@ -371,6 +402,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
 
             }
         });
+*/
         return loader;
     }
 
@@ -382,6 +414,7 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
 
         AdapterPropertiCell(GaleriLoader loader, int lebar, int jml){
             this.loader= loader;
+            loader.aturLpWadahImg(new ViewGroup.LayoutParams(lebar, lebar));
             this.lebar= lebar;
             this.jml= jml;
         }
@@ -403,10 +436,46 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parentInn) {
-            View view= getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
-            view.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
+            View view= loader.buatFoto(position); //getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
+//            view.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
 
-            view= loader.buatFoto(view, position);
+//            view= loader.buatFoto(view, position);
+
+            ImageView indUrutan= view.findViewById(R.id.tambah_cell_centang);
+            indUrutan.setVisibility(View.GONE);
+
+            ImageView bg= view.findViewById(R.id.tambah_cell_pratinjau);
+            bg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent kePreview= new Intent(getBaseContext(), PhotoPreview.class);
+                    kePreview.putStringArrayListExtra("judul", loader.ambilDaftarJudul());
+                    kePreview.putExtra("path", loader.ambilDaftarPathFoto());
+                    kePreview.putExtra("indDipilih", position);
+
+                    startActivity(kePreview);
+                }
+            });
+
+            ImageView batalPilih= view.findViewById(loader.idAksesoris(0));
+            batalPilih.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    GridView gambarDipilih= viewBarKomen.findViewById(R.id.wadah_gambar);
+                    String pathFoto[]= loader.ambilDaftarPathFoto();
+                    String pathFotoBaru[]= new String[pathFoto.length-1]; //data.getStringArrayExtra("pathFoto");
+                    int jalan= 0;
+                    for(int i= 0; i< pathFoto.length; i++)
+                        if(i != position)
+                            pathFotoBaru[jalan++]= pathFoto[i];
+
+                    loader.aturPathItem(pathFotoBaru);
+                    gambarDipilih.setAdapter(new AdapterPropertiCell(loader, gambarDipilih.getWidth() / loader.ambilJmlItemPerGaris(), pathFotoBaru.length));
+//                    loader.batalPilihFoto(posisiDipilih[position]);
+//                    Toast.makeText(DetailPertanyaanActivityWkr.this, "posisi batal= " +posisiDipilih[position], Toast.LENGTH_LONG).show();
+                }
+            });
+
             return view;
         }
     }
@@ -414,14 +483,37 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == AMBIL_GAMBAR && resultCode == RESULT_OK){
-            final GridView gambarDipilih= viewBarKomen.findViewById(R.id.wadah_gambar);
-            float batasTinggi = viewBarKomen.getHeight() + 400;
+            if(lbrBarKomen == -3)
+                lbrBarKomen= viewBarKomen.getHeight();
+
             String pathFoto[]= data.getStringArrayExtra("pathFoto");
+            urutanDipilih = data.getIntArrayExtra("urutanDipilih");
+            posisiDipilih= data.getIntArrayExtra("posisiDipilih");
+
+            final GridView gambarDipilih= viewBarKomen.findViewById(R.id.wadah_gambar);
+            float batasTinggi= lbrBarKomen +400;
+            loader.aturPathItem(pathFoto);
+/*
+            int posisiDipilihDalam[]= new int[urutanDipilih.length];
+            for(int i= 0; i< urutanDipilih.length; i++)
+                posisiDipilih[i]= i;
+
+            loader.aturIndDipilih(posisiDipilihDalam, urutanDipilih);
+*/
+            gambarDipilih.setPadding(0, 50, 0, 20);
+
+            if(pathFoto.length <= 3)
+                batasTinggi= lbrBarKomen + (loader.ambilUkuranPratinjau() +loader.ambilOffsetItem())
+                        +gambarDipilih.getPaddingBottom() +gambarDipilih.getPaddingTop();
+            else{
+                RelativeLayout.LayoutParams lpDipilih= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (batasTinggi- lbrBarKomen));
+                gambarDipilih.setLayoutParams(lpDipilih);
+            }
 
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) batasTinggi);
-            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+//            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
             viewBarKomen.setLayoutParams(lp);
-            gambarDipilih.setAdapter(new AdapterPropertiCell(initLoader(pathFoto), gambarDipilih.getWidth() / gambarDipilih.getNumColumns(), pathFoto.length));
+            gambarDipilih.setAdapter(new AdapterPropertiCell(loader, gambarDipilih.getWidth() / loader.ambilJmlItemPerGaris(), pathFoto.length));
 
             ((EditText) viewBarKomen.findViewById(R.id.tab_text_hint)).setMaxLines(1);
             final ImageView tmbBatal= viewBarKomen.findViewById(R.id.batal);
@@ -429,12 +521,18 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
             tmbBatal.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 150);
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                    gambarDipilih.setAdapter(null);
+                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, lbrBarKomen);
+                    RelativeLayout.LayoutParams lpDipilih= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//                    lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
                     viewBarKomen.setLayoutParams(lp);
+                    gambarDipilih.setAdapter(null);
+                    gambarDipilih.setLayoutParams(lpDipilih);
+                    gambarDipilih.setPadding(0,0,0,0);
                     ((EditText) viewBarKomen.findViewById(R.id.tab_text_hint)).setMaxLines(4);
                     tmbBatal.setVisibility(View.GONE);
+
+                    urutanDipilih= new int[0];
+                    posisiDipilih= new int[0];
                 }
             });
         }

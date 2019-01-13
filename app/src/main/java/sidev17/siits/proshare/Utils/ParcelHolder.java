@@ -1,6 +1,5 @@
 package sidev17.siits.proshare.Utils;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -44,12 +43,12 @@ public class ParcelHolder<Tipe> implements Parcelable {
 
 
     public void tambah(Tipe obj){
-        objList= ArrayModification.tambahArray(objList, obj);
+        objList= ArrayMod.tambahArray(objList, obj);
     }
     public void hapus(Tipe obj){
-        objList= ArrayModification.kurangiArray(objList, obj);
+        objList= ArrayMod.kurangiArray(objList, obj);
     } public void hapus(int ind){
-        objList= ArrayModification.kurangiArray(objList, ind);
+        objList= ArrayMod.kurangiArray(objList, ind);
     }
     public void atur(int ind, Tipe obj){
         objList[ind]= obj;

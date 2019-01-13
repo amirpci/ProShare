@@ -1,97 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="50dp"
-    android:orientation="vertical"
-    android:layout_alignParentBottom="true">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_above="@id/tab_text_utama"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <GridView
+            android:id="@+id/wadah_gambar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#30000000"
+            android:numColumns="3"/>
+
+        <ImageView
+            android:id="@+id/batal"
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_margin="8dp"
+            android:src="@drawable/icon_silang"
+            android:tint="@color/merah"
+            android:visibility="gone" />
+
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/tab_text_utama"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
+        android:layout_gravity="bottom"
+        android:layout_height="50dp"
         android:background="@color/abuTua"
-        android:layout_alignParentBottom="true">
-    <ImageView
-        android:id="@+id/tab_text_latar"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:tint="#FFFFFF"
-        android:src="@drawable/latar_kotak_tumpul"/>
-    <RelativeLayout
-        android:id="@+id/tab_text_indikator"
-        android:layout_width="60dp"
-        android:layout_height="35dp">
-        <ImageView
-            android:id="@+id/tab_text_indikator_latar"
-            android:layout_width="70dp"
-            android:layout_height="match_parent"
-            android:tint="#FFFFFF"
-            android:src="@drawable/latar_kotak_tumpul_satu_sisi_kiri"/>
-        <ImageView
-            android:id="@+id/tab_text_indikator_gambar"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="5dp"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:tint="@color/abuTua"
-            android:src="@drawable/obj_search"/>
-    </RelativeLayout>
-    <EditText
-        android:id="@+id/tab_text_hint"
-        android:layout_toRightOf="@id/tab_text_indikator"
-        android:layout_marginLeft="10dp"
-        android:layout_centerVertical="true"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:textColorHint="@color/abuTua"
-        android:backgroundTint="#00000000"
-        android:hint="Your question here"
-        android:maxLines="4"
-        android:singleLine="false"/>
-    <RelativeLayout
-        android:id="@+id/tab_text_tindakan"
-        android:layout_width="60dp"
-        android:layout_height="35dp"
-        android:layout_alignParentRight="true">
-        <ImageView
-            android:id="@+id/tab_text_tindakan_latar"
-            android:layout_width="70dp"
-            android:layout_height="match_parent"
-            android:tint="@color/colorPrimaryDark"
-            android:src="@drawable/latar_kotak_tumpul_satu_sisi_kanan"/>
-        <ImageView
-            android:id="@+id/tab_text_tindakan_gambar"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="5dp"
-            android:layout_width="30dp"
-            android:layout_height="match_parent"
-            android:tint="#FFFFFF"
-            android:src="@drawable/obj_tanda_tanya"/>
-    </RelativeLayout>
-    </RelativeLayout>
-    <GridView
-        android:id="@+id/wadah_gambar"
-        android:layout_above="@id/tab_text_utama"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="17dp"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingBottom="8dp"
-        android:numColumns="3"
-        android:background="#30000000"/>
+        android:padding="8dp">
 
-    <ImageView
-        android:id="@+id/batal"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
-        android:visibility="gone"
-        android:layout_alignParentRight="true"
-        android:src="@drawable/icon_silang"
-        android:tint="@color/merah"/>
-</RelativeLayout>
+        <ImageView
+            android:id="@+id/tab_text_latar"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:src="@drawable/latar_kotak_tumpul"
+            android:tint="#FFFFFF" />
+
+        <RelativeLayout
+            android:id="@+id/tab_text_indikator"
+            android:layout_width="60dp"
+            android:layout_height="35dp">
+
+            <ImageView
+                android:id="@+id/tab_text_indikator_latar"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/latar_kotak_tumpul_satu_sisi_kiri"
+                android:tint="#FFFFFF" />
+
+            <ImageView
+                android:id="@+id/tab_text_indikator_gambar"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:src="@drawable/obj_search"
+                android:tint="@color/abuTua" />
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/tab_text_hint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/tab_text_indikator"
+            android:backgroundTint="#00000000"
+            android:hint="Your question here"
+            android:maxLines="4"
+            android:singleLine="false"
+            android:textColorHint="@color/abuTua"
+            android:textSize="15sp" />
+
+        <RelativeLayout
+            android:id="@+id/tab_text_tindakan"
+            android:layout_width="60dp"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true">
+
+            <ImageView
+                android:id="@+id/tab_text_tindakan_latar"
+                android:layout_width="70dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/latar_kotak_tumpul_satu_sisi_kanan"
+                android:tint="@color/colorPrimaryDark" />
+
+            <ImageView
+                android:id="@+id/tab_text_tindakan_gambar"
+                android:layout_width="30dp"
+                android:layout_height="match_parent"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:src="@drawable/obj_tanda_tanya"
+                android:tint="#FFFFFF" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</LinearLayout>

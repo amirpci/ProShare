@@ -4,14 +4,20 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/preview_foto_wadah"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
     <TextView
         android:id="@+id/preview_foto_judul"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
+        android:padding="10dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Judul"
         android:textSize="20sp"
-        android:textColor="#FFFFFF"/>
+        android:textColor="#FFFFFF"
+        android:background="#22000000"/>
 
     <TextView
         android:id="@+id/preview_judul"
@@ -22,10 +28,4 @@
         android:text="Image View"
         android:textSize="20sp"
         android:textColor="#FFFFFF"/>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/preview_foto_wadah"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
 </RelativeLayout>

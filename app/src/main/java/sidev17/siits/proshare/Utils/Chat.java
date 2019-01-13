@@ -1,14 +1,12 @@
 package sidev17.siits.proshare.Utils;
 
 import android.graphics.Bitmap;
-import android.media.Image;
 
 import java.io.File;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
-import java.util.Stack;
 
 public class Chat {
     final String header= "pesan waktu diriSendiri";
@@ -58,7 +56,7 @@ public class Chat {
 
 //====================
     public String ambilPesan(String strWaktu){
-        int ind= ArrayModification.cariIndDlmArrayPukul(pukul, strWaktu);
+        int ind= ArrayMod.cariIndDlmArrayPukul(pukul, strWaktu);
         if(ind >= 0)
             return pesan[ind];
         else
@@ -75,7 +73,7 @@ public class Chat {
         return array;
     }
     public String ambilPukul(String strWaktu){
-        int ind= ArrayModification.cariIndDlmArrayPukul(pukul, strWaktu);
+        int ind= ArrayMod.cariIndDlmArrayPukul(pukul, strWaktu);
         if(ind >= 0)
             return format.format(pukul[ind]);
         else
@@ -85,7 +83,7 @@ public class Chat {
         return pukul;
     }
     public Date ambilPukulMentah(String strWaktu){
-        int ind= ArrayModification.cariIndDlmArrayPukul(pukul, strWaktu);
+        int ind= ArrayMod.cariIndDlmArrayPukul(pukul, strWaktu);
         if(ind >= 0)
             return pukul[ind];
         else
@@ -96,7 +94,7 @@ public class Chat {
         return diriSendiri;
     }
     public boolean diriSendiriKah(String strWaktu){
-        int ind= ArrayModification.cariIndDlmArrayPukul(pukul, strWaktu);
+        int ind= ArrayMod.cariIndDlmArrayPukul(pukul, strWaktu);
         if(diriSendiri[ind] == DIRI_SENDIRI)
             return true;
         else
@@ -128,16 +126,16 @@ public class Chat {
 
 //====================
     public void perlebarChat(int pjgTambahan){
-        pesan= ArrayModification.ubahArray(pesan, pjgTambahan);
-        pukul= (Date[]) ArrayModification.ubahArray(pukul, pjgTambahan);
-        diriSendiri= ArrayModification.ubahArray(diriSendiri, pjgTambahan);
+        pesan= ArrayMod.ubahArray(pesan, pjgTambahan);
+        pukul= (Date[]) ArrayMod.ubahArray(pukul, pjgTambahan);
+        diriSendiri= ArrayMod.ubahArray(diriSendiri, pjgTambahan);
     }
     public void rampingkanChat(){
-        int batas= ArrayModification.cariIndKosongDlmArray(pesan, ArrayModification.ARAH_MUNDUR) +1;
+        int batas= ArrayMod.cariIndKosongDlmArray(pesan, ArrayMod.ARAH_MUNDUR) +1;
         if(batas > 0) {
-            pesan = ArrayModification.hapusArrayDepan(pesan, batas);
-            pukul = (Date[]) ArrayModification.hapusArrayDepan(pukul, batas);
-            diriSendiri = ArrayModification.hapusArrayDepan(diriSendiri, batas);
+            pesan = ArrayMod.hapusArrayDepan(pesan, batas);
+            pukul = (Date[]) ArrayMod.hapusArrayDepan(pukul, batas);
+            diriSendiri = ArrayMod.hapusArrayDepan(diriSendiri, batas);
         }
     }
 
@@ -147,9 +145,9 @@ public class Chat {
         tambahChatData(pesan, pukul, diriSendiri);
     }
     private void tambahChatData(String pesan, Date pukul, int diriSendiri){
-        this.pesan= ArrayModification.tambahArray(this.pesan, pesan);
-        this.pukul= (Date[]) ArrayModification.tambahArray(this.pukul, pukul);
-        this.diriSendiri= ArrayModification.tambahArray(this.diriSendiri, diriSendiri);
+        this.pesan= ArrayMod.tambahArray(this.pesan, pesan);
+        this.pukul= (Date[]) ArrayMod.tambahArray(this.pukul, pukul);
+        this.diriSendiri= ArrayMod.tambahArray(this.diriSendiri, diriSendiri);
     }
     private void tambahChatKeServer(String pesan, Date pukul, int diriSendiri){
         //sesuatu

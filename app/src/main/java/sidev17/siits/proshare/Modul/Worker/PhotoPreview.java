@@ -75,7 +75,7 @@ public class PhotoPreview extends AppCompatActivity {
 
             @Override
             public void onPageSelected(int position) {
-                judulFoto.setText(judul.get(position) +" " +position);
+                judulFoto.setText(judul.get(position));
             }
 
             @Override
@@ -106,12 +106,13 @@ public class PhotoPreview extends AppCompatActivity {
 
     void initLoader(String pathFile[], int jenisFoto){
 //        inisiasiArrayDipilih(pathFoto.length);
-        loader= new GaleriLoader(getBaseContext(), this, pathFile, 18, jenisFoto);
+        loader= new GaleriLoader(this, pathFile, 18, jenisFoto,
+                GaleriLoader.ELEMEN_KOSONG, GaleriLoader.ELEMEN_KOSONG);
 //        loader.bisaDiScale(true);
         loader.aturUkuranPratinjau(1000);
         loader.aturSumberBg(R.drawable.obj_gambar_kotak);
         loader.aturSumberBgTakBisa(R.drawable.obj_tanda_seru_lingkaran_garis);
-//        loader.aturIdElemenImg(R.id.tambah_cell_pratinjau);
+//        loader.aturElemenImg(R.id.tambah_cell_pratinjau);
 
         loader.aturModeBg(false);
 
@@ -126,7 +127,7 @@ public class PhotoPreview extends AppCompatActivity {
             }
             @Override
             public void batalPilihFoto(View v, int posisi) {
-                int indDipilih[]= loader.ambilSemuaUrutanDipilih();
+                int indDipilih[]= loader.ambilUrutanDipilih();
                 ArrayList<View> viewDipilih= loader.ambilViewDipilih();
                 int indYgDibatalkan= loader.ambilUrutanDipilih(posisi) -1;
                 int indBaru= indYgDibatalkan +1;
