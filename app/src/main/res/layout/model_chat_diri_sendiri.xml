@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/chat_kita"
-    android:visibility="gone"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="10dp"
@@ -33,7 +32,7 @@
             android:background="@drawable/latar_kotak_tumpul"
             android:backgroundTint="@color/colorPrimaryDark">
             <TextView
-                android:id="@+id/chat_teks_kita"
+                android:id="@+id/chat_teks"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
@@ -58,7 +57,7 @@
                 android:layout_width="20dp"
                 android:layout_height="20dp"/>
             <TextView
-                android:id="@+id/chat_waktu_kita"
+                android:id="@+id/chat_waktu"
                 android:layout_toRightOf="@id/chat_dibaca"
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"

@@ -3,12 +3,12 @@
 
     <item
         android:drawable="@android:color/white"/>
-
+<!--
     <item>
         <bitmap
             android:src="@drawable/ic_launcher_foreground"
             android:gravity="center"
             android:tint="@color/colorPrimaryDark"/>
     </item>
-
+-->
 </layer-list>

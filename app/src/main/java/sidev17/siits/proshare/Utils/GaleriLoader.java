@@ -623,7 +623,7 @@ public class GaleriLoader {
     }
     private void pasangFotoDipilih(final ImageView img, final int posisi, final int urutan, final int urutanTrahir){
         final int ind= posisi % batasMaksDipilih;
-        if(loaderDipilih[urutan] != null) {
+            if(loaderDipilih[urutan] != null) {
             loaderDipilih[urutan].cancel(true);
         }
         loaderDipilih[urutan]= new AsyncTask<Integer, Integer, Bitmap>() {

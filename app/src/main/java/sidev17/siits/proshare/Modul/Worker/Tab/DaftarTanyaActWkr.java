@@ -149,7 +149,9 @@ public class DaftarTanyaActWkr extends Fragment {
                                     masalah.setproblem_title(jsonObject.getString("problem_title"));
                                     masalah.setproblem_owner(jsonObject.getString("problem_owner"));
                                     masalah.setStatus(jsonObject.getInt("status"));
+                                    masalah.setTimestamp(jsonObject.getString("timestamp"));
                                     masalah.setpid(jsonObject.getString("pid"));
+                                    masalah.setmajority_id(jsonObject.getString("majority_id"));
                                     Masalah.add(masalah);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
@@ -229,7 +231,8 @@ public class DaftarTanyaActWkr extends Fragment {
                 }
                 judul.setText(masalah.get(posisi).getproblem_title());
                 isi.setText(masalah.get(posisi).getproblem_desc());
-                Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
+               // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
                 Utilities.updateFoto(masalah.get(posisi).getpid(), foto, act);
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -238,6 +241,9 @@ public class DaftarTanyaActWkr extends Fragment {
                         paketDetailPetanyaan.putString("judul_pertanyaan", masalah.get(posisi).getproblem_title());
                         paketDetailPetanyaan.putString("deskripsi_pertanyaan", masalah.get(posisi).getproblem_desc());
                         paketDetailPetanyaan.putString("owner", masalah.get(posisi).getproblem_owner());
+                        paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
+                        paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
+                        paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
                         Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                         startActivity(inten);

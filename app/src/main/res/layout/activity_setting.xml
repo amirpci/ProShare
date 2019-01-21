@@ -64,6 +64,7 @@
             android:textSize="15sp"/>
     </LinearLayout>
     <LinearLayout
+        android:clickable="true"
         android:id="@+id/setting_isi_2"
         android:layout_width="match_parent"
         android:layout_height="35dp"

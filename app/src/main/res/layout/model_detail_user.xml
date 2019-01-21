@@ -15,14 +15,17 @@
         android:backgroundTint="#FFFFFF"
         android:layout_centerInParent="true">
 
-        <ImageView
+        <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/user_profil"
             android:layout_gravity="center_horizontal"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_margin="20dp"
-            android:src="@drawable/obj_profilephoto"
-            android:tint="@color/abuLebihTua"/>
+            android:padding="22dp"
+            android:tint="#FFFFFF"
+            android:src="@drawable/tab_orang"
+            android:background="@drawable/latar_lingkaran"
+            android:backgroundTint="@color/abuLebihTua"/>
 
         <TextView
             android:id="@+id/user_nama"

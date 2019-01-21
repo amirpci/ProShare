@@ -1,6 +1,9 @@
 package sidev17.siits.proshare.Modul.Expert.Tab;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -10,17 +13,25 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import sidev17.siits.proshare.Model.ChatListItem;
+import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Modul.ChatActivity;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Utilities;
@@ -43,13 +54,14 @@ public class FeedbackActExprt extends Fragment {
     private String feedback[][]= {{"I do this everyday, but somehow..."}, {"When it happens, I don't know what to do. I need inspiration."}, {"bla bla bla..."}, {"Just bel cool bro!"}};
 
     private RecyclerView wadahFeedback;
-
+    private ImageView mulaiChat;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_beranda_chat_exprt, container, false);
         wadahFeedback= (RecyclerView)view.findViewById(R.id.feedback_wadah);
+        mulaiChat = (ImageView)view.findViewById(R.id.daftar_pertanyaan_tambah);
         initDaftarChat();
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setReverseLayout(true);
@@ -60,14 +72,47 @@ public class FeedbackActExprt extends Fragment {
         wadahFeedback.setAdapter(adapter);
        // AdapterFeedback adpFeedback= new AdapterFeedback();
       //  wadahFeedback.setAdapter(adpFeedback);
+        mulaiChat.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog dialog = new Dialog(getActivity());
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.dialog_mulai_chatt);
+                RelativeLayout next = (RelativeLayout)dialog.findViewById(R.id.mulai_chat);
+                final EditText email = (EditText)dialog.findViewById(R.id.et_email_orang);
+                next.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Utilities.getUserRef().child(email.getText().toString().replace(".", ",")).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Pengguna orang = dataSnapshot.getValue(Pengguna.class);
+                                Intent i = new Intent(getActivity(), ChatActivity.class);
+                                //i.putExtra("idPesan", listPesan.getIdPesan());
+                                i.putExtra("pengguna", orang);
+                                Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
+                                startActivity(i);
+                                dialog.dismiss();
+                            }
 
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                });
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.show();
+            }
+        });
         return view;
     }
 
     void initDaftarChat(){
         FirebaseRecyclerOptions<ChatListItem> options =
                 new FirebaseRecyclerOptions.Builder<ChatListItem>()
-                        .setQuery(Utilities.getChatListRef(getActivity()).orderByChild("jam"), ChatListItem.class)
+                        .setQuery(Utilities.getChatListRef(getActivity()).child(Utilities.getUserID(getActivity()).replace(".", ",")).orderByChild("jam"), ChatListItem.class)
                         .build();
 
         adapter = new FirebaseRecyclerAdapter<ChatListItem, vhChatList>(options) {
@@ -131,64 +176,4 @@ public class FeedbackActExprt extends Fragment {
         String delegate = "hh:mm aaa";
         return (String) DateFormat.format(delegate, Calendar.getInstance().getTime());
     }
-    /*
-    class AdapterFeedback extends BaseAdapter {
-
-                String nama[];
-                String job[];
-                String pp[];
-
-                String solusi[];
-                String tgl[];
-
-        AdapterFeedback (){
-        }
-
-        @Override
-        public int getCount() {
-            return orang.length;
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return orang[position];
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view;
-                view= getLayoutInflater().inflate(R.layout.model_kolom_chat, parent, false);
-
-                TextView teksOrang= view.findViewById(R.id.feedback_orang_nama);
-                TextView teksChat= view.findViewById(R.id.feedback_orang_chat);
-                TextView teksWaktu= view.findViewById(R.id.feedback_waktu);
-                ImageView centang= view.findViewById(R.id.feedback_orang_centang);
-
-                teksOrang.setText(orang[position]);
-                teksChat.setText(feedback[position][0]);
-//                teksWaktu.setText(descSolusi[position-1]);
-
-                if(kategoriExpert[position]== PENGGUNA_EXPERT)
-                    centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
-                else if(kategoriExpert[position]== PENGGUNA_EXPERT_TERVERIFIKASI)
-                    centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
-
-                final ChatActivity anil= new ChatActivity();
-
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Intent inten= new Intent(getContext(), ChatActivity.class);
-                        startActivity(inten);
-                    }
-                });
-            return view;
-        }
-    }
-    */
 }

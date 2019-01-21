@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
@@ -30,8 +33,8 @@ public class MainActivityWkr extends AppCompatActivity {
     private LinearLayout tmb_Jawab, tmb_Chat;
     private ImageView garis_Jawab;
 
-    private ViewPagerAdapter adapter;
-    private ViewPager mvPager;
+  //  private ViewPagerAdapter adapter;
+   // private ViewPager mvPager;
     private boolean click_duaKali=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +54,7 @@ public class MainActivityWkr extends AppCompatActivity {
         tmb_Tanya = (LinearLayout) findViewById(R.id.tab_tanya_wkr);
         tmb_Jawab = (LinearLayout) findViewById(R.id.tab_tl_wkr);
         tmb_Chat = (LinearLayout) findViewById(R.id.tab_feedback_wkr);
-
+        /*
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
         adapter.AddFragment(new ProfileActWkr(), "");
@@ -76,7 +79,7 @@ public class MainActivityWkr extends AppCompatActivity {
 
             }
         });
-
+        */
         //Buat Warna Inisiasi
        saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_wkr), warnaTab[0],
                 tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis_wkr), warnaTab[1]);
@@ -85,7 +88,8 @@ public class MainActivityWkr extends AppCompatActivity {
         tmb_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(mvPager, 0);
+                tampilkan(new ProfileActWkr());
+                gantiWarnaTab(0, tmbTab[0], tmbTab[1],warnaTab);
             }
         });
 
@@ -93,7 +97,8 @@ public class MainActivityWkr extends AppCompatActivity {
         tmb_Tanya.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(mvPager, 1);
+                tampilkan(new DaftarTanyaActWkr());
+                gantiWarnaTab(1, tmbTab[0], tmbTab[1],warnaTab);
             }
         });
 
@@ -101,24 +106,27 @@ public class MainActivityWkr extends AppCompatActivity {
         tmb_Jawab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(mvPager, 2);
+                tampilkan(new ShareActWkr());
+                gantiWarnaTab(2, tmbTab[0], tmbTab[1],warnaTab);
             }
         });
         tmb_Chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(mvPager, 3);
+                tampilkan(new ChatExprt());
+                gantiWarnaTab(3, tmbTab[0], tmbTab[1],warnaTab);
             }
         });
     }
-/*
+
     void tampilkan(Fragment frag) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.layout_wadah_fragment_wkr, frag);
         ft.commit();
+        Toast.makeText(this, "ganti fragment", Toast.LENGTH_SHORT).show();
     }
-*/
+
     void tampilkan(ViewPager vPager, int posisi) {
         vPager.setCurrentItem(posisi);
     }

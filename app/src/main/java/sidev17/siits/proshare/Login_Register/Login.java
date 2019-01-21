@@ -115,6 +115,8 @@ public class Login extends AppCompatActivity {
                                     editor.putLong("bidang", user.getStatus());
                                     editor.putString("major", user.getBidang());
                                     editor.putString("lang", user.getNegara());
+                                    editor.putString("nama", user.getNama());
+                                    editor.putString("foto", user.getPhotoProfile());
                                     editor.apply();
                                     Toast.makeText(Login.this, String.valueOf((int)Utilities.getUserBidang(getApplicationContext())), Toast.LENGTH_SHORT).show();
                                     switch ((int)user.getStatus()){

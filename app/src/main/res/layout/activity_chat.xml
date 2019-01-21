@@ -14,7 +14,8 @@
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:layout_width="40dp"
-            android:layout_height="40dp" />
+            android:layout_height="40dp"
+            android:src="@drawable/tab_orang"/>
         <TextView
             android:id="@+id/chat_bar_status_nama"
             android:layout_toRightOf="@id/chat_bar_status_foto"
@@ -40,7 +41,7 @@
         android:id="@+id/chat_bar_isi"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="70dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/chat_wadah"

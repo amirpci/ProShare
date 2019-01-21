@@ -19,9 +19,12 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -39,6 +42,8 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,6 +62,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import java.io.File;
 import java.lang.annotation.Target;
@@ -65,11 +71,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Country;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Permasalahan;
+import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.R;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -124,6 +132,450 @@ public class Utilities {
         canvas.drawBitmap(bitmap, rect, rect, paint);
 
         return output;
+    }
+
+    public static void loadBidang(final String bidang_id, final String languageID, final TextView txt_bidang, final Activity act) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.BIDANGKU,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArr = new JSONArray(response);
+                            String bidang = jsonArr.getJSONObject(0).getString("bidang");
+                            try {
+//                                major.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang, Language.ENGLISH, languageID));
+                                txt_bidang.setText(Utilities.ubahBahasa(bidang, languageID, act));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+              //  Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("majority_id", bidang_id);
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(act).add(stringRequest);
+    }
+
+    public static void loadVoteCountProblem(final ImageView voteup, final ImageView votedown, final TextView txtCount, final Activity act, final String id_masalah){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.PROBLEM_VOTE_COUNT,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        JSONParser parser = new JSONParser();
+                        try {
+                            org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(response);
+                            if(json.get("terhapus").toString().equals("1")){
+                                if(json.get("type").toString().equals("1")){
+                                    voteup.setColorFilter(ContextCompat.getColor(act, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                                }else{
+                                    votedown.setColorFilter(ContextCompat.getColor(act, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                                }
+                            }else{
+                                voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                                votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                            }
+                            txtCount.setText(json.get("vote_total").toString());
+                        } catch (org.json.simple.parser.ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(act, Utilities.ubahBahasa("Failed to vote!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("voter", Utilities.getUserID(act));
+                vote.put("id_problem", id_masalah);
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(act).add(stringRequest);
+    }
+
+    public static void voteProblem(final String type, final ImageView voteup, final ImageView votedown, final TextView txtCount, final Activity act, final String id_masalah){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.PROBLEM_VOTE,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        JSONParser parser = new JSONParser();
+                        try {
+                            org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(response);
+                            if(json.get("terhapus").toString().equals("1")){
+                                if(!json.get("type").toString().equals(type)){
+                                    Toast.makeText(act, Utilities.ubahBahasa("Vote changed!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                    voteProblem(type, voteup, votedown, txtCount, act, id_masalah);
+                                    if(json.get("type").toString().equals("1")){
+                                        voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    }else{
+                                        votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    }
+                                }else {
+                                    Toast.makeText(act, Utilities.ubahBahasa("Problem unvoted!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                    loadVoteCountProblem(voteup, votedown,txtCount, act, id_masalah);
+                                }
+                            }else{
+                                Toast.makeText(act, Utilities.ubahBahasa("Problem voted this!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                loadVoteCountProblem(voteup, votedown,txtCount, act, id_masalah);
+                            }
+                        } catch (org.json.simple.parser.ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(act, Utilities.ubahBahasa("Failed to vote!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("voter", Utilities.getUserID(act));
+                vote.put("problem_id", id_masalah);
+                vote.put("type", type);
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(act).add(stringRequest);
+    }
+
+    public static void loadVoteCountSolusi(final ImageView voteup, final ImageView votedown, final TextView txtCount, final Activity act, final String id_solusi){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SOLUTION_VOTE_COUNT,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        JSONParser parser = new JSONParser();
+                        try {
+                            org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(response);
+                            if(json.get("terhapus").toString().equals("1")){
+                                if(json.get("type").toString().equals("1")){
+                                    voteup.setColorFilter(ContextCompat.getColor(act, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                                }else{
+                                    votedown.setColorFilter(ContextCompat.getColor(act, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                                }
+                            }else{
+                                voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                                votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                            }
+                            txtCount.setText(json.get("vote_total").toString());
+                        } catch (org.json.simple.parser.ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(act, Utilities.ubahBahasa("Failed to vote!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("voter", Utilities.getUserID(act));
+                vote.put("id_solusi", id_solusi);
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(act).add(stringRequest);
+    }
+
+    public static void voteSolusi(final String type, final ImageView voteup, final ImageView votedown, final TextView txtCount, final Activity act, final String id_solusi){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SOLUTION_VOTE,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        JSONParser parser = new JSONParser();
+                        try {
+                            org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(response);
+                            if(json.get("terhapus").toString().equals("1")){
+                                if(!json.get("type").toString().equals(type)){
+                                    Toast.makeText(act, Utilities.ubahBahasa("Vote changed!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                    voteSolusi(type, voteup, votedown, txtCount, act, id_solusi);
+                                    if(json.get("type").toString().equals("1")){
+                                        voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    }else{
+                                        votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                                    }
+                                }else {
+                                    Toast.makeText(act, Utilities.ubahBahasa("Problem unvoted!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                    loadVoteCountSolusi(voteup, votedown,txtCount, act, id_solusi);
+                                }
+                            }else{
+                                Toast.makeText(act, Utilities.ubahBahasa("Problem voted this!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                loadVoteCountSolusi(voteup, votedown,txtCount, act, id_solusi);
+                            }
+                        } catch (org.json.simple.parser.ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(act, Utilities.ubahBahasa("Failed to vote!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("voter", Utilities.getUserID(act));
+                vote.put("id_solusi", id_solusi);
+                vote.put("type", type);
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(act).add(stringRequest);
+    }
+
+    //Untuk masang foto.
+    public static void setFotoDariUrl1(String url, ImageView gambar){
+        Picasso.get().load(url).resize(200,200).centerCrop().into(gambar);
+    }
+    public static void setFotoDariUrl2(final ArrayList<String> url, final ImageView gambar1, final ImageView gambar2){
+        Picasso.get().load(url.get(0)).resize(200,200).centerCrop().into(gambar1, new com.squareup.picasso.Callback(){
+
+            @Override
+            public void onSuccess() {
+                Log.d("foto1", "sukses");
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+        Picasso.get().load(url.get(1)).resize(200,200).centerCrop().into(gambar2, new com.squareup.picasso.Callback(){
+
+            @Override
+            public void onSuccess() {
+                Log.d("foto1", "sukses");
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+    }
+    public static void setFotoDariUrl3(final ArrayList<String> url, final ImageView gambar1, final ImageView gambar2, final ImageView gambar3){
+        Picasso.get().load(url.get(0)).resize(200,200).centerCrop().into(gambar1, new com.squareup.picasso.Callback(){
+
+            @Override
+            public void onSuccess() {
+                Log.d("foto1", "sukses");
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.d("foto1 gagal", e.toString());
+            }
+        });
+        Picasso.get().load(url.get(1)).resize(100,100).centerCrop().into(gambar2, new com.squareup.picasso.Callback(){
+
+            @Override
+            public void onSuccess() {
+                Log.d("foto2", "sukses");
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.d("foto2 gagal", e.toString());
+            }
+        });
+        Picasso.get().load(url.get(2)).resize(100,100).centerCrop().into(gambar3, new com.squareup.picasso.Callback(){
+
+            @Override
+            public void onSuccess() {
+                Log.d("foto3", "sukses");
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.d("foto3 gagal", e.toString());
+            }
+        });
+    }
+    public static void loadFotoLampiran(final ArrayList<String> fotoLampiran, final ArrayList<String> videoLampiran, final LinearLayout lampiran, final Activity act, final String id_masalah){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArr = new JSONArray(response);
+                            //  Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                            Solusi sol = new Solusi();
+                            if(jsonArr.length()!=0){
+                                for(int i = 0; i < jsonArr.length(); i++){
+                                    org.json.JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    fotoLampiran.add(jsonObject.getString("url_foto"));
+                                }
+                            }
+                            loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+               // Toast.makeText(act, Utilities.ubahBahasa("error cek solusi!", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("id_problem", id_masalah);
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(act).add(stringRequest);
+    }
+
+    public static void loadVideoLampiran(final ArrayList<String> fotoLampiran, final ArrayList<String> videoLampiran, final LinearLayout lampiran, final Activity act, final String id_masalah) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_VIDEO,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArr = new JSONArray(response);
+                            Solusi sol = new Solusi();
+                            if(jsonArr.length()!=0){
+                                for(int i = 0; i < jsonArr.length(); i++){
+                                    org.json.JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    videoLampiran.add(jsonObject.getString("url_video"));
+                                }
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        initViewLampiran(fotoLampiran, videoLampiran, lampiran, act);
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                initViewLampiran(fotoLampiran, videoLampiran, lampiran, act);
+              //  Toast.makeText(getApplicationContext(), Utilities.ubahBahasa("error cek solusi!", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("id_problem", id_masalah);
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(act).add(stringRequest);
+    }
+
+
+    ///inisiasi foto dan video eprtanyaan
+    public static void initViewLampiran(ArrayList<String> fotoLampiran, ArrayList<String> videoLampiran, LinearLayout lampiran, Activity act) {
+        // fotoLampiran = directlink foto yang ada di server
+        // videoLampiran = direclink video yang ada di server
+        // viewGroup untuk tumbnail foto dan video di awal
+        int panjangLampiran = fotoLampiran.size() + videoLampiran.size();
+        Toast.makeText(act.getApplicationContext(), String.valueOf(panjangLampiran), Toast.LENGTH_LONG).show();
+        if (panjangLampiran != 0) {
+            // GetXMLTask task = new GetXMLTask();
+            if (panjangLampiran == 1) {
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_1, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                if(fotoLampiran.size()!=0)
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                lampiran.addView(v);
+            } else if (panjangLampiran == 2) {
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_2, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
+                if(fotoLampiran.size()==2){
+                    Utilities.setFotoDariUrl2(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2);
+                }else if(fotoLampiran.size()==1)
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                lampiran.addView(v);
+            } else if (panjangLampiran == 3) {
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_3, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
+                ImageView pertanyaanGambar3 = v.findViewById(R.id.lampiran_pertanyaan_3);
+                if(fotoLampiran.size()==3){
+                    Utilities.setFotoDariUrl3(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3);
+                }else if(fotoLampiran.size()==2){
+                    Utilities.setFotoDariUrl2(fotoLampiran,  pertanyaanGambar1, pertanyaanGambar2);
+                }else if(fotoLampiran.size()==1){
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                }
+                lampiran.addView(v);
+            } else {
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_4, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
+                ImageView pertanyaanGambar3 = v.findViewById(R.id.lampiran_pertanyaan_3);
+                TextView countLeft = v.findViewById(R.id.lampiran_count_left);
+                if(fotoLampiran.size()>=3){
+                    Utilities.setFotoDariUrl3(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3);
+                }else if(fotoLampiran.size()==2){
+                    Utilities.setFotoDariUrl2(fotoLampiran,  pertanyaanGambar1, pertanyaanGambar2);
+                }else if(fotoLampiran.size()==1){
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                }
+                pertanyaanGambar3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //pindah untuk melihat list lampiran secara penuh
+                    }
+                });
+                countLeft.setText(String.valueOf(panjangLampiran-3));
+                lampiran.addView(v);
+            }
+        }
+    }
+
+    public static void updateFotoProfile(String url, final CircleImageView gambar){
+        Picasso.get().load(url).resize(100,100).into(new com.squareup.picasso.Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                if(gambar!=null)
+                    gambar.setImageBitmap(bitmap);
+            }
+
+            @Override
+            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        });
     }
 
     public static void updateFoto(final String id_problem, final ImageView gambar, final Context c){
@@ -310,6 +762,23 @@ public class Utilities {
         }
         return kata;
     }
+
+    public static  String ubahBahasaChat(String kata,String langID, Context c){
+        Language languageID=null;
+        switch (langID){
+            case "2" : languageID=Language.INDONESIAN; break;
+            case "3" : languageID=Language.ENGLISH; break;
+            case "4" : languageID=Language.ENGLISH; break;
+            case "5" : languageID=Language.JAPANESE; break;
+        }
+        com.rmtheis.yandtran.translate.Translate.setKey(c.getString(R.string.yandex_api_key));
+        try {
+            return com.rmtheis.yandtran.translate.Translate.execute(kata, languageID, Language.ENGLISH);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return kata;
+    }
     public static String cekNull(String str){
         if(str==null)
             return "null";
@@ -372,6 +841,12 @@ public class Utilities {
         String id = prefs.getString("user", null);
         return  id;
     }
+    //untuk mendapatkan nama pengguna
+    public static String getUserNama(Context c){
+        SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
+        String nama = prefs.getString("nama", null);
+        return  nama;
+    }
     //untuk mendapatkan status pengguna
     public static long getUserBidang(Context c){
         SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
@@ -400,12 +875,16 @@ public class Utilities {
     public static DatabaseReference getChatListRef(Context c){
       //  FirebaseDatabase.getInstance().setPersistenceEnabled(true);
         return FirebaseDatabase.getInstance()
-                .getReference("Daftar Chat"+"/"+getUserID(c).replace(".", ","));
+                .getReference("Daftar Chat");
     }
     //untuk mendapatkan referensi key chat room list
     public static DatabaseReference getChatRoomRef(String chatListId, Context c){
         return FirebaseDatabase.getInstance()
                 .getReference("Chat Room/"+Utilities.getUserID(c)+"/"+chatListId);
+    }
+    public static DatabaseReference getChatRef(){
+        return FirebaseDatabase.getInstance()
+                .getReference("Chats");
     }
     //untuk mendapatkan data pengguna
     public static Pengguna getCurrentUser(Context c){
@@ -421,6 +900,11 @@ public class Utilities {
             }
         });
         return currentUser;
+    }
+
+    //untuk mendapatkan user sekarang
+    public static FirebaseUser getUserNow(){
+        return FirebaseAuth.getInstance().getCurrentUser();
     }
     //untuk mendapatkan key unik
     public static String getUid(){

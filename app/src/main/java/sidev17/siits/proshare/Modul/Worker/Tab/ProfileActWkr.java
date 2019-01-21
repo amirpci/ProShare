@@ -76,7 +76,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 public class ProfileActWkr extends Fragment {
     //private DatabaseReference dataRef;
-   // private StorageReference storageRef;
+    // private StorageReference storageRef;
     private EditText nama;
     private ImageView editNama;
     private TextView status, terjawab, rating, penilai;
@@ -214,11 +214,11 @@ public class ProfileActWkr extends Fragment {
             return tv;
         }
     }
-/*
-==========
-Belum selesai masalah untuk menentukan apakah user sudah me-rekom skill user lain
-==========
-*/
+    /*
+    ==========
+    Belum selesai masalah untuk menentukan apakah user sudah me-rekom skill user lain
+    ==========
+    */
     void initDaftarSkill(){
 
     }
@@ -419,39 +419,41 @@ Belum selesai masalah untuk menentukan apakah user sudah me-rekom skill user lai
             Utilities.getUserRef(Utilities.getUserID(getActivity())).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Pengguna user = dataSnapshot.getValue(Pengguna.class);
-                    String nama_ = user.getNama();
-                    long status_ = user.getStatus();
-                    String photo_ = user.getPhotoProfile();
-                    String bidang_ = user.getBidang();
-                    String langID = user.getNegara();
-                    Language languageID=null;
-                    switch (langID){
-                        case "2" : languageID=Language.INDONESIAN; break;
-                        case "3" : languageID=Language.ENGLISH; break;
-                        case "4" : languageID=Language.ENGLISH; break;
-                        case "5" : languageID=Language.JAPANESE; break;
-                    }
-                    com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
-                    try {
-                        loadBidang(bidang_, languageID);
-                        switch ((int)status_){
-                            case 200 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Worker", Language.ENGLISH, languageID)); break;
-                            case 201 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Expert", Language.ENGLISH, languageID)); break;
-                            case 202 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Verified Expert", Language.ENGLISH, languageID)); break;
+                    if(getActivity()!=null){
+                        Pengguna user = dataSnapshot.getValue(Pengguna.class);
+                        String nama_ = user.getNama();
+                        long status_ = user.getStatus();
+                        String photo_ = user.getPhotoProfile();
+                        String bidang_ = user.getBidang();
+                        String langID = user.getNegara();
+                        Language languageID=null;
+                        switch (langID){
+                            case "2" : languageID=Language.INDONESIAN; break;
+                            case "3" : languageID=Language.ENGLISH; break;
+                            case "4" : languageID=Language.ENGLISH; break;
+                            case "5" : languageID=Language.JAPANESE; break;
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
+                        try {
+                            loadBidang(bidang_, languageID);
+                            switch ((int)status_){
+                                case 200 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Worker", Language.ENGLISH, languageID)); break;
+                                case 201 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Expert", Language.ENGLISH, languageID)); break;
+                                case 202 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Verified Expert", Language.ENGLISH, languageID)); break;
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        nama.setText(nama_);
+                        if(photo_!=null){
+                            Glide.with(getActivity()).load(photo_).into(profile_photo);
+                            pp_view.setVisibility(View.GONE);
+                            addPhoto.setVisibility(View.GONE);
+                            profile_photo.setVisibility(View.VISIBLE);
+                        }
+                        Toast.makeText(getActivity(), "coba", Toast.LENGTH_SHORT).show();
+                        loading.dismiss();
                     }
-                    nama.setText(nama_);
-                    if(photo_!=null){
-                        Glide.with(getActivity()).load(photo_).into(profile_photo);
-                        pp_view.setVisibility(View.GONE);
-                        addPhoto.setVisibility(View.GONE);
-                        profile_photo.setVisibility(View.VISIBLE);
-                    }
-                    Toast.makeText(getActivity(), "coba", Toast.LENGTH_SHORT).show();
-                    loading.dismiss();
                 }
 
                 @Override
@@ -524,13 +526,19 @@ Belum selesai masalah untuk menentukan apakah user sudah me-rekom skill user lai
             uploading.setMessage("uploading...");
             uploading.show();
             alamatPhoto = data.getData();
-            StorageReference filepath = Utilities.getProfileImageStorageRef(getActivity()).child("myProfile");
+            final StorageReference filepath = Utilities.getProfileImageStorageRef(getActivity()).child("myProfile");
             filepath.putFile(alamatPhoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                //    pp_url = taskSnapshot.getDownloadUrl().toString();
-                    Utilities.getProfileImageRef(getActivity()).setValue(pp_url);
-                    loadUploadedPP();
+                    //    pp_url = taskSnapshot.getDownloadUrl().toString();
+                    filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            String alamatUrl = uri.toString();
+                            Utilities.getProfileImageRef(getActivity()).setValue(alamatUrl);
+                            loadUploadedPP();
+                        }
+                    });
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override

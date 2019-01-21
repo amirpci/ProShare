@@ -3,6 +3,9 @@ package sidev17.siits.proshare.Modul.Expert;
 import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +17,7 @@ import android.widget.Toast;
 
 import sidev17.siits.proshare.Modul.Expert.Tab.FeedbackActExprt;
 import sidev17.siits.proshare.Modul.Expert.Tab.JawabActExprt;
+import sidev17.siits.proshare.Modul.Expert.Tab.ProfileActExprt;
 import sidev17.siits.proshare.Modul.Expert.Tab.TimelineActExprt;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
 import sidev17.siits.proshare.R;
@@ -24,8 +28,8 @@ public class MainActivityExprt extends AppCompatActivity {
     private LinearLayout tmb_Profile, tmb_Jawab, tmb_Timeline, tmb_Feedback;
     private ImageView garis_Profile, garis_Timeline, garis_Jawab, garis_Feedback;
 
-    private ViewPagerAdapter adapter;
-    private ViewPager mvPager;
+    //private ViewPagerAdapter adapter;
+   // private ViewPager mvPager;
     private boolean click_duaKali=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,23 +40,21 @@ public class MainActivityExprt extends AppCompatActivity {
         final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
                 {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
-       // final ImageView icon_Profile = (ImageView) findViewById(R.id.tab_profile_ikon);
-      //  garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis);
 
         tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile_Exprt);
         tmb_Timeline = (LinearLayout) findViewById(R.id.tab_timeline_Exprt);
         tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab_Exprt);
         tmb_Feedback = (LinearLayout) findViewById(R.id.tab_feedback_Exprt);
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
-        adapter.AddFragment(new ProfileActWkr(), "");
-        adapter.AddFragment(new JawabActExprt(), "");
-        adapter.AddFragment(new TimelineActExprt(), "");
-        adapter.AddFragment(new FeedbackActExprt(), "");
-        mvPager.setAdapter(adapter);
+       // adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        //mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
+       // adapter.AddFragment(new ProfileActWkr(), "");
+        //adapter.AddFragment(new JawabActExprt(), "");
+        //adapter.AddFragment(new TimelineActExprt(), "");
+        //adapter.AddFragment(new FeedbackActExprt(), "");
+        //mvPager.setAdapter(adapter);
 
-        tampilkan(mvPager, 1);
-
+        //tampilkan(mvPager, 1);
+/*
         mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -69,16 +71,18 @@ public class MainActivityExprt extends AppCompatActivity {
 
             }
         });
-
+*/
         //Buat Warna Inisiasi
-        saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_jawab_ikon_Exprt), warnaTab[0],
-                tmbTab[1], (ImageView) findViewById(R.id.tab_jawab_garis_Exprt), warnaTab[1]);
+        saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_Exprt), warnaTab[0],
+                tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis_Exprt), warnaTab[1]);
 
 //        garis_Profile= (ImageView) findViewById(R.id.tab_profile_garis);
         tmb_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(mvPager, 0);
+                tampilkan(new ProfileActExprt());
+                gantiWarnaTab(0, tmbTab[0], tmbTab[1],warnaTab);
+                //tampilkan(mvPager, 0);
             }
         });
 
@@ -86,7 +90,9 @@ public class MainActivityExprt extends AppCompatActivity {
         tmb_Timeline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(mvPager, 2);
+                tampilkan(new TimelineActExprt());
+                gantiWarnaTab(2, tmbTab[0], tmbTab[1],warnaTab);
+                //tampilkan(mvPager, 2);
             }
         });
 
@@ -94,28 +100,30 @@ public class MainActivityExprt extends AppCompatActivity {
         tmb_Jawab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(mvPager, 1);
+                tampilkan(new JawabActExprt());
+                gantiWarnaTab(1, tmbTab[0], tmbTab[1],warnaTab);
+                //tampilkan(mvPager, 1);
             }
         });
 
         tmb_Feedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(mvPager, 3);
-                saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_feedback_ikon_Exprt), warnaTab[0],
-                        tmbTab[1], (ImageView) findViewById(R.id.tab_feedback_garis_Exprt), warnaTab[1]);
+                tampilkan(new FeedbackActExprt());
+                gantiWarnaTab(3, tmbTab[0], tmbTab[1],warnaTab);
             }
         });
     }
 
-/*
+
     void tampilkan(Fragment frag) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.layout_wadah_fragment_Exprt, frag);
+        ft.addToBackStack(null);
         ft.commit();
     }
-*/
+
     void tampilkan(ViewPager vPager, int posisi) {
         vPager.setCurrentItem(posisi);
     }

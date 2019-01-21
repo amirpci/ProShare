@@ -48,7 +48,7 @@ public class Register extends AppCompatActivity {
     public FrameLayout registerLayout;
     public String namaReg="", emailReg="", negaraReg="", spesialisasiReg="", passwordReg="";
     public int positionNegara=0,positionBidang=0;
-    public int clickCounter=0;
+    public int clickCounter = 0;
     public int contHeight = 0;
     public static final String[] negara = {"Select...","Indonesia", "United States", "United Kingdom", "Japan"};
     public static final String[] specialization = {"Select...","Safety Engineering", "Civil Engineering", "Constructional", "Enviromental Engineering","Materials Science","More Options"};
@@ -119,7 +119,7 @@ public class Register extends AppCompatActivity {
         progress.show();
         final Pengguna user = new Pengguna();
         user.setNama(Nama_);
-        user.setEmail(Email_.replace(".",",").toLowerCase());
+        user.setEmail(Email_.toLowerCase());
         user.setPassword(Pass_);
         user.setNegara(Negara_);
         user.setBidang(Bidang_);
