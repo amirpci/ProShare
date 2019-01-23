@@ -361,13 +361,20 @@ public class ArrayMod {
         return (indKosong.length == 0) ? -1 : indKosong[0];
     }
     public static <Tipe> int[] cariKosong(Tipe array[], boolean semua){
+        return cariKosong(array, semua, array.length);
+    }
+    //(#param) sampai -> batas indek array yang dicari
+    public static <Tipe> int[] cariKosong(Tipe array[], boolean semua, int sampai){
         int indKosong[]= new int[0];
         int i= 0;
-        int batas= (semua) ? array.length : 1;
+        int mirip= 0;
+        int batas= (semua) ? sampai : 1;
         do {
-            if (array[i] == null)
-                indKosong = tambahArray(indKosong, i++);
-        } while(i<batas);
+            if (array[i] == null) {
+                indKosong = tambahArray(indKosong, i);
+                mirip++;
+            }
+        } while(mirip<batas && ++i<array.length);
         return indKosong;
     }
 
@@ -376,13 +383,20 @@ public class ArrayMod {
         return (indKosong.length == 0) ? -1 : indKosong[0];
     }
     public static int[] cariKosong(int array[], boolean semua){
+        return cariKosong(array, semua, array.length);
+    }
+    //(#param) sampai -> batas indek array yang dicari
+    public static int[] cariKosong(int array[], boolean semua, int sampai){
         int indKosong[]= new int[0];
         int i= 0;
-        int batas= (semua) ? array.length : 1;
+        int mirip= 0;
+        int batas= (semua) ? sampai : 1;
         do {
-            if (array[i]== 0)
-                indKosong = tambahArray(indKosong, i++);
-        } while(i<batas);
+            if (array[i]== 0) {
+                indKosong = tambahArray(indKosong, i);
+                mirip++;
+            }
+        } while(mirip<batas && ++i<array.length);
         return indKosong;
     }
 

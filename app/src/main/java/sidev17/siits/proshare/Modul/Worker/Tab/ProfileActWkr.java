@@ -51,10 +51,12 @@ import com.google.firebase.storage.UploadTask;
 import java.util.HashMap;
 import java.util.Map;
 
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
-import sidev17.siits.proshare.Model.View.ImgViewTouch;
-import sidev17.siits.proshare.Model.View.MenuBarView;
+import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
+import sidev17.siits.proshare.Utils.View.ImgViewTouch;
+import sidev17.siits.proshare.Utils.View.MenuBarView;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Modul.SettingAct;
 import sidev17.siits.proshare.Utils.ArrayMod;
@@ -142,6 +144,17 @@ public class ProfileActWkr extends Fragment {
                 startActivityForResult(add, ambilPhoto);
             }
         });
+
+        initMenuBar();
+        initBidang();
+
+        ((MainActivityWkr)getActivity()).aturPenungguGantiHalaman(new MainActivityWkr.PenungguGantiHalaman() {
+            @Override
+            public void gantiHalaman(int halSebelumnnya, int halamanSkrg) {
+                if(!menuBar.menuBisaDitampilkan() || menuBar.menuDitampilkan())
+                    menuBar.klik();
+            }
+        });
 /*
         signout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,8 +168,6 @@ public class ProfileActWkr extends Fragment {
             }
         });
 */
-        initMenuBar();
-        initBidang();
 
         return v;
     }
@@ -258,7 +269,7 @@ public class ProfileActWkr extends Fragment {
         int tersedia[]= {menuBar.ITEM_TERSEDIA, menuBar.ITEM_TERSEDIA};
         menuBar.aturGmbItem(gmbOpsi);
         menuBar.aturItemTersedia(tersedia);
-//        menuBar.aturArahBar(menuBar.ARAH_VERTICAL);
+//        menuBar.aturArahBar(menuBar.ARAH_VERTIKAL);
         menuBar.aturLetakRelatif(menuBar.BAR_DI_BAWAH);
         menuBar.aturWarnaTersedia("#FFFFFF");
         menuBar.aturWarnaTakTersedia();
@@ -266,33 +277,34 @@ public class ProfileActWkr extends Fragment {
         menuBar.aturPenungguKlikBar(new MenuBarView.PenungguKlik_BarView() {
             @Override
             public void klik(MenuBarView v, boolean menuDitampilkan) {
-                if(!menuDitampilkan) {
-                    v.sembunyikanLatar();
+                if(!menuDitampilkan && v.menuBisaDitampilkan()) {
+//                    v.sembunyikanLatar();
                     v.setBackgroundColor(getResources().getColor(R.color.abuTua));
+                } else if(!menuDitampilkan && !v.menuBisaDitampilkan()){
+                    v.menuBisaDitampilkan(true);
+                    v.aturGambarInduk(R.drawable.obj_titik_tiga_horizontal);
+                    v.aturWarnaInduk("#ffffff");
+                    v.aturWarnaLatar("#C9C9C9");
+//                    menuBar.setSelected(false);
+                    simpanProfil(nama.getText().toString(), (String) bidang.getSelectedItem());
                 }
-                else{
-                    v.latarIndukAwal();
+                else if(menuDitampilkan){
+//                    v.latarIndukAwal();
                 }
             }
         });
         menuBar.aturAksiKlikItem(0, new ImgViewTouch.PenungguKlik() {
             @Override
             public void klik(View v) {
-                if(!menuBar.isSelected()) {
-                    editProfil(true);
-                    menuBar.aturGambarInduk(R.drawable.obj_centang);
-                    menuBar.aturWarnaInduk("#ffffff");
-                    menuBar.aturWarnaLatar("#4972AD");
-                    menuBar.setSelected(true);
-                    menuBar.klik();
-                } else{
-                    editProfil(false);
-                    menuBar.aturGambarInduk(R.drawable.obj_titik_tiga_horizontal);
-                    menuBar.aturWarnaInduk("#ffffff");
-                    menuBar.aturWarnaLatar("#C9C9C9");
-                    menuBar.setSelected(false);
-                    simpanProfil(nama.getText().toString(), (String) bidang.getSelectedItem());
-                }
+                editProfil(true);
+                menuBar.latarIndukAwal();
+                menuBar.aturGambarInduk(R.drawable.obj_centang);
+                menuBar.aturWarnaInduk("#ffffff");
+                menuBar.aturWarnaLatar("#4972AD");
+//                menuBar.setSelected(true);
+                menuBar.klik();
+                menuBar.menuBisaDitampilkan(false);
+
             }
         });
         menuBar.aturAksiKlikItem(1, new ImgViewTouch.PenungguKlik() {
@@ -310,6 +322,8 @@ public class ProfileActWkr extends Fragment {
             }
         });
         menuBar.latarIndukAwal();
+
+        ((Aktifitas)getActivity()).daftarkanBatas(menuBar.ambilBatas());
     }
     void editProfil(boolean enable){
         int visibility= (enable) ? View.VISIBLE : View.GONE;
@@ -318,6 +332,9 @@ public class ProfileActWkr extends Fragment {
     }
     void simpanProfil(String nama, String bidang){
         //lakukan sesuatu
+        editProfil(false);
+        if(editNama.isSelected())
+            editNama.performClick();
     }
 
     void gantiBahasa(Context c){

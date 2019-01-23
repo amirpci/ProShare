@@ -20,9 +20,10 @@ import sidev17.siits.proshare.Modul.Worker.Tab.DaftarTanyaActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ShareActWkr;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.ViewPagerAdapter;
 
-public class MainActivityWkr extends AppCompatActivity {
+public class MainActivityWkr extends Aktifitas {
 
     private LinearLayout tmb_Profile;
     private ImageView garis_Profile;
@@ -36,6 +37,10 @@ public class MainActivityWkr extends AppCompatActivity {
   //  private ViewPagerAdapter adapter;
    // private ViewPager mvPager;
     private boolean click_duaKali=false;
+
+    private int halamanFragmen= 0;
+    private PenungguGantiHalaman pngGantiHalaman;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +93,8 @@ public class MainActivityWkr extends AppCompatActivity {
         tmb_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ProfileActWkr());
-                gantiWarnaTab(0, tmbTab[0], tmbTab[1],warnaTab);
+                tampilkan(new ProfileActWkr(), 0);
+                gantiWarnaTab(0, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
 
@@ -97,8 +102,8 @@ public class MainActivityWkr extends AppCompatActivity {
         tmb_Tanya.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new DaftarTanyaActWkr());
-                gantiWarnaTab(1, tmbTab[0], tmbTab[1],warnaTab);
+                tampilkan(new DaftarTanyaActWkr(), 1);
+                gantiWarnaTab(1, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
 
@@ -106,24 +111,36 @@ public class MainActivityWkr extends AppCompatActivity {
         tmb_Jawab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ShareActWkr());
-                gantiWarnaTab(2, tmbTab[0], tmbTab[1],warnaTab);
+                tampilkan(new ShareActWkr(), 2);
+                gantiWarnaTab(2, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
         tmb_Chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ChatExprt());
-                gantiWarnaTab(3, tmbTab[0], tmbTab[1],warnaTab);
+                tampilkan(new ChatExprt(), 3);
+                gantiWarnaTab(3, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
     }
 
-    void tampilkan(Fragment frag) {
+    public interface PenungguGantiHalaman{
+        void gantiHalaman(int halSebelumnnya, int halamanSkrg);
+    }
+    public void aturPenungguGantiHalaman(PenungguGantiHalaman png){
+        pngGantiHalaman= png;
+    }
+
+    void tampilkan(Fragment frag, int halamanKe) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.replace(R.id.layout_wadah_fragment_wkr, frag);
         ft.commit();
+
+        if(pngGantiHalaman != null)
+            pngGantiHalaman.gantiHalaman(halamanFragmen, halamanKe);
+        halamanFragmen= halamanKe;
+
         Toast.makeText(this, "ganti fragment", Toast.LENGTH_SHORT).show();
     }
 

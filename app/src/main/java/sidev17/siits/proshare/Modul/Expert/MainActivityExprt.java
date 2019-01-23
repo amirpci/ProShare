@@ -31,6 +31,8 @@ public class MainActivityExprt extends AppCompatActivity {
     //private ViewPagerAdapter adapter;
    // private ViewPager mvPager;
     private boolean click_duaKali=false;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

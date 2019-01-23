@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Utils;
+package sidev17.siits.proshare.Utils;//package cob.cob3_1_2.Tools;
 
 
 public class Array<Tipe> {
@@ -6,6 +6,7 @@ public class Array<Tipe> {
 
     private Object elemen[];
     private boolean bolehRumpang= false;
+//    private boolean bolehDuplikat= false;
     private int ukuran= 0;
     private int indIsi= 0;  //berguna untuk arrayyang boleh rumpang
     private int batas= -1;
@@ -13,11 +14,6 @@ public class Array<Tipe> {
     public final ArrayPrimitif PRIMITIF= new ArrayPrimitif();
 
     private PenungguTraverse<Tipe> pngTraverse;
-
-//    private int mapping[]= new int[0];
-
-//    private int ukuranAwal; //ukuran yang ditentukan pengguna
-//    private int indIsi;
 
 
     public Array(Tipe array[]){
@@ -35,6 +31,10 @@ public class Array<Tipe> {
             ukuran= batas;
         }
     }
+    public Array(Object arrayPrimitif){
+        elemen= new Object[UKURAN_DEFAULT];
+        dariArrayPrimitif(arrayPrimitif);
+    }
     public Array(int ukuranAwal){
 //        bolehRumpang= false;
         elemen= new Object[ukuranAwal];
@@ -49,6 +49,8 @@ public class Array<Tipe> {
     }
 
     public void tambah(Tipe masuk){
+        if(masuk == null)
+            return;
         if(ukuran >= elemen.length)
             elemen= ArrayMod.ubahArray(elemen, ukuran +10);
         if(!bolehRumpang) {
@@ -64,6 +66,8 @@ public class Array<Tipe> {
         }
     }
     public void tambah(Tipe masuk, int indek){
+        if(masuk == null)
+            return;
         if(!bolehRumpang && indek > ukuran)
             throw new IndexOutOfBoundsException(pesanOutOfBound(indek));
         if (ukuran >= elemen.length || indek >= elemen.length){
@@ -80,10 +84,10 @@ public class Array<Tipe> {
 
         if(indek > batas)
             batas= indek;
-        else if(ukuran > batas)
+        else if((ukuran-1) > batas)
             batas= ukuran-1;
 
-        if(indek == indIsi)
+        if(bolehRumpang)
             kosongSelanjutnya();
     }
 
@@ -129,13 +133,16 @@ public class Array<Tipe> {
         return array;
     }
 
+
     public class ArrayPrimitif{
         //parameter hanya sebagai pembeda method, bukan pengubah array
 
         public char[] arrayChar(){
-            Object cek= elemen[0];
-            if(!(cek instanceof Character))
-                throw new ClassCastException(pesanClassCast(cek.getClass().getName(), char.class.getName()));
+            if(ukuran > 0){
+                Object cek= elemen[0];
+                if(!(cek instanceof Character))
+                    throw new ClassCastException(pesanClassCast(cek.getClass().getName(), char.class.getName()));
+            }
 //            int batas= (!bolehRumpang) ? ukuran : elemen.length;
             char array[]= new char[batas+1];
             for(int i= 0; i<= batas; i++)
@@ -144,9 +151,11 @@ public class Array<Tipe> {
             return array;
         }
         public int[] arrayInt(){
-            Object cek= elemen[0];
-            if(!(cek instanceof Integer))
-                throw new ClassCastException(pesanClassCast(cek.getClass().getName(), int.class.getName()));
+            if(ukuran > 0){
+                Object cek= elemen[0];
+                if(!(cek instanceof Integer))
+                    throw new ClassCastException(pesanClassCast(cek.getClass().getName(), int.class.getName()));
+            }
 //            int batas= (!bolehRumpang) ? ukuran : elemen.length;
             int array[]= new int[batas+1];
             for(int i= 0; i<= batas; i++)
@@ -155,9 +164,11 @@ public class Array<Tipe> {
             return array;
         }
         public byte[] arrayByte(){
-            Object cek= elemen[0];
-            if(!(cek instanceof Byte))
-                throw new ClassCastException(pesanClassCast(cek.getClass().getName(), byte.class.getName()));
+            if(ukuran > 0){
+                Object cek= elemen[0];
+                if(!(cek instanceof Byte))
+                    throw new ClassCastException(pesanClassCast(cek.getClass().getName(), byte.class.getName()));
+            }
 //            int batas= (!bolehRumpang) ? ukuran : elemen.length;
             byte array[]= new byte[batas+1];
             for(int i= 0; i<= batas; i++)
@@ -166,9 +177,11 @@ public class Array<Tipe> {
             return array;
         }
         public boolean[] arrayBoolean(){
-            Object cek= elemen[0];
-            if(!(cek instanceof Boolean))
-                throw new ClassCastException(pesanClassCast(cek.getClass().getName(), boolean.class.getName()));
+            if(ukuran > 0){
+                Object cek= elemen[0];
+                if(!(cek instanceof Boolean))
+                    throw new ClassCastException(pesanClassCast(cek.getClass().getName(), boolean.class.getName()));
+            }
 //            int batas= (!bolehRumpang) ? ukuran : elemen.length;
             boolean array[]= new boolean[batas+1];
             for(int i= 0; i<= batas; i++)
@@ -177,9 +190,11 @@ public class Array<Tipe> {
             return array;
         }
         public short[] arrayShort(){
-            Object cek= elemen[0];
-            if(!(cek instanceof Short))
-                throw new ClassCastException(pesanClassCast(cek.getClass().getName(), short.class.getName()));
+            if(ukuran > 0){
+                Object cek= elemen[0];
+                if(!(cek instanceof Short))
+                    throw new ClassCastException(pesanClassCast(cek.getClass().getName(), short.class.getName()));
+            }
 //            int batas= (!bolehRumpang) ? ukuran : elemen.length;
             short array[]= new short[batas+1];
             for(int i= 0; i<= batas; i++)
@@ -188,9 +203,11 @@ public class Array<Tipe> {
             return array;
         }
         public long[] arrayLong(){
-            Object cek= elemen[0];
-            if(!(cek instanceof Long))
-                throw new ClassCastException(pesanClassCast(cek.getClass().getName(), long.class.getName()));
+            if(ukuran > 0){
+                Object cek= elemen[0];
+                if(!(cek instanceof Long))
+                    throw new ClassCastException(pesanClassCast(cek.getClass().getName(), long.class.getName()));
+            }
 //            int batas= (!bolehRumpang) ? ukuran : elemen.length;
             long array[]= new long[batas+1];
             for(int i= 0; i<= batas; i++)
@@ -199,9 +216,11 @@ public class Array<Tipe> {
             return array;
         }
         public float[] arrayFloat(){
-            Object cek= elemen[0];
-            if(!(cek instanceof Float))
-                throw new ClassCastException(pesanClassCast(cek.getClass().getName(), float.class.getName()));
+            if(ukuran > 0){
+                Object cek= elemen[0];
+                if(!(cek instanceof Float))
+                    throw new ClassCastException(pesanClassCast(cek.getClass().getName(), float.class.getName()));
+            }
 //            int batas= (!bolehRumpang) ? ukuran : elemen.length;
             float array[]= new float[batas+1];
             for(int i= 0; i<= batas; i++)
@@ -210,9 +229,11 @@ public class Array<Tipe> {
             return array;
         }
         public double[] arrayDouble(){
-            Object cek= elemen[0];
-            if(!(cek instanceof Double))
-                throw new ClassCastException(pesanClassCast(cek.getClass().getName(), double.class.getName()));
+            if(ukuran > 0){
+                Object cek= elemen[0];
+                if(!(cek instanceof Double))
+                    throw new ClassCastException(pesanClassCast(cek.getClass().getName(), double.class.getName()));
+            }
 //            int batas= (!bolehRumpang) ? ukuran : elemen.length;
             double array[]= new double[batas+1];
             for(int i= 0; i<= batas; i++)
@@ -220,6 +241,59 @@ public class Array<Tipe> {
 //            System.arraycopy(elemen, 0, array, 0, ukuran);
             return array;
         }
+    }
+
+
+    public void dariArrayPrimitif(Object arrayPrimitif){
+        Class<?> tipeArray= arrayPrimitif.getClass();
+        Class<?> tipeData= arrayPrimitif.getClass().getComponentType();
+        if(tipeArray.isArray() && tipeArray.getComponentType().isPrimitive()){
+            if (tipeData == char.class) {
+                char array[]= (char[]) arrayPrimitif;
+                hapusSemua();
+                for(int i= 0; i< array.length; i++)
+                    tambah((Tipe) new Character(array[i]));
+            } else if (tipeData == int.class) {
+                int array[]= (int[]) arrayPrimitif;
+                hapusSemua();
+                for(int i= 0; i< array.length; i++)
+                    tambah((Tipe) new Integer(array[i]));
+            } else if (tipeData == byte.class) {
+                byte array[]= (byte[]) arrayPrimitif;
+                hapusSemua();
+                for(int i= 0; i< array.length; i++)
+                    tambah((Tipe) new Byte(array[i]));
+            } else if (tipeData == boolean.class) {
+                boolean array[]= (boolean[]) arrayPrimitif;
+                hapusSemua();
+                for(int i= 0; i< array.length; i++)
+                    tambah((Tipe) new Boolean(array[i]));
+            } else if (tipeData == short.class) {
+                short array[]= (short[]) arrayPrimitif;
+                hapusSemua();
+                for(int i= 0; i< array.length; i++)
+                    tambah((Tipe) new Short(array[i]));
+            } else if (tipeData == long.class) {
+                long array[]= (long[]) arrayPrimitif;
+                hapusSemua();
+                for(int i= 0; i< array.length; i++)
+                    tambah((Tipe) new Long(array[i]));
+            } else if (tipeData == float.class) {
+                float array[]= (float[]) arrayPrimitif;
+                hapusSemua();
+                for(int i= 0; i< array.length; i++)
+                    tambah((Tipe) new Float(array[i]));
+            } else if (tipeData == double.class) {
+                double array[]= (double[]) arrayPrimitif;
+                hapusSemua();
+                for(int i= 0; i< array.length; i++)
+                    tambah((Tipe) new Double(array[i]));
+            } else if (tipeData == void.class) {
+                throw new IllegalArgumentException("Gak bisa buat array tipe void");
+            } else
+                throw new AssertionError();
+        } else
+            throw new RuntimeException("Parameter bukan arrayPrimitif");
     }
 
     private Object arrayPrimitif(Class<?> tipeData, int ukuran) throws NegativeArraySizeException {
@@ -246,11 +320,15 @@ public class Array<Tipe> {
     }
 
     public void ganti(int indek, Tipe masuk){
+        if(masuk == null)
+            return;
         if((!bolehRumpang && indek >= ukuran) || indek >= elemen.length)
             throw new IndexOutOfBoundsException(pesanOutOfBound(indek));
         elemen[indek]= masuk;
     }
     public boolean ganti(Tipe keluar, Tipe masuk, boolean semuaYgMirip){
+        if(masuk == null)
+            return false;
         if(!semuaYgMirip)
             return ganti(keluar, masuk);
         if(!keluar.getClass().getName().equals(masuk.getClass().getName()))
@@ -276,6 +354,8 @@ public class Array<Tipe> {
         return true;
     }
     public boolean ganti(Tipe keluar, Tipe masuk){
+        if(masuk == null)
+            return false;
         if(!keluar.getClass().getName().equals(masuk.getClass().getName()))
             throw new ClassCastException(pesanClassCast(keluar.getClass(), masuk.getClass()));
         int indek= -1;
@@ -299,7 +379,14 @@ public class Array<Tipe> {
         return false;
     }
 
-
+    public void hapusSemua(){
+        if(ukuran > 0) {
+            elemen= new Object[UKURAN_DEFAULT];
+            ukuran= 0;
+            indIsi= 0;
+            batas= -1;
+        }
+    }
     public Tipe hapus(int indek){
         if((!bolehRumpang && indek >= ukuran) || indek >= elemen.length)
             return null;
@@ -327,7 +414,7 @@ public class Array<Tipe> {
     }
     public boolean hapus(int daftarInd[]){
         int jmlDihapus= daftarInd.length;
-        if(jmlDihapus == 0 || jmlDihapus > ukuran)
+        if(jmlDihapus == 0 || jmlDihapus > batas)
             return false;
 
         ArrayMod.urutkan(daftarInd);
@@ -349,10 +436,9 @@ public class Array<Tipe> {
                 } else if(daftarInd[jalanHapus] > this.batas)
                     throw new IndexOutOfBoundsException(pesanOutOfBound(daftarInd[i]));
 
-            this.batas-= jmlDihapus;
-            while(jmlDihapus-- > 0){
-                elemen[--ukuran]= null;
-            }
+            ukuran-= jmlDihapus;
+            while(jmlDihapus-- > 0)
+                elemen[this.batas--]= null;
         } else{
             for(int i= 0; i< daftarInd.length; i++){
                 elemen[daftarInd[i]]= null;
@@ -371,7 +457,7 @@ public class Array<Tipe> {
         return true;
     }
 
-    public boolean hapus(Tipe keluar){
+    public int hapus(Tipe keluar){
         int indek= -1;
         if(keluar instanceof Comparable){
             for(int i= 0; i< ukuran; i++)
@@ -392,7 +478,6 @@ public class Array<Tipe> {
                 System.arraycopy(elemen, indek+1, elemen, indek, ygGeser);
                 elemen[--ukuran]= null;
                 batas= ukuran-1;
-                return true;
             } else{
                 elemen[indek]= null;
                 ukuran--;
@@ -406,12 +491,13 @@ public class Array<Tipe> {
                 if(indek < indIsi)
                     indIsi= indek;
             }
+//            return indek;
         }
-        return false;
+        return indek;
     }
     public boolean hapus(Tipe keluar, boolean semuaYgMirip){
         if(!semuaYgMirip)
-            return hapus(keluar);
+            return (hapus(keluar) != -1) ? true : false;
         int jmlYgMirip= 0;
         int batas= (!bolehRumpang) ? ukuran : elemen.length;
 //        int batasJmlYgMirip= ukuran;
@@ -476,15 +562,19 @@ public class Array<Tipe> {
         return indek[ke];
     }
     public int indekAwal(Tipe isi){
+        if(ukuran == 0)
+            return -1;
         if(isi instanceof Comparable) {
             Comparable<Tipe> array[]= new Comparable[batas+1];
             salinArray(elemen, 0, array, 0, batas+1);
-            return ArrayMod.cariIndDlmArray(array, isi);
+            return ArrayMod.cariIndDlmArray(array, (Comparable) isi);
         } else
             return ArrayMod.cariIndDlmArray(elemen, isi);
     }
     public int indekAkhir(Tipe isi){
         int indek[]= indek(isi);
+        if(indek.length == 0)
+            return -1;
         return indek[indek.length-1];
     }
 
@@ -492,7 +582,7 @@ public class Array<Tipe> {
         if(isi instanceof Comparable){
             Comparable<Tipe> array[]= new Comparable[batas+1];
             salinArray(elemen, 0, array, 0, batas+1);
-            return ArrayMod.cariIndDlmArray(array, isi, true);
+            return ArrayMod.cariIndDlmArray(array, (Comparable) isi, true);
         }
         return ArrayMod.cariIndDlmArray(elemen, isi, true);
     }
@@ -509,11 +599,13 @@ public class Array<Tipe> {
     }
 
     public int[] indekKosong(boolean semua){
+/*
         int batas= this.batas +1;
         Object elemenPenuh[]= new Object[batas];
         for(int i= 0; i< batas; i++)
             elemenPenuh[i]= elemen[i];
-        return ArrayMod.cariKosong(elemenPenuh, semua);
+*/
+        return ArrayMod.cariKosong(elemen, semua, batas +1);
     }
 
     //jml elemen yang berisi (tidak null)
@@ -548,13 +640,25 @@ public class Array<Tipe> {
         void traverse(int indek, Tipe isi);
     }
 
-    /*
-    =========================
-    Struktur Array Elemen
-    =========================
-    */
+/*
+=========================
+Struktur Array Elemen
+=========================
+*/
+/*
+    public void aturBolehDuplikat(boolean boleh){
+        bolehDuplikat= boleh;
+    }
+    private boolean hilangkanDuplikat(){
+        int indek[];
+        int duplikat[][];
+        for(int i= 0; i< batas; i++)
+            if(elemen[i] != null && )
+        indek()
+    }
+*/
     public void aturBolehRumpang(boolean boleh){
-        if(boleh= bolehRumpang)
+        if(boleh== bolehRumpang)
             return;
         if(bolehRumpang){
             rampingkan();
@@ -583,20 +687,43 @@ public class Array<Tipe> {
         return true;
     }
     private void kosongSelanjutnya(){
-        int batas= this.batas +2;
-        for(int i= indIsi; i< batas; i++)
-            if(elemen[i]== null){
-                indIsi= i;
-                break;
-            }
+        int batas= this.batas +1;
+        if(batas < elemen.length){
+            for(int i= indIsi; i<= batas; i++)
+                if(elemen[i]== null){
+                    indIsi= i;
+                    break;
+                }
+        } else
+            indIsi= batas;
     }
 
+    //jika Array #ini memiliki isi yang sama dengan urutan yang sama juga dengan #param "masuk"
+    public boolean samaDengan(Array<Tipe> masuk){
+        if(ukuran == 0)
+            throw new RuntimeException("Array<Tipe> kosong dan tidak bisa di-SETARAKAN!");
 
-    /*
-    =========================
-    Exception
-    =========================
-    */
+        Object cek= elemen[0];
+        if(cek instanceof Comparable){
+            if(masuk.ukuran() != ukuran)
+                return false;
+
+            for(int i= 0; i< batas; i++)
+                if(((Comparable) elemen[i]).compareTo(masuk.ambil(i)) != 0)
+                    return false;
+        } else{
+            for(int i= 0; i< batas; i++)
+                if(elemen[i] != masuk.ambil(i))
+                    return false;
+        }
+        return true;
+    }
+
+/*
+=========================
+Exception
+=========================
+*/
     private String pesanOutOfBound(int indek) {
         int ukuran= (!bolehRumpang) ? this.ukuran : elemen.length;
         return "Indek: " +indek +", Ukuran: " +ukuran;

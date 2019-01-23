@@ -53,7 +53,7 @@
                             android:layout_alignParentBottom="true"
                             android:layout_alignParentRight="true"/>
                     </RelativeLayout>
-                    <sidev17.siits.proshare.Model.View.MenuBarView
+                    <sidev17.siits.proshare.Utils.View.MenuBarView
                         android:id="@+id/opsi_profil"
                         android:paddingBottom="10dp"
                         android:paddingTop="5dp"

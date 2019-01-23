@@ -20,8 +20,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import sidev17.siits.proshare.R;
-import sidev17.siits.proshare.Utils.GaleriLoader;
 import sidev17.siits.proshare.Utils.ScaleGesture;
+import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 
 public class PhotoPreviewOnline extends AppCompatActivity {
 
@@ -166,7 +166,7 @@ public class PhotoPreviewOnline extends AppCompatActivity {
 
             panel= (ImageView) loader.buatFoto(panel, position);
 
-            ScaleGesture gestur= new ScaleGesture(getBaseContext());
+            ScaleGesture gestur= new ScaleGesture(panel, getBaseContext());
             gestur.aturAksiZoom(new ScaleGesture.AksiZoom() {
                 @Override
                 public void zoomIn(View v, float scale) {

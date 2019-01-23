@@ -10,30 +10,35 @@
         android:layout_height="match_parent"
         android:background="@drawable/obj_gambar_kotak"
         android:backgroundTint="@color/abuTua"/>
-    <ImageView
-        android:id="@+id/tambah_cell_centang"
+
+    <RelativeLayout
+        android:layout_margin="3dp"
+        android:paddingLeft="8dp"
+        android:paddingBottom="8dp"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="5dp"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:background="@drawable/latar_lingkaran"
-        android:backgroundTint="#33000000"
-        android:src="@drawable/latar_lingkaran_bolong"
-        android:tint="#EEFFFFFF"/>
-    <TextView
-        android:id="@+id/tambah_cell_centang_no"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_margin="5dp"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:background="@drawable/latar_lingkaran"
-        android:backgroundTint="#00000000"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
-        android:textSize="12sp"
-        android:gravity="center"/>
+        android:layout_alignParentTop="true">
+        <ImageView
+            android:id="@+id/tambah_cell_centang"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/latar_lingkaran"
+            android:backgroundTint="#33000000"
+            android:src="@drawable/latar_lingkaran_bolong"
+            android:tint="#EEFFFFFF"/>
+        <TextView
+            android:id="@+id/tambah_cell_centang_no"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/latar_lingkaran"
+            android:backgroundTint="#00000000"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:gravity="center"/>
+    </RelativeLayout>
+
     <ImageView
         android:id="@+id/tambah_cell_indek_video"
         android:layout_alignParentRight="true"

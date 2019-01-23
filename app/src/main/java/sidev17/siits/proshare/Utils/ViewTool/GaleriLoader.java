@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Utils;
+package sidev17.siits.proshare.Utils.ViewTool;
 
 import android.app.Activity;
 import android.content.Context;
@@ -17,9 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import sidev17.siits.proshare.Utils.Array;
+import sidev17.siits.proshare.Utils.ScaleGesture;
 
 public class GaleriLoader {
     public static final int JENIS_FOTO= 10;
@@ -33,6 +37,8 @@ public class GaleriLoader {
     public static final int UKURAN_MENYESUAIKAN_LBR_INDUK= -3;
 
     public static final int ELEMEN_KOSONG= -10;
+    public static final int ELEMEN_TAK_DIPILIH= -11;
+    public static final int ELEMEN_DIPILIH= -12;
 
     private int bentukFoto= BENTUK_ASLI;
 
@@ -86,7 +92,7 @@ public class GaleriLoader {
 //    private Array<Integer> urutanDipilih= new Array<Integer>(true);
     private int cursorDipilih= 0;
     private int jmlDipilihTertunda= 0;
-    private int jmlUdahDiload= -1;
+    private int jmlUdahDiload= 0;
 
     private boolean dipilihLengkap= true;
 
@@ -189,7 +195,13 @@ public class GaleriLoader {
 
 //    == 4 Jan 2019
     private void perbaruiDipilih(){
-
+        int jmlDihapus= viewDipilih.ukuran();
+        for(int i= 0; i< dipilih.length; i++)
+            if(dipilih[i] > 0){
+                dipilih[i]= 0;
+                jmlDihapus--;
+            } else if(jmlDihapus == 0)
+                break;
     }
 
     public void aturJmlBuffer(int jmlBuffer){
@@ -316,7 +328,7 @@ public class GaleriLoader {
 
 
     private void tambahScaleGesture(View v){
-        v.setOnTouchListener(new ScaleGesture(konteks));
+        v.setOnTouchListener(new ScaleGesture(v, konteks));
     } public void tambahScaleGesture(View v, ScaleGesture gesture){
         v.setOnTouchListener(gesture);
     }
@@ -535,10 +547,10 @@ public class GaleriLoader {
         return buatFoto(new ImageView(konteks), posisi);
     }
 */
-    public View buatFoto(int posisi){
+    public View buatFoto(final int posisi){
         return buatFoto(null, posisi);
     }
-    public View buatFoto(View v, int posisi){
+    public View buatFoto(View v, final int posisi){
         int ind= posisi % batasBuffer;
         if(posisi /batasBuffer != indKelihatan[ind] && dipilih[posisi]== 0 /*jmlDipilihTertunda == 0*/){
             if(v == null)
@@ -557,7 +569,7 @@ public class GaleriLoader {
         }
         return pilahView(posisi);
     }
-    private View pilahView(int posisi){
+    private View pilahView(final int posisi){
         if(dipilih[posisi] == 0)
             return bufferView[posisi % batasBuffer];
         else
@@ -621,7 +633,7 @@ public class GaleriLoader {
         };
         loader[ind].execute(posisi);
     }
-    private void pasangFotoDipilih(final ImageView img, final int posisi, final int urutan, final int urutanTrahir){
+    private void pasangFotoDipilih(final ImageView img, final int posisi, final int urutan){
         final int ind= posisi % batasMaksDipilih;
             if(loaderDipilih[urutan] != null) {
             loaderDipilih[urutan].cancel(true);
@@ -632,9 +644,10 @@ public class GaleriLoader {
                 int posisi= integers[0].intValue();
 
                 isiFileFotoDipilih(posisi, urutan, ukuranPratinjau);
-//                if(aksiBuffer != null)
-//                    aksiBuffer.bufferUtama(posisi, batasBuffer);
+                if(aksiBuffer != null)
+                    aksiBuffer.bufferThumbnail(posisi, batasBuffer);
 //                updateJmlFotoDiload(posisi);
+                jmlUdahDiload++;
                 return bitmapDipilih.ambil(urutan);
             }
 
@@ -642,13 +655,19 @@ public class GaleriLoader {
             protected void onPostExecute(Bitmap bitmap) {
                 if(bitmap != null){
                     img.setImageBitmap(bitmap);
-                    if(urutan == urutanTrahir-1){
+                    if(posisi == jmlDipilihTertunda-1){
                         dipilihLengkap= true;
                         jmlDipilihTertunda= 0;
+                        viewDipilih.aturBolehRumpang(false);
+                        bitmapDipilih.aturBolehRumpang(false);
                     }
                 }
                 else
                     isiBgTakBisa(ind);
+/*
+                if(posisi == jmlDipilihTertunda-1)
+                    Toast.makeText(konteks, "bolehRumpang= " +viewDipilih.bolehRumpang(), Toast.LENGTH_LONG).show();
+*/
                 super.onPostExecute(bitmap);
             }
         };
@@ -686,6 +705,7 @@ public class GaleriLoader {
             v = bufferView[indek];
             b= bufferBitmap[indek];
             bitmapDipilih.tambah(b, urutan);
+            viewDipilih.tambah(v, urutan);
         } else{
             v= isiBufferView(posisi);
             ImageView img;
@@ -693,10 +713,10 @@ public class GaleriLoader {
                 img= (ImageView) v;
             else
                 img= v.findViewById(idElemenImg);
-            pasangFotoDipilih(img, posisi, urutan, jmlDipilihTertunda);
+            viewDipilih.tambah(v, urutan);
+            pasangFotoDipilih(img, posisi, urutan);
         }
 
-        viewDipilih.tambah(v, urutan);
         cursorDipilih++;
         if(aksiPilihFoto != null)
             aksiPilihFoto.pilihFoto(v, posisi);
@@ -705,9 +725,10 @@ public class GaleriLoader {
         pilihFoto(posisi, cursorDipilih, false);
     }
 //    ==Batal pilih masih error!!!
-    public void batalPilihFoto(int posisi){
+    public void batalPilihFoto(final int posisi){
 //        Integer objPosisi= new Integer(posisi);
         int urutan= dipilih[posisi]-1;//urutanDipilih.indekAwal(objPosisi);
+
         if(aksiPilihFoto != null) {
             View v= viewDipilih.ambil(urutan);
             aksiPilihFoto.batalPilihFoto(v, posisi);
@@ -757,32 +778,63 @@ public class GaleriLoader {
     }
 //    ==Belum Diupdate
     public void aturIndDipilih(int indPosisiDipilih[], int indUrutanDipilih[]){
+        Array<Integer> indPosisi= new Array<>();
+        Array<Integer> indUrutan= new Array<>();
+        for(int i= 0; i< indPosisiDipilih.length; i++)
+            if(indPosisiDipilih[i] != ELEMEN_TAK_DIPILIH && indUrutanDipilih[i] != ELEMEN_TAK_DIPILIH){
+                indPosisi.tambah(indPosisiDipilih[i]);
+                indUrutan.tambah(indUrutanDipilih[i]);
+            }
+        aturIndDipilih(indPosisi, indUrutan);
+    }
+    public void aturIndDipilih(Array<Integer> indPosisiDipilih, Array<Integer> indUrutanDipilih){
 /*
         1. ambil indek item dipilih yang terbesar
         2. urutkan urutan dipilih
         3. cek kelengkapan view yang dipilih
         4. lakukan (pilihFoto()) sesuai urutan yang sudah diurutkan
 */
-        if(indPosisiDipilih.length != indUrutanDipilih.length)
-            throw new RuntimeException("Ukuran indPosisiDipilih (" +indPosisiDipilih.length
-                    +") tidak sama dengan ukurang indUkuranDipilih (" +indUrutanDipilih.length +")");
-        if(indPosisiDipilih.length == 0)
+        if(indPosisiDipilih.ukuran() != indUrutanDipilih.ukuran())
+            throw new RuntimeException("Ukuran indPosisiDipilih (" +indPosisiDipilih.ukuran()
+                    +") tidak sama dengan ukurang indUkuranDipilih (" +indUrutanDipilih.ukuran() +")");
+        if(indPosisiDipilih.ukuran() == 0)
             return;
 
         dipilihLengkap= false;
-        jmlDipilihTertunda= indPosisiDipilih.length;
 
-        viewDipilih= new Array<>(true);
-        bitmapDipilih= new Array<>(true);
+        jmlDipilihTertunda= indPosisiDipilih.ukuran();
+        int jmlDipilihJalan= 0;
 
-        for(int i= 0; i< indPosisiDipilih.length; i++)
-            pilihFoto(indPosisiDipilih[i], indUrutanDipilih[i]-1, true);
+//        Toast.makeText(konteks, "jmlDipilihTertunda= " +jmlDipilihTertunda, Toast.LENGTH_SHORT).show();
 
-        viewDipilih.aturBolehRumpang(false);
-        bitmapDipilih.aturBolehRumpang(false);
+        cursorDipilih= 0;
+        perbaruiIndKelihatan(0, batasBuffer);
+        perbaruiDipilih();
+
+        viewDipilih.hapusSemua(); //new Array<>(true);
+        viewDipilih.aturBolehRumpang(true);
+        bitmapDipilih.hapusSemua(); //new Array<>(true);
+        bitmapDipilih.aturBolehRumpang(true);
+
+        for(int i= 0; i< indPosisiDipilih.ukuran(); i++)
+            if(indPosisiDipilih.ambil(i) != ELEMEN_TAK_DIPILIH) {
+                pilihFoto(indPosisiDipilih.ambil(i), indUrutanDipilih.ambil(i)-1, true);
+                jmlDipilihJalan++;
+            }
+
+        if(jmlDipilihJalan== 0){
+            jmlDipilihTertunda= 0;
+            dipilihLengkap= true;
+            viewDipilih.aturBolehRumpang(false);
+            bitmapDipilih.aturBolehRumpang(false);
+            Toast.makeText(konteks, "bolehRumpang= GAK MASUK!!!", Toast.LENGTH_SHORT).show();
+        }
     }
     public int ambilUrutanDipilih(int posisi){
         return dipilih[posisi];
+    }
+    public int ambilUrutanDipilih(View v){
+        return viewDipilih.indekAwal(v) +1;
     }
     public int[][] ambilUrutanDipilih(){
         int batas= viewDipilih.ukuran();
@@ -810,6 +862,14 @@ public class GaleriLoader {
             }
 */
         return indDipilih;
+    }
+
+    public boolean fotoDipilih(int posisi){
+        return dipilih[posisi] > 0;
+    }
+    public boolean fotoDipilih(View v){
+        int indek= viewDipilih.indekAwal(v);
+        return indek > -1;
     }
 
     private void updateJmlFotoDiload(int posisi){

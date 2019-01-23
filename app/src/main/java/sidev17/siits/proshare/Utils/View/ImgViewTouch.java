@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Model.View;
+package sidev17.siits.proshare.Utils.View;
 
 import android.content.Context;
 import android.support.annotation.Nullable;

@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Model.View;
+package sidev17.siits.proshare.Utils.View;
 
 import android.app.Activity;
 import android.content.Context;
@@ -11,21 +11,23 @@ import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.Ukuran;
+import sidev17.siits.proshare.Utils.ViewTool.Batas;
 import sidev17.siits.proshare.Utils.Warna;
 
 
 public class MenuBarView extends ImgViewTouch {
     public static final int ARAH_HORIZONTAL= 11;
-    public static final int ARAH_VERTICAL= 12;
+    public static final int ARAH_VERTIKAL = 12;
 
     public static final int BAR_DI_ATAS= 511;
     public static final int BAR_DI_BAWAH= 512;
@@ -50,18 +52,19 @@ public class MenuBarView extends ImgViewTouch {
     private int arahBar;
     private int letakBar;
     private int rataanBar;
-    private int pjg;
-    private int lbr;
-    private float letakX= -1;
-    private float letakY= -1;
+    private int pjgBar;
+    private int lbrBar;
+    private float letakBarX = -1;
+    private float letakBarY = -1;
     private boolean menuDitampilkan = false;
     private boolean aksiSentuhItemDefault= false;
+    private boolean menuBisaDitampilkan= true;
     private int padding;
     private int elevasiBar;
 
     private RelativeLayout viewBar;
-    private ImgViewTouch daftarItem[];
-    private int daftarItemTersedia[];
+    private Array<ImgViewTouch> daftarItem= new Array<>();
+    private Array<Integer> daftarItemTersedia= new Array<>();
     private int jmlItem= 0;
     private int ukuranItem;
     private int jarakAntarItem= 0;
@@ -80,6 +83,7 @@ public class MenuBarView extends ImgViewTouch {
     private String warnaInduk;
 
     private PenungguKlik_BarView pngKlikBar;
+    private Batas batas;
 
 
     public MenuBarView(Context kntk){
@@ -128,7 +132,7 @@ public class MenuBarView extends ImgViewTouch {
         aturWarnaTakTersedia("#888888");
         aturWarnaTersedia("#000000");
         aturLatarBar(R.drawable.latar_kotak_tumpul);
-        isiViewBar();
+        pasangItem();
     }
     /*
     public MenuBarView(Context kntk, int item[]){
@@ -149,7 +153,7 @@ public class MenuBarView extends ImgViewTouch {
         aturWarnaTakTersedia("#888888");
         aturWarnaTersedia("#000000");
         aturLatarBar(R.drawable.latar_kotak_tumpul);
-        isiViewBar();
+        pasangItem();
 
         for(int i= 0; i<jmlItem; i++)
             aturGmbItem(i, item[i]);
@@ -194,6 +198,8 @@ public class MenuBarView extends ImgViewTouch {
         aturLetakRelatif(BAR_DI_KANAN);
         setElevation(elevasiBar);
 
+        batasDefault();
+
         if(attrs != null) {
             TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MenuBarView);
             aturWarnaKuat(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_kuat, Color.parseColor(warnaKuat))));
@@ -203,9 +209,9 @@ public class MenuBarView extends ImgViewTouch {
             aturWarnaTersedia(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_tersedia, Color.parseColor(warnaTersedia))));
             aturWarnaTakTersedia(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_tak_tersedia, Color.parseColor(warnaTakTersedia))));
 
-            aturLatarInduk_Akhir(a.getResourceId(R.styleable.MenuBarView_latarInduk, -1));
+            aturLatarInduk_Akhir(a.getResourceId(R.styleable.MenuBarView_latarInduk_AKHIR, -1));
             aturLatarInduk_Awal(a.getResourceId(R.styleable.MenuBarView_latarInduk_AWAL, -1));
-            aturGambarInduk(a.getResourceId(R.styleable.MenuBarView_gambarInduk, -1));
+            aturGambarInduk(a.getResourceId(R.styleable.MenuBarView_gambarInduk_AKHIR, -1));
             aturGambarInduk(a.getResourceId(R.styleable.MenuBarView_gambarInduk_AWAL, -1));
 
             aturLatarBar(a.getResourceId(R.styleable.MenuBarView_BAR_latarInduk, -1));
@@ -258,7 +264,7 @@ Overrides - Bawahan
         elevasiBar = Ukuran.DpKePx(4, resolusi);
         ukuranItem= Ukuran.DpKePx(30, resolusi);
     }
-/*
+    /*
 =========================
 Overrides - Bawahan
 =========================
@@ -268,35 +274,51 @@ Overrides - Bawahan
         aturPenungguKlik_Internal(new PenungguKlik_Internal() {
             @Override
             public void klik(View v) {
+                boolean menuBisaDitampilkanAwal= menuBisaDitampilkan;
                 if(pngKlikBar != null)
                     pngKlikBar.klik(superView, menuDitampilkan);
-                klikInduk();
+                klikInduk(menuBisaDitampilkanAwal);
             }
         });
     }
     public final boolean klik(){
         return super.performClick();
+    } public final boolean klik(boolean tampilkan){
+        menuDitampilkan= !tampilkan;
+        return klik();
     }
-    private final void klikInduk(){
-        if(jmlItem > 0 && !menuDitampilkan) {
-            if(letakX == -1 || letakY == -1)
-                sesuaikanLetakRelatif(letakBar);
-            if(!aksiSentuhItemDefault)
-                aturAksiSentuhItemDefault();
-            tampilkanBar();
-            if(sumberLatarInduk_Awal == -1)
-                tampilkanLatar();
-            Log.d("DIKLIK!!!", "Ditampilkan!!!!");
-            Toast.makeText(konteks, "DITAMPILKAN!!!", Toast.LENGTH_LONG).show();
-            Toast.makeText(konteks, letakBar +" " +Float.toString(letakX) +" " +Float.toString(letakY), Toast.LENGTH_LONG).show();
+    private final void klikInduk(boolean menuBisaDitampilkan){
+        if(menuBisaDitampilkan){
+            if(jmlItem > 0 && !menuDitampilkan) {
+                if(letakBarX == -1 || letakBarY == -1){
+                    aturLetakRelatif(letakBar);
+                    sesuaikanLetakRelatif();
+                }
+                if(!aksiSentuhItemDefault)
+                    aturAksiSentuhItemDefault();
+                tampilkanBar();
+                if(sumberLatarInduk_Awal == -1)
+                    tampilkanLatar();
+                latarIndukAkhir();
+            }
+            else if(menuDitampilkan) {
+                hilangkanBar();
+//            hilangkanBatas();
+                if(sumberLatarInduk_Awal == -1)
+                    sembunyikanLatar();
+                latarIndukAwal();
+            }
         }
-        else if(menuDitampilkan) {
-            hilangkanBar();
-            if(sumberLatarInduk_Awal == -1)
-                sembunyikanLatar();
-            Log.d("DIKLIK!!!", "Tidak ditampilkan!!!!");
-            Toast.makeText(konteks, "TIDAK DITAMPILKAN!!!", Toast.LENGTH_LONG).show();
-        }
+    }
+
+    public void menuBisaDitampilkan(boolean bisa){
+        menuBisaDitampilkan= bisa;
+    }
+    public boolean menuBisaDitampilkan(){
+        return menuBisaDitampilkan;
+    }
+    public boolean menuDitampilkan(){
+        return menuDitampilkan;
     }
 
 /*
@@ -304,10 +326,8 @@ Overrides - Bawahan
 Penunggu
 =========================
 */
-
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-
         return super.dispatchTouchEvent(event);
     }
 
@@ -316,12 +336,12 @@ Penunggu
     }
 
     public void aturAksiSentuhItem(int posisiItem, PenungguSentuhan png){
-        if(daftarItem[posisiItem] != null && posisiItem < jmlItem)
-            daftarItem[posisiItem].aturPenungguSentuhan(png);
+        if(daftarItem.ambil(posisiItem) != null && posisiItem < jmlItem)
+            daftarItem.ambil(posisiItem).aturPenungguSentuhan(png);
     }
     public void aturAksiKlikItem(int posisiItem, PenungguKlik png){
-        if(daftarItem[posisiItem] != null && posisiItem < jmlItem)
-            daftarItem[posisiItem].aturPenungguKlik(png);
+        if(daftarItem.ambil(posisiItem) != null && posisiItem < jmlItem)
+            daftarItem.ambil(posisiItem).aturPenungguKlik(png);
     }
 /*
 =========================
@@ -335,6 +355,47 @@ Interface - Penunggu
     public interface PenungguKlik_BarView{
         void klik(MenuBarView v, boolean menuDitampilkan);
     }
+
+/*
+=========================
+Batas View
+=========================
+*/
+    public void batasDefault(){
+        batas= new Batas(this, konteks);
+        batas.tambahBatas(viewBar);
+        batas.aturPenungguSentuh_Internal(new Aktifitas.PenungguSentuh_Internal() {
+            @Override
+            public boolean sentuhInt(Array<View> view, MotionEvent event, boolean diDalam) {
+                if(!diDalam && event.getAction() == MotionEvent.ACTION_UP && menuBisaDitampilkan) {
+                    ((MenuBarView) view.ambil(0)).klik(false);
+//                    if(diDalam);
+//                        Cek.toast(konteks, "luar!!!");
+                }
+//                Toast.makeText(konteks, "menuBisaDitampilkan= " +menuBisaDitampilkan, Toast.LENGTH_LONG).show();
+                return diDalam;
+            }
+        });
+    }
+    public void aturPenungguBantas(Aktifitas.PenungguSentuh png){
+        batas.aturPenungguSentuh(png);
+    }
+    private void hilangkanBatas(){
+        batas= null;
+    }
+    public Batas ambilBatas(){
+        return batas;
+    }
+    public void tambahBatas(View v){
+        batas.tambahBatas(v);
+    }
+    public void kurangiBatas(View v){
+        batas.kurangiBatas(v);
+    }
+    public void gantiBatas(View v){
+        batas.gantiBatas(v);
+    }
+
 /*
 =========================
 Arah - Ukuran - Letak Latar
@@ -342,48 +403,73 @@ Arah - Ukuran - Letak Latar
 */
     public void aturArahBar(int kategoriArah){
         arahBar= kategoriArah;
-        inisiasiItem();
+        RelativeLayout.LayoutParams lp;
+        for(int i= 0; i< jmlItem; i++){
+            lp= (RelativeLayout.LayoutParams) daftarItem.ambil(i).getLayoutParams();
+            if(arahBar == ARAH_HORIZONTAL){
+                lp.addRule(RelativeLayout.CENTER_HORIZONTAL, 0);
+                lp.addRule(RelativeLayout.BELOW, 0);
+                lp.addRule(RelativeLayout.CENTER_VERTICAL);
+                if(i > 0)
+                    lp.addRule(RelativeLayout.RIGHT_OF, daftarItem.ambil(i - 1).getId());
+            }
+            else if(arahBar == ARAH_VERTIKAL){
+                lp.addRule(RelativeLayout.CENTER_VERTICAL, 0);
+                lp.addRule(RelativeLayout.RIGHT_OF, 0);
+                lp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                if(i > 0)
+                    lp.addRule(RelativeLayout.BELOW, daftarItem.ambil(i - 1).getId());
+            }
+            daftarItem.ambil(i).setLayoutParams(lp);
+        }
     }
 
     public void aturLetakRelatif(int letak){
         Point layar= new Point();
+        //ambil ukuran view sebelum dirender
         ((Activity) konteks).getWindowManager().getDefaultDisplay().getSize(layar);
         int pjgLayar= layar.x;
         int lbrLayar= layar.y;
+
+        int letakAbs[]= new int[2];
+        getLocationOnScreen(letakAbs);
+        int x= letakAbs[0];
+        int y= letakAbs[1];
 
         //measure(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         //layout(getLeft(), getTop(), getRight(), getBottom());
 
         switch(letak) {
             case BAR_DI_BAWAH:
-                if (getY() +getHeight() +viewBar.getHeight()> lbrLayar)
+                if (y +getHeight() +viewBar.getHeight()> lbrLayar)
                     letak = BAR_DI_ATAS;
-                aturArahBar(ARAH_VERTICAL);
+                aturArahBar(ARAH_VERTIKAL);
                 break;
             case BAR_DI_KANAN:
-                if (getX() +getWidth() +viewBar.getWidth()> pjgLayar)
+                if (x +getWidth() +viewBar.getWidth()> pjgLayar)
                     letak = BAR_DI_KIRI;
                 aturArahBar(ARAH_HORIZONTAL);
                 break;
             case BAR_DI_ATAS:
-                if(getY() -viewBar.getHeight() < 0)
+                if(y -viewBar.getHeight() <= 0)
                     letak= BAR_DI_BAWAH;
-                aturArahBar(ARAH_VERTICAL);
+                aturArahBar(ARAH_VERTIKAL);
                 break;
             case BAR_DI_KIRI:
-                if(getX() -viewBar.getWidth() < 0)
+                if(x -viewBar.getWidth() <= 0)
                     letak= BAR_DI_KANAN;
                 aturArahBar(ARAH_HORIZONTAL);
                 break;
         }
         letakBar= letak;
     }
-    private void sesuaikanLetakRelatif(int letak){
+    private void sesuaikanLetakRelatif(){
+        //letak absolut view di layar
         int letakAbs[]= new int[2];
         getLocationOnScreen(letakAbs);
 
-        float x= letakAbs[0], y= letakAbs[1];
-        switch(letak){
+        int x= letakAbs[0], y= letakAbs[1];
+        switch(letakBar){
             case BAR_DI_BAWAH:
                 y+= getHeight();
                 break;
@@ -397,7 +483,7 @@ Arah - Ukuran - Letak Latar
                 x-= viewBar.getWidth();
                 break;
         }
-        aturLetakPilihan(x, y);
+        aturLetakBar(x, y);
     }
 
     public void aturRataanRelatif(int rataan){
@@ -410,50 +496,54 @@ Arah - Ukuran - Letak Latar
         int lbrLayar= layar.y;
     }
 
-    public void aturUkuran(int pjg, int lbr){
-        this.pjg= pjg;
-        this.lbr= lbr;
+    public void aturUkuranBar(int pjg, int lbr){
+        this.pjgBar = pjg;
+        this.lbrBar = lbr;
         RelativeLayout.LayoutParams lp= ambilLpBar();
         lp.width= pjg;
         lp.height= lbr;
     }
     public void aturPanjang(int pjg){
-        aturUkuran(pjg, lbr);
+        aturUkuranBar(pjg, lbrBar);
     }
     private void aturPanjangInternal(int pjg){
-        this.pjg= pjg;
+        this.pjgBar = pjg;
     }
     public int ambilPanjangInduk(){
         return viewBar.getWidth();
     }
 
     public void aturLebar(int lbr){
-        aturUkuran(pjg, lbr);
+        aturUkuranBar(pjgBar, lbr);
     }
     private void aturLebarInternal(int lbr){
-        this.lbr= lbr;
+        this.lbrBar = lbr;
     }
     public int ambilLebarInduk(){
         return viewBar.getHeight();
     }
 
-    public void aturLetakPilihan(float x, float y){
-        aturLetakX(x);
-        aturLetakY(y);
+    public void aturLetakBar(float x, float y){
+        aturLetakBarX(x);
+        aturLetakBarY(y);
     }
-    public void aturLetakX(float x){
-        letakX= x;
-        viewBar.setX(letakX);
+    public void aturLetakBarX(float x){
+        letakBarX = x;
+        viewBar.setX(letakBarX);
+        viewBar.setTranslationX(letakBarX);
+//        viewBar.setScrollX((int)-x);
+//        Cek.toast(konteks, "" +viewBar.getX());
     }
-    public float ambilLetakX(){
-        return letakX;
+    public float ambilLetakBarX(){
+        return letakBarX;
     }
-    public void aturLetakY(float y){
-        letakY= y;
-        viewBar.setY(letakY);
+    public void aturLetakBarY(float y){
+        letakBarY = y;
+        viewBar.setY(letakBarY);
+        viewBar.setTranslationY(y);
     }
-    public float ambilLetakY(){
-        return letakY;
+    public float ambilLetakBarY(){
+        return letakBarY;
     }
 
 /*
@@ -525,85 +615,85 @@ Warna
     }
 
     public void aturItemWarnaKuat(int posisiItem){
-        if(daftarItem[posisiItem] != null)
-            daftarItem[posisiItem].setColorFilter(Color.parseColor(warnaKuat));
+        if(daftarItem.ambil(posisiItem) != null)
+            daftarItem.ambil(posisiItem).setColorFilter(Color.parseColor(warnaKuat));
     }
     public void aturItemWarnaLemah(int posisiItem){
-        if(daftarItem[posisiItem] != null)
-            daftarItem[posisiItem].setColorFilter(Color.parseColor(warnaLemah));
+        if(daftarItem.ambil(posisiItem) != null)
+            daftarItem.ambil(posisiItem).setColorFilter(Color.parseColor(warnaLemah));
     }
 
     public void aturItemTersedia(int indek[]){
-        if(indek.length == daftarItemTersedia.length && indek.length > 0) {
-            daftarItemTersedia = indek;
+        if(indek.length == daftarItemTersedia.ukuran() && indek.length > 0) {
+            daftarItemTersedia = new Array<>(indek);
             sesuaikanKetersediaanItem();
         }
     }
     public void aturItemTersedia(View v){
-        for(int i= 0; i<daftarItem.length; i++)
-            if(daftarItem[i] == v){
+        for(int i= 0; i<daftarItem.ukuran(); i++)
+            if(daftarItem.ambil(i) == v){
                 aturItemTersedia(i);
                 break;
             }
     }
     public void aturItemTersedia(int posisiItem){
-        if(daftarItem[posisiItem] != null) {
-            daftarItem[posisiItem].setColorFilter(Color.parseColor(warnaTersedia));
-            daftarItemTersedia[posisiItem]= ITEM_TERSEDIA;
+        if(daftarItem.ambil(posisiItem) != null) {
+            daftarItem.ambil(posisiItem).setColorFilter(Color.parseColor(warnaTersedia));
+            daftarItemTersedia.ganti(posisiItem, new Integer(ITEM_TERSEDIA));
         }
     }
 
     public void aturItemTakTersedia(View v){
-        for(int i= 0; i<daftarItem.length; i++)
-            if(daftarItem[i] == v){
+        for(int i= 0; i<daftarItem.ukuran(); i++)
+            if(daftarItem.ambil(i) == v){
                 aturItemTakTersedia(i);
                 break;
             }
     }
     public void aturItemTakTersedia(int posisiItem){
-        if(daftarItem[posisiItem] != null) {
-            daftarItem[posisiItem].setColorFilter(Color.parseColor(warnaTakTersedia));
-            daftarItemTersedia[posisiItem]= ITEM_TAK_TERSEDIA;
+        if(daftarItem.ambil(posisiItem) != null) {
+            daftarItem.ambil(posisiItem).setColorFilter(Color.parseColor(warnaTakTersedia));
+            daftarItemTersedia.ganti(posisiItem, new Integer(ITEM_TAK_TERSEDIA));
         }
     }
     public void aturItemHanyaTersedia(int posisiItem){
         for(int i= 0; i< jmlItem; i++)
-            if(daftarItem[i] != null)
+            if(daftarItem.ambil(i) != null)
                 aturItemTakTersedia(i);
 
-        if(daftarItem[posisiItem] != null)
+        if(daftarItem.ambil(posisiItem) != null)
             aturItemTersedia(posisiItem);
     }
 
     private void sesuaikanKetersediaanItem(){
         for(int i= 0; i<jmlItem; i++) {
-            if(daftarItemTersedia[i] == ITEM_TERSEDIA)
+            if(daftarItemTersedia.ambil(i) == ITEM_TERSEDIA)
                 aturItemTersedia(i);
-            else if(daftarItemTersedia[i] == ITEM_TAK_TERSEDIA)
+            else if(daftarItemTersedia.ambil(i) == ITEM_TAK_TERSEDIA)
                 aturItemTakTersedia(i);
         }
     }
 
     public void aturItemKuat(View v){
-        for(int i= 0; i<daftarItem.length; i++)
-            if(daftarItem[i] == v) {
+        for(int i= 0; i<daftarItem.ukuran(); i++)
+            if(daftarItem.ambil(i) == v) {
                 aturItemKuat(i);
                 break;
             }
     }
     public void aturItemKuat(int posisi){
-        daftarItem[posisi].setColorFilter(Color.parseColor(warnaKuat));
+        daftarItem.ambil(posisi).setColorFilter(Color.parseColor(warnaKuat));
     }
 
     public void aturItemLemah(View v){
-        for(int i= 0; i<daftarItem.length; i++)
-            if(daftarItem[i] == v) {
+        for(int i= 0; i<daftarItem.ukuran(); i++)
+            if(daftarItem.ambil(i) == v) {
                 aturItemLemah(i);
                 break;
             }
     }
     public void aturItemLemah(int posisi){
-        daftarItem[posisi].setColorFilter(Color.parseColor(warnaLemah));
+        daftarItem.ambil(posisi).setColorFilter(Color.parseColor(warnaLemah));
     }
 
     private void sesuaikanWarnaLatar(){
@@ -678,7 +768,7 @@ View Bar
         elevasiBar = elevasi;
     }
     private void inisiasiViewBar(){
-        RelativeLayout.LayoutParams lpInduk= new RelativeLayout.LayoutParams(pjg, lbr);
+        RelativeLayout.LayoutParams lpInduk= new RelativeLayout.LayoutParams(pjgBar, lbrBar);
         lpInduk.setMargins(Ukuran.DpKePx(10, resolusi), Ukuran.DpKePx(10, resolusi), Ukuran.DpKePx(10, resolusi), Ukuran.DpKePx(10, resolusi));
         viewBar = new RelativeLayout(konteks);
         viewBar.setLayoutParams(lpInduk);
@@ -703,11 +793,14 @@ View Bar
         }
     }
 
-    private void isiViewBar(){
+    private void pasangItem(){
         for(int i= 0; i<jmlItem; i++)
-            if(daftarItem[i] != null)
-                viewBar.addView(daftarItem[i]);
+            viewBar.addView(daftarItem.ambil(i));
     }
+    private void lepasItem(int posisi){
+        viewBar.removeView(daftarItem.ambil(posisi));
+    }
+
     public RelativeLayout ambilViewBar(){
         return viewBar;
     }
@@ -734,9 +827,21 @@ View Bar
 Item
 =========================
 */
-    public void aturJmlItem(int jml){
+    private void aturJmlItem(int jml){
+        int jmlItemAwal= jmlItem;
         jmlItem= jml;
-        inisiasiDaftarItem();
+        if(jml > jmlItemAwal){
+            perbaruiItem(jmlItemAwal);
+            perbaruiItemTersedia(jmlItemAwal);
+        }
+        else if(jml < jmlItemAwal){
+//            int jmlJalan= jmlItemAwal;
+            while(jmlItemAwal > jml){
+                daftarItem.hapus(--jmlItemAwal);
+                daftarItemTersedia.hapus(jmlItemAwal);
+                lepasItem(jmlItemAwal);
+            }
+        }
     }
     public int ambilJmlItem(){
         return jmlItem;
@@ -744,8 +849,17 @@ Item
 
     public void aturJarakAntarItem(int jarak){
         jarakAntarItem= jarak;
-        if(daftarItem != null)
-            inisiasiItem();
+        RelativeLayout.LayoutParams lp;
+        int kiri= 0, atas= 0;
+        for(int i= 1; i< jmlItem; i++){
+            lp= (RelativeLayout.LayoutParams) daftarItem.ambil(i).getLayoutParams();
+            if(arahBar == ARAH_HORIZONTAL)
+                kiri= jarakAntarItem;
+            else if(arahBar == ARAH_VERTIKAL)
+                atas= jarakAntarItem;
+            lp.setMargins(kiri, atas, 0, 0);
+            daftarItem.ambil(i).setLayoutParams(lp);
+        }
     }
     public int ambilJarakAntarItem(){
         return jarakAntarItem;
@@ -753,78 +867,107 @@ Item
 
     public void aturUkuranItem(int ukuran){
         ukuranItem= ukuran;
-        if(daftarItem != null)
-            inisiasiItem();
+        RelativeLayout.LayoutParams lp;
+        for(int i= 1; i< jmlItem; i++){
+            lp= (RelativeLayout.LayoutParams) daftarItem.ambil(i).getLayoutParams();
+            lp.width= Ukuran.DpKePx(ukuranItem, resolusi);
+            lp.height= Ukuran.DpKePx(ukuranItem, resolusi);
+            daftarItem.ambil(i).setLayoutParams(lp);
+        }
     }
     public int ambilUkuranItem(){
         return ukuranItem;
     }
 
+/*
     private void inisiasiDaftarItem(){
-        daftarItem= new ImgViewTouch[jmlItem];
+//        daftarItem= new ImgViewTouch[jmlItem];
         daftarItemTersedia= new int[jmlItem];
     }
-    private void inisiasiItem(){
-        for(int i= 0; i< jmlItem; i++)
+*/
+    private void perbaruiItem(int mulai){
+        for(int i= mulai; i< jmlItem; i++)
             inisiasiItem(i);
     }
-    private void inisiasiItem(int posisiItem){
+    private ImgViewTouch inisiasiItem(int posisiItem){
         RelativeLayout.LayoutParams lpItem= new RelativeLayout.LayoutParams(Ukuran.DpKePx(ukuranItem, resolusi), Ukuran.DpKePx(ukuranItem, resolusi));
         if(arahBar == ARAH_HORIZONTAL)
             lpItem.addRule(RelativeLayout.CENTER_VERTICAL);
-        else if(arahBar == ARAH_VERTICAL)
+        else if(arahBar == ARAH_VERTIKAL)
             lpItem.addRule(RelativeLayout.CENTER_HORIZONTAL);
 
         if(posisiItem > 0){
-            if(daftarItem[posisiItem-1] != null) {
-                if(arahBar == ARAH_HORIZONTAL) {
-                    lpItem.addRule(RelativeLayout.RIGHT_OF, cariIdItemSebelum(posisiItem));
-                    lpItem.setMargins(jarakAntarItem, 0, 0 ,0);
-                }
-                else if(arahBar == ARAH_VERTICAL) {
-                    lpItem.addRule(RelativeLayout.BELOW, cariIdItemSebelum(posisiItem));
-                    lpItem.setMargins(0, jarakAntarItem, 0, 0);
-                }
+            if(arahBar == ARAH_HORIZONTAL) {
+                lpItem.addRule(RelativeLayout.RIGHT_OF, daftarItem.ambil(posisiItem-1).getId());
+                lpItem.setMargins(jarakAntarItem, 0, 0 ,0);
+            }
+            else if(arahBar == ARAH_VERTIKAL) {
+                lpItem.addRule(RelativeLayout.BELOW, daftarItem.ambil(posisiItem-1).getId());
+                lpItem.setMargins(0, jarakAntarItem, 0, 0);
             }
         }
-        if(daftarItem[posisiItem] == null) {
-            daftarItem[posisiItem] = new ImgViewTouch(konteks);
-            daftarItem[posisiItem].setPadding(Ukuran.DpKePx(4, resolusi), Ukuran.DpKePx(4, resolusi), Ukuran.DpKePx(4, resolusi), Ukuran.DpKePx(4, resolusi));
-            daftarItem[posisiItem].setId(View.generateViewId());
-        }
-        daftarItem[posisiItem].setLayoutParams(lpItem);
+        ImgViewTouch itemBaru= new ImgViewTouch(konteks);
+        daftarItem.tambah(itemBaru, posisiItem);
+        itemBaru.setPadding(Ukuran.DpKePx(4, resolusi), Ukuran.DpKePx(4, resolusi), Ukuran.DpKePx(4, resolusi), Ukuran.DpKePx(4, resolusi));
+        itemBaru.setId(View.generateViewId());
+        itemBaru.setLayoutParams(lpItem);
+        itemBaru.setColorFilter(Color.parseColor(warnaLemah));
+        itemBaru.aturPenungguKlik_Internal(new PenungguKlik_Internal() {
+            @Override
+            public void klik(View v) {
+                if(!v.isSelected())
+                    v.setSelected(true);
+                else
+                    v.setSelected(false);
+            }
+        });
+        return itemBaru;
+    }
+    private void perbaruiItemTersedia(int mulai){
+        for(int i= mulai; i< jmlItem; i++)
+            inisiasiItemTersedia(i);
+    }
+    private void inisiasiItemTersedia(int posisiItem){
+        daftarItemTersedia.tambah(new Integer(ITEM_TAK_TERSEDIA), posisiItem);
     }
 
+/*
     private int cariIdItemSebelum(int posisiItem){
-        for(int i= posisiItem -1; i>= 0; i--)
-            if(daftarItem[i] != null)
-                return daftarItem[i].getId();
-        return 0;
+        if(posisiItem > 0)
+            return daftarItem.ambil(posisiItem-1).getId();
+        return -1;
     }
     private int cariIdItemSelanjut(int posisiItem){
-        for(int i= posisiItem +1; i< jmlItem; i++)
-            if(daftarItem[i] != null)
-                return daftarItem[i].getId();
-        return 0;
+        if(posisiItem < jmlItem-1)
+            return daftarItem.ambil(posisiItem+1).getId();
+        return -1;
     }
+*/
 
     public void aturGmbItem(int idGmb[]){
         aturJmlItem(idGmb.length);
         for(int i= 0; i<jmlItem; i++)
             aturGmbItem(i, idGmb[i]);
-        isiViewBar();
+        pasangItem();
     }
     public void aturGmbItem(int posisiItem, int idGmb){
-        if(daftarItem[posisiItem] == null)
-            inisiasiItem(posisiItem);
+        ImgViewTouch itemBaru= daftarItem.ambil(posisiItem);
+        itemBaru.setImageResource(idGmb);
+    }
 
-        daftarItem[posisiItem].setImageResource(idGmb);
-        daftarItem[posisiItem].setColorFilter(Color.parseColor(warnaLemah));
+    public void tambahGmbItem(int idGmb){
+        if(idGmb < 10)
+            return;
+        ImgViewTouch itemBaru= inisiasiItem(daftarItem.ukuran());
+        itemBaru.setImageResource(idGmb);
+        daftarItem.tambah(itemBaru);
+        daftarItemTersedia.tambah(ITEM_TAK_TERSEDIA);
+        jmlItem++;
     }
 
     public void aturAksiSentuhItemDefault(){
-        for (int i= 0; i<daftarItem.length; i++){
-            if(daftarItemTersedia[i] == ITEM_TERSEDIA)
+        for (int i= 0; i<daftarItem.ukuran(); i++){
+            if(daftarItemTersedia.ambil(i) == ITEM_TERSEDIA)
                 aturAksiSentuhItem(i, new PenungguSentuhan() {
                     @Override
                     public void sentuh(View v, MotionEvent event) {
@@ -836,5 +979,9 @@ Item
                 });
         }
         aksiSentuhItemDefault= true;
+    }
+
+    public boolean itemDipilihKah(int indek){
+        return daftarItem.ambil(indek).isSelected();
     }
 }

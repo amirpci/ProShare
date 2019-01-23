@@ -9,23 +9,76 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <TextView
-        android:id="@+id/preview_foto_judul"
-        android:padding="10dp"
+    <RelativeLayout
+        android:id="@+id/preview_header"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Judul"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF"
-        android:background="#22000000"/>
+        android:layout_height="65dp"
+        android:background="#AAFFFFFF">
+        <RelativeLayout
+            android:id="@+id/cell_centang"
+            android:padding="12dp"
+            android:layout_width="65dp"
+            android:layout_height="65dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true">
+            <ImageView
+                android:id="@+id/tambah_cell_centang"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/latar_lingkaran"
+                android:backgroundTint="#55000000"
+                android:src="@drawable/latar_lingkaran_bolong"
+                android:tint="#EEFFFFFF"/>
+            <TextView
+                android:id="@+id/tambah_cell_centang_no"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/latar_lingkaran"
+                android:backgroundTint="#00000000"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:gravity="center"/>
+        </RelativeLayout>
 
-    <TextView
-        android:id="@+id/preview_judul"
+        <TextView
+            android:id="@+id/preview_foto_judul"
+            android:layout_toLeftOf="@id/cell_centang"
+            android:gravity="center_vertical"
+            android:paddingLeft="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Judul"
+            android:textSize="20sp"
+            android:textColor="#000000"/>
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/preview_footer"
         android:layout_alignParentBottom="true"
-        android:layout_margin="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Image View"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF"/>
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="#AAFFFFFF">
+
+        <TextView
+            android:id="@+id/preview_judul"
+            android:layout_centerVertical="true"
+            android:gravity="center_vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Image View"
+            android:paddingLeft="10dp"
+            android:textSize="20sp"
+            android:textColor="#000000"/>
+
+        <ImageView
+            android:id="@+id/preview_ok"
+            android:layout_alignParentRight="true"
+            android:padding="12dp"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@drawable/obj_centang"
+            android:tint="@color/biruLaut"/>
+    </RelativeLayout>
 </RelativeLayout>

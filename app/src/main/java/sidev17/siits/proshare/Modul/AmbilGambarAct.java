@@ -11,18 +11,21 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
-import sidev17.siits.proshare.Modul.Worker.PhotoPreview;
+import sidev17.siits.proshare.Modul.Worker.GaleriPreview;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.ArrayMod;
-import sidev17.siits.proshare.Utils.GaleriLoader;
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
+import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 
 public class AmbilGambarAct extends AppCompatActivity {
 
@@ -35,6 +38,7 @@ public class AmbilGambarAct extends AppCompatActivity {
     private String pathFoto[];
     private int posisiDipilih[]= new int[0];
     private int urutanDipilih[]= new int[0];
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,17 +66,62 @@ public class AmbilGambarAct extends AppCompatActivity {
                 finish();
             }
         });
-        wadahGambar.setAdapter(new AdapterPropertiCell(display.widthPixels / wadahGambar.getNumColumns(), pathFoto.length));
+/*
+        wadahGambar.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                Toast.makeText(AmbilGambarAct.this, "firstVisible= " +firstVisibleItem, Toast.LENGTH_SHORT).show();
+            }
+        });
+*/
+        wadahGambar.setAdapter(new AdapterPropertiCell(/*display.widthPixels / wadahGambar.getNumColumns(), pathFoto.length*/));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK){
+            int posisiTrahir= 0;
+            posisiDipilih= data.getIntArrayExtra("posisiDipilih");
+            urutanDipilih= data.getIntArrayExtra("urutanDipilih");
+            if(posisiDipilih != null && posisiDipilih.length > 0){
+                wadahGambar.setAdapter(null);
+                loader.aturIndDipilih(posisiDipilih, urutanDipilih);
+                posisiTrahir= posisiDipilih[posisiDipilih.length-1];
+                wadahGambar.setAdapter(new AdapterPropertiCell());
+//            wadahGambar.invalidateViews();
+            }
+
+            int posisiFoto= data.getIntExtra("posisiFoto", wadahGambar.getFirstVisiblePosition());
+//        int posisiGaleri= (posisiFoto /wadahGambar.getNumColumns());
+            posisiTrahir= (posisiTrahir == 0) ? posisiFoto : posisiTrahir;
+            posisiTrahir += (2 *wadahGambar.getNumColumns());
+
+            if(posisiTrahir > pathFoto.length)
+                posisiTrahir= pathFoto.length -1;
+
+            wadahGambar.smoothScrollToPosition(posisiTrahir);
+//        wadahGambar.setSelection(posisiTrahir);
+//        wadahGambar.requestLayout();
+
+//        Toast.makeText(this, "posisiTrahir= " +posisiTrahir, Toast.LENGTH_SHORT).show();
+
+//        super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void isiIndDipilih(){
         int posisiDipilih[] = getIntent().getIntArrayExtra("posisiDipilih");
         int urutanDipilih[] = getIntent().getIntArrayExtra("urutanDipilih");
 
-        if(posisiDipilih != null)
+        if(posisiDipilih != null && posisiDipilih.length > 0) {
             this.posisiDipilih= posisiDipilih;
-        if(urutanDipilih != null) {
             this.urutanDipilih= urutanDipilih;
+//            Toast.makeText(this, "posisiDipilih= " +posisiDipilih.length, Toast.LENGTH_SHORT).show();
             loader.aturIndDipilih(posisiDipilih, urutanDipilih);
         }
 //        for(int i= 0; i< posisiDipilih.length; i++)
@@ -80,20 +129,18 @@ public class AmbilGambarAct extends AppCompatActivity {
     }
 
     class AdapterPropertiCell extends BaseAdapter {
+        int dipilih= 0;
 
         int penghitung= 0;
         int batas= 0;
-        int lebar;
-        int jml;
+//        int lebar;
 
-        AdapterPropertiCell(int lebar, int jml){
-            this.lebar= lebar;
-            this.jml= jml;
+        AdapterPropertiCell(){
         }
 
         @Override
         public int getCount() {
-            return jml;
+            return pathFoto.length;
         }
 
         @Override
@@ -110,6 +157,12 @@ public class AmbilGambarAct extends AppCompatActivity {
         public View getView(final int position, View convertView, ViewGroup parentInn) {
             View view= loader.buatFoto(position); //getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
 //            view.setLayoutParams(new ViewGroup.LayoutParams(lebar, lebar));
+
+/*
+            TextView noUrut = view.findViewById(R.id.tambah_cell_centang_no);
+            if(noUrut.isSelected())
+                Toast.makeText(AmbilGambarAct.this, "dipilih= " +noUrut.isSelected() +" posisi= " +position +" urutan= " +loader.ambilUrutanDipilih(view), Toast.LENGTH_LONG).show();
+
 /*
             if(penghitung < posisiDipilih.length && posisiDipilih[penghitung]== position) {
                 int batasDalam= urutanDipilih[penghitung];
@@ -122,18 +175,30 @@ public class AmbilGambarAct extends AppCompatActivity {
                 loader.pilihFoto(posisiDipilih[penghitung++]);
             }
 */
+            try{
+                view.findViewById(R.id.tambah_cell_pratinjau);
+            } catch (Exception e){
+                throw new RuntimeException(e.getMessage() +" posisi= " +position +" ukuran= " +loader.ambilUrutanDipilih()[0].length);
+            }
+
             ImageView bg= view.findViewById(R.id.tambah_cell_pratinjau);
             bg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent kePreview= new Intent(getBaseContext(), PhotoPreview.class);
-                    kePreview.putStringArrayListExtra("judul", loader.ambilDaftarJudul());
-                    kePreview.putExtra("path", loader.ambilDaftarPathFoto());
-                    kePreview.putExtra("indDipilih", position);
+                    Intent kePreview= new Intent(getBaseContext(), GaleriPreview.class);
+//                    kePreview.putStringArrayListExtra("judul", loader.ambilDaftarJudul());
+//                    kePreview.putExtra("path", loader.ambilDaftarPathFoto());
+//                    kePreview.putExtra("jenisPath", GaleriPreview.PATH_DEFAULT);
+                    kePreview.putExtra("posisiFoto", position);
 
-                    startActivity(kePreview);
+                    int indDipilih[][]= loader.ambilUrutanDipilih();
+                    kePreview.putExtra("posisiDipilih", indDipilih[0]);
+                    kePreview.putExtra("urutanDipilih", indDipilih[1]);
+
+                    startActivityForResult(kePreview, 0);
                 }
             });
+
             return view;
         }
     }
@@ -142,7 +207,7 @@ public class AmbilGambarAct extends AppCompatActivity {
 //        inisiasiArrayDipilih(pathFoto.length);
         loader= new GaleriLoader(this, pathFile, 18, jenisFoto,
                 R.layout.model_tambah_properti_cell, R.id.tambah_cell_pratinjau);
-        loader.aturIndDipilih(posisiDipilih, urutanDipilih);
+//        loader.aturIndDipilih(posisiDipilih, urutanDipilih);
         loader.aturBentukFoto(GaleriLoader.BENTUK_KOTAK);
         loader.aturJmlItemPerGaris(3);
         loader.aturOffsetItem(20);
@@ -154,11 +219,28 @@ public class AmbilGambarAct extends AppCompatActivity {
 
         loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
             @Override
-            public void pilihFoto(View v, int posisi) {
+            public void pilihFoto(View v, final int posisi) {
                 TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
                 noUrut.setText(Integer.toString(loader.ambilUrutanDipilih(posisi)));
                 noUrut.getBackground().setTint(getResources().getColor(R.color.biruLaut));
                 noUrut.getBackground().setAlpha(255);
+
+//                TextView centang = v.findViewById(R.id.tambah_cell_centang_no);
+                noUrut.setSelected(true);
+/*
+                ImageView bg= v.findViewById(R.id.tambah_cell_pratinjau);
+                bg.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent kePreview= new Intent(getBaseContext(), GaleriPreview.class);
+                        kePreview.putStringArrayListExtra("judul", loader.ambilJudulDipilih());
+                        kePreview.putExtra("path", loader.ambilPathDipilih());
+                        kePreview.putExtra("indDipilih", loader.ambilUrutanDipilih(posisi)-1);
+
+                        startActivity(kePreview);
+                    }
+                });
+*/
             }
             @Override
             public void batalPilihFoto(View v, int posisi) {
@@ -177,6 +259,14 @@ public class AmbilGambarAct extends AppCompatActivity {
                     noUrut = viewDipilih.ambil(i).findViewById(R.id.tambah_cell_centang_no);
                     noUrut.setText(Integer.toString(indBaru++));
                 }
+
+//                TextView centang = v.findViewById(R.id.tambah_cell_centang_no);
+                noUrut= v.findViewById(R.id.tambah_cell_centang_no);
+                noUrut.setSelected(false);
+/*
+                ImageView bg= v.findViewById(R.id.tambah_cell_pratinjau);
+                bg.setOnClickListener(null);
+*/
             }
         });
 
@@ -184,7 +274,7 @@ public class AmbilGambarAct extends AppCompatActivity {
             @Override
             public void bufferThumbnail(final int posisi, final int jmlBuffer) {
                 View view= loader.ambilView(posisi);
-                final int lebar= view.getLayoutParams().width;
+//                final int lebar= view.getLayoutParams().width;
 
                 final TextView indDipilih = view.findViewById(R.id.tambah_cell_centang_no);
 //                final GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
@@ -193,7 +283,6 @@ public class AmbilGambarAct extends AppCompatActivity {
                     public void onClick(View v) {
                         if (!indDipilih.isSelected()) {
                             loader.pilihFoto(posisi);
-                            indDipilih.setSelected(true);
 /*
                             TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
                             liveQuestion.setAdapter(adpDipilih);
@@ -204,7 +293,6 @@ public class AmbilGambarAct extends AppCompatActivity {
 */
                         } else {
                             loader.batalPilihFoto(posisi);
-                            indDipilih.setSelected(false);
 /*
                             TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
                             liveQuestion.setAdapter(adpDipilih);
@@ -229,14 +317,14 @@ public class AmbilGambarAct extends AppCompatActivity {
     }
 
 
-    public String[] ambilPathGambar(){
+    private String[] ambilPathGambar(){
         ArrayList<String> arrayList= getImagesPath();
         String array[]= new String[arrayList.size()];
         int indJalan= 0;
         for(int i= array.length-1; i >= 0; i--)
             array[indJalan++]= arrayList.get(i);
         return array;
-    } public ArrayList<String> getImagesPath() {
+    } private ArrayList<String> getImagesPath() {
         Uri uri;
         ArrayList<String> listOfAllImages = new ArrayList<String>();
         Cursor cursor;

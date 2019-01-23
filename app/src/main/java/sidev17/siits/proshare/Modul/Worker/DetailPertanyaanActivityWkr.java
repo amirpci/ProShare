@@ -63,8 +63,8 @@ import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
-import sidev17.siits.proshare.Utils.ArrayMod;
-import sidev17.siits.proshare.Utils.GaleriLoader;
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
+import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
 
 public class DetailPertanyaanActivityWkr extends AppCompatActivity {
@@ -117,8 +117,8 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
 
     private View viewBarKomen;
     private GaleriLoader loader;
-    private int urutanDipilih[]; //urutan item yg dipilih
-    private int posisiDipilih[]; //posisi item yg dipilih
+    private Array<Integer> urutanDipilih; //urutan item yg dipilih
+    private Array<Integer> posisiDipilih; //posisi item yg dipilih
     private int lbrBarKomen= -3;
 
     private final int BATAS_BUFFER_VIEW= 7;
@@ -594,8 +594,9 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
         RelativeLayout.LayoutParams lpAksesoris[]= {lpSilang};
 
         loader= initLoader(new String[0], aksesoris, lpAksesoris);
-        urutanDipilih = new int[0];
-        posisiDipilih = new int[0];
+
+        urutanDipilih= new Array<>();
+        posisiDipilih= new Array<>();
 
         View klip= viewBarKomen.findViewById(R.id.tab_text_indikator);
         final TextView teksKomentar= viewBarKomen.findViewById(R.id.tab_text_hint);
@@ -610,8 +611,8 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent keAmbilGambar= new Intent(DetailPertanyaanActivityWkr.this, AmbilGambarAct.class);
-                keAmbilGambar.putExtra("urutanDipilih", urutanDipilih);
-                keAmbilGambar.putExtra("posisiDipilih", posisiDipilih);
+                keAmbilGambar.putExtra("urutanDipilih", urutanDipilih.PRIMITIF.arrayInt());
+                keAmbilGambar.putExtra("posisiDipilih", posisiDipilih.PRIMITIF.arrayInt());
                 startActivityForResult(keAmbilGambar, AMBIL_GAMBAR);
             }
         });
@@ -851,10 +852,11 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
             bg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent kePreview= new Intent(getBaseContext(), PhotoPreview.class);
+                    Intent kePreview= new Intent(getBaseContext(), GaleriPreview.class);
                     kePreview.putStringArrayListExtra("judul", loader.ambilDaftarJudul());
                     kePreview.putExtra("path", loader.ambilDaftarPathFoto());
-                    kePreview.putExtra("indDipilih", position);
+                    kePreview.putExtra("posisiFoto", position);
+                    kePreview.putExtra("indikatorDitampilkan", false);
 
                     startActivity(kePreview);
                 }
@@ -873,7 +875,27 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                             pathFotoBaru[jalan++]= pathFoto[i];
 
                     loader.aturPathItem(pathFotoBaru);
+//                    int urutanHilang= urutanDipilih.ambil(position);
+                    int indek= urutanDipilih.hapus(new Integer(position+1));
+                    posisiDipilih.hapus(indek);
+                    Toast.makeText(DetailPertanyaanActivityWkr.this, "indekHilang= " +position, Toast.LENGTH_SHORT).show();
+                    perbaruiUrutanDipilih(position+1);
                     gambarDipilih.setAdapter(new AdapterPropertiCell(loader, gambarDipilih.getWidth() / loader.ambilJmlItemPerGaris(), pathFotoBaru.length));
+
+
+                    float batasTinggi= lbrBarKomen +400;
+                    if(pathFotoBaru.length <= 3) {
+                        batasTinggi = lbrBarKomen + (loader.ambilUkuranPratinjau() + loader.ambilOffsetItem())
+                                + gambarDipilih.getPaddingBottom() + gambarDipilih.getPaddingTop();
+                        RelativeLayout.LayoutParams lp= (RelativeLayout.LayoutParams) gambarDipilih.getLayoutParams();
+                        lp.height= ViewGroup.LayoutParams.WRAP_CONTENT;
+                    } else{
+                        RelativeLayout.LayoutParams lpDipilih= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (batasTinggi- lbrBarKomen));
+                        gambarDipilih.setLayoutParams(lpDipilih);
+                    }
+                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) batasTinggi);
+                    viewBarKomen.setLayoutParams(lp);
+
 //                    loader.batalPilihFoto(posisiDipilih[position]);
 //                    Toast.makeText(DetailPertanyaanActivityWkr.this, "posisi batal= " +posisiDipilih[position], Toast.LENGTH_LONG).show();
                 }
@@ -883,6 +905,12 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
         }
     }
 
+    private void perbaruiUrutanDipilih(int urutanHilang){
+        for(int i= 0; i< urutanDipilih.ukuran(); i++)
+            if(urutanDipilih.ambil(i) > urutanHilang)
+                urutanDipilih.ganti(i, new Integer(urutanDipilih.ambil(i)-1));
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == AMBIL_GAMBAR && resultCode == RESULT_OK){
@@ -890,8 +918,8 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                 lbrBarKomen= viewBarKomen.getHeight();
 
             String pathFoto[]= data.getStringArrayExtra("pathFoto");
-            urutanDipilih = data.getIntArrayExtra("urutanDipilih");
-            posisiDipilih= data.getIntArrayExtra("posisiDipilih");
+            urutanDipilih.dariArrayPrimitif(data.getIntArrayExtra("urutanDipilih"));
+            posisiDipilih.dariArrayPrimitif(data.getIntArrayExtra("posisiDipilih"));
 
             final GridView gambarDipilih= viewBarKomen.findViewById(R.id.wadah_gambar);
             float batasTinggi= lbrBarKomen +400;
@@ -905,10 +933,12 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
 */
             gambarDipilih.setPadding(0, 50, 0, 20);
 
-            if(pathFoto.length <= 3)
-                batasTinggi= lbrBarKomen + (loader.ambilUkuranPratinjau() +loader.ambilOffsetItem())
-                        +gambarDipilih.getPaddingBottom() +gambarDipilih.getPaddingTop();
-            else{
+            if(pathFoto.length <= 3) {
+                batasTinggi = lbrBarKomen + (loader.ambilUkuranPratinjau() + loader.ambilOffsetItem())
+                        + gambarDipilih.getPaddingBottom() + gambarDipilih.getPaddingTop();
+                RelativeLayout.LayoutParams lp= (RelativeLayout.LayoutParams) gambarDipilih.getLayoutParams();
+                lp.height= ViewGroup.LayoutParams.WRAP_CONTENT;
+            } else{
                 RelativeLayout.LayoutParams lpDipilih= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (batasTinggi- lbrBarKomen));
                 gambarDipilih.setLayoutParams(lpDipilih);
             }
@@ -934,8 +964,8 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                     ((EditText) viewBarKomen.findViewById(R.id.tab_text_hint)).setMaxLines(4);
                     tmbBatal.setVisibility(View.GONE);
 
-                    urutanDipilih= new int[0];
-                    posisiDipilih= new int[0];
+                    urutanDipilih.hapusSemua();
+                    posisiDipilih.hapusSemua();
                 }
             });
         }

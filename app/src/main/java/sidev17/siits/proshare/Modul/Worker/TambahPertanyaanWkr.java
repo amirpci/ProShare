@@ -50,7 +50,7 @@ import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.ArrayMod;
-import sidev17.siits.proshare.Utils.GaleriLoader;
+import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
@@ -776,16 +776,17 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
             bg.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent kePreview= new Intent(getBaseContext(), PhotoPreview.class);
+                    Intent kePreview= new Intent(getBaseContext(), GaleriPreview.class);
 /*
                     Bitmap arrayBm[]= new Bitmap[itemDipilih.size()];
                     arrayBm= itemDipilih.toArray(arrayBm);
                     kePreview.putExtra("foto", new ParcelHolder<Bitmap>(arrayBm));
 */
 //                    kePreview.putParcelableArrayListExtra("foto", itemDipilih);
-                    kePreview.putStringArrayListExtra("judul", loader.ambilJudulDipilih());
-                    kePreview.putExtra("path", loader.ambilPathDipilih());
-                    kePreview.putExtra("indDipilih", position);
+//                    kePreview.putStringArrayListExtra("judul", loader.ambilJudulDipilih());
+//                    kePreview.putExtra("path", loader.ambilPathDipilih());
+                    kePreview.putExtra("jenisPath", GaleriPreview.PATH_DEFAULT);
+                    kePreview.putExtra("posisiFoto", position);
 
                     startActivity(kePreview);
                 }
