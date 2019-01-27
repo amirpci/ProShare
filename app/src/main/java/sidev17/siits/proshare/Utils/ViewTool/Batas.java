@@ -83,7 +83,7 @@ public class Batas {
 
     protected boolean sentuhInt(MotionEvent ev){
         if(pngSentuhInt != null)
-            return pngSentuhInt.sentuhInt(view, ev, menampung(ev.getRawX(), ev.getRawY()));
+            return pngSentuhInt.sentuh_Int(view, ev, menampung(ev.getRawX(), ev.getRawY()));
         return false;
     }
 

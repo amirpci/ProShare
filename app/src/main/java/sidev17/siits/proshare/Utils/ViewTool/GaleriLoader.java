@@ -29,6 +29,7 @@ public class GaleriLoader {
     public static final int JENIS_FOTO= 10;
     public static final int JENIS_VIDEO_THUMBNAIL= 11;
     public static final int JENIS_VIDEO= 12;
+    public static final int JENIS_CAMPURAN= 13;
 
     public static final int BENTUK_KOTAK= 21;
     public static final int BENTUK_ASLI= 20;
@@ -51,6 +52,7 @@ public class GaleriLoader {
 
     private AksiBuffer aksiBuffer;
     private AksiPilihFoto aksiPilihFoto;
+    private AksiProsesBitmap aksiProsesBitmap;
 
     private String pathFoto[];
     private Bitmap bufferBitmap[];
@@ -88,7 +90,7 @@ public class GaleriLoader {
 
     private int dipilih[];
     private Array<View> viewDipilih = new Array<View>();
-    private Array<Bitmap> bitmapDipilih= new Array<Bitmap>();
+    private Array<BitmapHandler> bitmapDipilih= new Array<BitmapHandler>();
 //    private Array<Integer> urutanDipilih= new Array<Integer>(true);
     private int cursorDipilih= 0;
     private int jmlDipilihTertunda= 0;
@@ -162,6 +164,14 @@ public class GaleriLoader {
     }
     public void aturAksiPilihFoto(AksiPilihFoto a){
         aksiPilihFoto= a;
+    }
+
+    public interface AksiProsesBitmap{
+        void proses(BitmapHandler handler);
+        void selesai(Bitmap bm, boolean tuntas);
+    }
+    public void aturAksiProsesBitmap(AksiProsesBitmap a){
+        aksiProsesBitmap= a;
     }
 
     public void perbaruiBatasBuffer(int jmlBuffer){
@@ -311,19 +321,21 @@ public class GaleriLoader {
         }
     }
 
-    private void isiBgTakBisa(int ind){
-        ImageView img;
-        if(elemenImg)
-            img= (ImageView) bufferView[ind];
-        else
-            img= bufferView[ind].findViewById(idElemenImg);
-
+    private void isiBgTakBisa(ImageView img){
         if(sumberBgTakBisa== -1 && warnaBg.startsWith("#"))
             img.setColorFilter(Color.parseColor(warnaBg));
         else {
             img.setImageResource(sumberBgTakBisa);
             img.setColorFilter(Color.parseColor(warnaTintBgTakBisa));
         }
+    }
+    private void isiBgTakBisa(int ind){
+        ImageView img;
+        if(elemenImg)
+            img= (ImageView) bufferView[ind];
+        else
+            img= bufferView[ind].findViewById(idElemenImg);
+        isiBgTakBisa(img);
     }
 
 
@@ -333,11 +345,33 @@ public class GaleriLoader {
         v.setOnTouchListener(gesture);
     }
 
+    public static final Array<String> ekstensiFoto= new Array<>("jpg", "jpeg", "png", "bmp", "gif");
+    public static final Array<String> ekstensiVideo= new Array<>("mp4", "mkv", "3gp");
+
+    private int jenisFoto(int posisi){
+        String array[]= pathFoto[posisi].split("\\.");
+        String strTrahir= array[array.length -1];
+//        array= strTrahir.split(".");
+//        strTrahir= array[array.length-1];
+
+        int indekFoto= ekstensiFoto.indekAwal(strTrahir);
+        int indekVideo= ekstensiVideo.indekAwal(strTrahir);
+
+        if(indekFoto > -1)
+            return JENIS_FOTO;
+        else if(indekVideo > -1)
+            return jenisFoto == JENIS_VIDEO ? JENIS_VIDEO : JENIS_VIDEO_THUMBNAIL;
+        return -1;
+    }
+
     private void isiFileFoto(int mulai, int sebanyak, int ukuranPokok){
         File file;
+        int jenisFoto= this.jenisFoto;
         for(int i= mulai; i< mulai +sebanyak && i<pathFoto.length; i++){
             file= new File(pathFoto[/*pathFoto.length-1-*/i]);
             Bitmap bm= null;
+            if(this.jenisFoto == JENIS_CAMPURAN)
+                jenisFoto= jenisFoto(i);
             if(jenisFoto == JENIS_FOTO) {
                 if(file.length() /1024 < (8*1024) && file.length() < (Runtime.getRuntime().freeMemory() - (1024*1)))
                     bm = BitmapFactory.decodeFile(pathFoto[i]);
@@ -356,6 +390,7 @@ public class GaleriLoader {
     } private void isiFileFoto(int posisi, int ukuranPokok){
         File file= new File(pathFoto[/*pathFoto.length-1-*/posisi]);
         Bitmap bm= null;
+        int jenisFoto= (this.jenisFoto == JENIS_CAMPURAN) ? jenisFoto(posisi) : this.jenisFoto;
         if(jenisFoto == JENIS_FOTO) {
             if(file.length() /1024 < (8*1024) && file.length() < Runtime.getRuntime().totalMemory()/*batasMemori[posisi % batasBuffer]*/)
                 bm = BitmapFactory.decodeFile(pathFoto[posisi]);
@@ -373,6 +408,7 @@ public class GaleriLoader {
     private void isiFileFotoDipilih(int posisi, int urutan, int ukuranPokok){
         File file= new File(pathFoto[/*pathFoto.length-1-*/posisi]);
         Bitmap bm= null;
+        int jenisFoto= (this.jenisFoto == JENIS_CAMPURAN) ? jenisFoto(posisi) : this.jenisFoto;
         if(jenisFoto == JENIS_FOTO) {
             if(file.length() /1024 < (8*1024) && file.length() < Runtime.getRuntime().totalMemory()/*batasMemori[posisi % batasBuffer]*/)
                 bm = BitmapFactory.decodeFile(pathFoto[posisi]);
@@ -385,7 +421,7 @@ public class GaleriLoader {
             if (bentukFoto == BENTUK_KOTAK)
                 bm = kropFotoKotak(bm);
         }
-        bitmapDipilih.tambah(bm, urutan);
+        bitmapDipilih.ambil(urutan).isi(bm);
     }
 
     public void aturLpWadahImg(ViewGroup.LayoutParams lp){
@@ -436,6 +472,33 @@ public class GaleriLoader {
         isiBg(posisi % batasBuffer);
     }
 
+    private void isiBitmapDipilih(int urutan, final ImageView img){
+        BitmapHandler bh= new BitmapHandler();
+        bh.aturPenungguProses(new BitmapHandler.PenungguProses() {
+            @Override
+            public void proses(BitmapHandler handler) {
+                if(aksiProsesBitmap != null)
+                    aksiProsesBitmap.proses(handler);
+            }
+
+            @Override
+            public void selesai(BitmapHandler handler, Bitmap bm, boolean tuntas) {
+                if(tuntas){
+//                    img.setImageBitmap(bm);
+                    handler.pasangKeImage(img);
+                }
+                else
+                    isiBgTakBisa(img);
+                if(aksiProsesBitmap != null)
+                    aksiProsesBitmap.selesai(bm, tuntas);
+            }
+        });
+        bitmapDipilih.tambah(bh, urutan);
+    }/*
+    public boolean pasangBitmapDipilihKeImage(ImageView img, int urutan){
+        return bitmapDipilih.ambil(urutan).pasangKeImage(img);
+    }*/
+
     private Bitmap kropFotoKotak(Bitmap bm){
         int pjg= bm.getWidth();
         int lbr= bm.getHeight();
@@ -472,8 +535,8 @@ public class GaleriLoader {
     public String[] ambilDaftarPathFoto(){
         return pathFoto;
     }
-    public String ambilPathFoto(int ind){
-        return pathFoto[ind];
+    public String ambilPathFoto(int posisi){
+        return pathFoto[posisi];
     } public String ambilPathFoto(Bitmap bm){
         return pathFoto[cariIndBitmap(bm)];
     }
@@ -493,8 +556,15 @@ public class GaleriLoader {
     } public Bitmap ambilBitmap(int posisi){
         return bufferBitmap[posisi % batasBuffer];
     }
-    public Array<Bitmap> ambilBitmapDipilih(){
+    public Array<BitmapHandler> ambilBitmapDipilih(){
         return bitmapDipilih;
+    }
+    //BitmapHandler hanya untuk bitmap yg dipilih karena untuk membaca Bitmap dari file butuh waktu lama
+    public BitmapHandler ambilBitmapHandler(int urutan){
+        return bitmapDipilih.ambil(urutan);
+    }
+    public Bitmap ambilBitmapDipilih(int ke){
+        return bitmapDipilih.ambil(ke).bitmap();
     }
 
     public View ambilView(int posisi){
@@ -634,7 +704,7 @@ public class GaleriLoader {
         loader[ind].execute(posisi);
     }
     private void pasangFotoDipilih(final ImageView img, final int posisi, final int urutan){
-        final int ind= posisi % batasMaksDipilih;
+//        final int ind= posisi % batasMaksDipilih;
             if(loaderDipilih[urutan] != null) {
             loaderDipilih[urutan].cancel(true);
         }
@@ -643,27 +713,28 @@ public class GaleriLoader {
             protected Bitmap doInBackground(Integer... integers) {
                 int posisi= integers[0].intValue();
 
-                isiFileFotoDipilih(posisi, urutan, ukuranPratinjau);
+                bitmapDipilih.ambil(urutan).isiBitmap(pathFoto[posisi], ukuranPratinjau, jenisFoto, bentukFoto);
+//                isiFileFotoDipilih(posisi, urutan, ukuranPratinjau);
                 if(aksiBuffer != null)
                     aksiBuffer.bufferThumbnail(posisi, batasBuffer);
 //                updateJmlFotoDiload(posisi);
                 jmlUdahDiload++;
-                return bitmapDipilih.ambil(urutan);
+                return bitmapDipilih.ambil(urutan).bitmap();
             }
 
             @Override
             protected void onPostExecute(Bitmap bitmap) {
                 if(bitmap != null){
-                    img.setImageBitmap(bitmap);
+//                    img.setImageBitmap(bitmap);
                     if(posisi == jmlDipilihTertunda-1){
                         dipilihLengkap= true;
                         jmlDipilihTertunda= 0;
-                        viewDipilih.aturBolehRumpang(false);
-                        bitmapDipilih.aturBolehRumpang(false);
                     }
                 }
+/*
                 else
                     isiBgTakBisa(ind);
+*/
 /*
                 if(posisi == jmlDipilihTertunda-1)
                     Toast.makeText(konteks, "bolehRumpang= " +viewDipilih.bolehRumpang(), Toast.LENGTH_LONG).show();
@@ -704,7 +775,7 @@ public class GaleriLoader {
         if(!awal /*posisi /batasBuffer == indKelihatan[indek]*/ ) {
             v = bufferView[indek];
             b= bufferBitmap[indek];
-            bitmapDipilih.tambah(b, urutan);
+            bitmapDipilih.tambah(new BitmapHandler(b), urutan);
             viewDipilih.tambah(v, urutan);
         } else{
             v= isiBufferView(posisi);
@@ -714,6 +785,7 @@ public class GaleriLoader {
             else
                 img= v.findViewById(idElemenImg);
             viewDipilih.tambah(v, urutan);
+            isiBitmapDipilih(urutan, img);
             pasangFotoDipilih(img, posisi, urutan);
         }
 
@@ -778,6 +850,8 @@ public class GaleriLoader {
     }
 //    ==Belum Diupdate
     public void aturIndDipilih(int indPosisiDipilih[], int indUrutanDipilih[]){
+        if(indPosisiDipilih == null || indUrutanDipilih == null)
+            throw new RuntimeException("\"int indPosisiDipilih[]\" dan \"int indUrutanDipilih[]\" gak boleh kosong!");
         Array<Integer> indPosisi= new Array<>();
         Array<Integer> indUrutan= new Array<>();
         for(int i= 0; i< indPosisiDipilih.length; i++)
@@ -822,11 +896,11 @@ public class GaleriLoader {
                 jmlDipilihJalan++;
             }
 
+        viewDipilih.aturBolehRumpang(false);
+        bitmapDipilih.aturBolehRumpang(false);
         if(jmlDipilihJalan== 0){
             jmlDipilihTertunda= 0;
             dipilihLengkap= true;
-            viewDipilih.aturBolehRumpang(false);
-            bitmapDipilih.aturBolehRumpang(false);
             Toast.makeText(konteks, "bolehRumpang= GAK MASUK!!!", Toast.LENGTH_SHORT).show();
         }
     }
@@ -883,14 +957,14 @@ public class GaleriLoader {
     public View ambilViewDipilih(int indKe){
         return viewDipilih.ambil(indKe);
     }
-
-    public Array<Bitmap> ambilFotoDipilih(){
+/*
+    public Array<BitmapHandler> ambilBitmapDipilih(){
         return bitmapDipilih;
     }
-    public Bitmap ambilFotoDipilih(int indKe){
-        return bitmapDipilih.ambil(indKe);
+    public Bitmap ambilBitmapDipilih(int indKe){
+        return bitmapDipilih.ambil(indKe).bitmap();
     }
-
+*/
     public String ambilPathDipilih(int urutan){
         String pathDipilih[]= ambilPathDipilih();
         return pathDipilih[urutan];

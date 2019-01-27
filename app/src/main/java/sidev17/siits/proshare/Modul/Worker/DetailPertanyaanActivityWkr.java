@@ -2,14 +2,12 @@ package sidev17.siits.proshare.Modul.Worker;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -39,8 +37,6 @@ import com.rmtheis.yandtran.language.Language;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,19 +51,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import okio.Utf8;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
-import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
+import sidev17.siits.proshare.Modul.SettingAct;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
+import sidev17.siits.proshare.Utils.View.ImgViewTouch;
+import sidev17.siits.proshare.Utils.View.MenuBarView;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
+import sidev17.siits.proshare.Utils.Warna;
 
-public class DetailPertanyaanActivityWkr extends AppCompatActivity {
+public class DetailPertanyaanActivityWkr extends Aktifitas {
     public final int PENGGUNA_EXPERT_TERVERIFIKASI= 2;
     public final int PENGGUNA_EXPERT= 1;
     public final int PENGGUNA_BIASA= 0;
@@ -121,6 +119,8 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
     private Array<Integer> posisiDipilih; //posisi item yg dipilih
     private int lbrBarKomen= -3;
 
+    private MenuBarView menuBar;
+
     private final int BATAS_BUFFER_VIEW= 7;
 
     @Override
@@ -151,7 +151,59 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
        // initIndViewKomentar(jmlBuffer);
         isiViewPertanyaan();
         initBarKomen();
+        initMenuBar();
         ((ViewGroup) findViewById(R.id.detail_bar_komen)).addView(viewBarKomen);
+    }
+
+    private void initMenuBar(){
+        menuBar= viewPertanyaan.findViewById(R.id.tl_opsi);
+        int gmbOpsi[]= {R.drawable.icon_edit,
+                R.drawable.icon_hapus};
+        int tersedia[]= {menuBar.ITEM_TERSEDIA, menuBar.ITEM_TERSEDIA};
+        menuBar.aturGmbItem(gmbOpsi);
+        menuBar.aturItemTersedia(tersedia);
+//        menuBar.aturArahBar(menuBar.ARAH_VERTIKAL);
+        menuBar.aturLetakBarRelatif(menuBar.BAR_DI_BAWAH);
+        menuBar.aturWarnaTersedia("#FFFFFF");
+//        menuBar.aturWarnaTakTersedia();
+        menuBar.aturWarnaKuat(Warna.ambilStringWarna(getResources().getColor(R.color.biruLaut)));
+        menuBar.aturLatarInduk_Akhir(R.drawable.latar_kotak_tumpul_atas);
+        menuBar.aturPenungguKlikBar(new MenuBarView.PenungguKlik_BarView() {
+            @Override
+            public void klik(MenuBarView v, boolean menuDitampilkan) {
+                if(!menuDitampilkan)
+                    v.aturWarnaInduk("#FFFFFF");
+                else
+                    v.aturWarnaInduk(Warna.ambilStringWarna(getResources().getColor(R.color.biruLaut)));
+            }
+        });
+        menuBar.aturAksiKlikItem(0, new ImgViewTouch.PenungguKlik() {
+            @Override
+            public void klik(View v) {
+                Intent keEdit= new Intent(DetailPertanyaanActivityWkr.this, TambahPertanyaanWkr.class);
+
+                keEdit.putExtra("judul", judulPertanyaan);
+                keEdit.putExtra("deskripsi", deskripsiPertanyaan);
+                TextView majority= viewPertanyaan.findViewById(R.id.tl_majority);
+                keEdit.putExtra("bidang", majority.getText().toString());
+//                keEdit.putExtra("gambarAwal", gambarAwal);
+
+                startActivity(keEdit);
+            }
+        });
+        menuBar.aturAksiKlikItem(1, new ImgViewTouch.PenungguKlik() {
+            @Override
+            public void klik(View v) {
+                hapusPertanyaan();
+            }
+        });
+
+        daftarkanBatas(menuBar.ambilBatas());
+    }
+
+    private void hapusPertanyaan(){
+        //lakukan sesuatu...
+        //kalau bisa pake konfirmasi dulu
     }
 
     private void isiDataPertanyaan(){
@@ -778,20 +830,20 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                         if (!urutanDipilih.isSelected()) {
                             loader.pilihFoto(posisi);
                             urutanDipilih.setSelected(true);
-                            TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
+                            TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilBitmapDipilih());
                             liveQuestion.setAdapter(adpDipilih);
-                            if(loader.ambilFotoDipilih().size() <= 3)
+                            if(loader.ambilBitmapDipilih().size() <= 3)
                                 aturTinggiGrid(liveQuestion, lebar);
                             else
                                 aturTinggiGrid(liveQuestion, lebar+90);
                         } else {
                             loader.batalPilihFoto(posisi);
                             urutanDipilih.setSelected(false);
-                            TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
+                            TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilBitmapDipilih());
                             liveQuestion.setAdapter(adpDipilih);
-                            if(loader.ambilFotoDipilih().size() == 0)
+                            if(loader.ambilBitmapDipilih().size() == 0)
                                 aturTinggiGrid(liveQuestion, 0);
-                            else if(loader.ambilFotoDipilih().size() <= 3)
+                            else if(loader.ambilBitmapDipilih().size() <= 3)
                                 aturTinggiGrid(liveQuestion, lebar);
                             else
                                 aturTinggiGrid(liveQuestion, lebar+90);
@@ -874,7 +926,6 @@ public class DetailPertanyaanActivityWkr extends AppCompatActivity {
                         if(i != position)
                             pathFotoBaru[jalan++]= pathFoto[i];
 
-                    loader.aturPathItem(pathFotoBaru);
 //                    int urutanHilang= urutanDipilih.ambil(position);
                     int indek= urutanDipilih.hapus(new Integer(position+1));
                     posisiDipilih.hapus(indek);

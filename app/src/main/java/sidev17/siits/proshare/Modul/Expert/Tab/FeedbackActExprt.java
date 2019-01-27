@@ -33,13 +33,16 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import sidev17.siits.proshare.Model.ChatListItem;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Modul.ChatActivity;
+import sidev17.siits.proshare.Modul.TemanDaftarAct;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Utilities;
 
 public class FeedbackActExprt extends Fragment {
-    public final int PENGGUNA_EXPERT_TERVERIFIKASI= 202;
-    public final int PENGGUNA_EXPERT= 201;
-    public final int PENGGUNA_BIASA= 200;
+/*
+    public static final int PENGGUNA_EXPERT_TERVERIFIKASI= 202;
+    public static final int PENGGUNA_EXPERT= 201;
+    public static final int PENGGUNA_BIASA= 200;
+*/
     private FirebaseRecyclerAdapter adapter;
     //FORMAT KONSTANTA INT:
     // xxx >> digit 1: 1,2
@@ -48,7 +51,8 @@ public class FeedbackActExprt extends Fragment {
 
     private String orang[]= {"Mr. A", "Mr. B", "Mrs. C", "Will Smith"};
 //    private String chat[]= {"Psychiatrist", "Motivator", "Engineer", "Actor"};
-    private int kategoriExpert[]= {202, 201, 200, 202};
+    private int kategoriExpert[]= {Pengguna.Status.PENGGUNA_EXPERT_TERVERIFIKASI, Pengguna.Status.PENGGUNA_EXPERT,
+        Pengguna.Status.PENGGUNA_BIASA, Pengguna.Status.PENGGUNA_EXPERT_TERVERIFIKASI};
 
 //    private String judulSolusi[]= {"What should I do whe this happen?", "How to gain inspiration?", "How to else?", "Stay cool"};
     private String feedback[][]= {{"I do this everyday, but somehow..."}, {"When it happens, I don't know what to do. I need inspiration."}, {"bla bla bla..."}, {"Just bel cool bro!"}};
@@ -75,6 +79,10 @@ public class FeedbackActExprt extends Fragment {
         mulaiChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent keDaftarTeman= new Intent(getContext(), TemanDaftarAct.class);
+
+                startActivity(keDaftarTeman);
+/*
                 final Dialog dialog = new Dialog(getActivity());
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.dialog_mulai_chatt);
@@ -83,6 +91,10 @@ public class FeedbackActExprt extends Fragment {
                 next.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+/*
+============================
+NANTI DIPAKE DI TemanTambahAct
+============================
                         Utilities.getUserRef().child(email.getText().toString().replace(".", ",")).addValueEventListener(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -100,10 +112,12 @@ public class FeedbackActExprt extends Fragment {
 
                             }
                         });
+* /
                     }
                 });
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
+*/
             }
         });
         return view;
@@ -148,11 +162,14 @@ public class FeedbackActExprt extends Fragment {
 
         public void initList(final ChatListItem listPesan) {
             //Data Untuk orang
-            if(listPesan.getOrang().getStatus()==201){
+/*
+            if(listPesan.getOrang().getStatus() == Pengguna.Status.PENGGUNA_EXPERT){
                 centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
-            }else if(listPesan.getOrang().getStatus()==202){
+            }else if(listPesan.getOrang().getStatus() == Pengguna.Status.PENGGUNA_EXPERT_TERVERIFIKASI){
                 centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
             }
+*/
+            Pengguna.Status.pasangIndikatorStatus(centang, (int) listPesan.getOrang().getStatus());
             String delegate = "hh:mm aaa";
             prevChat.setText(listPesan.getPrewMessage());
             nama.setText(listPesan.getNama());

@@ -16,7 +16,7 @@ public class Aktifitas extends AppCompatActivity {
         boolean sentuh(Array<View> view, MotionEvent event, boolean diDalam);
     }
     public interface PenungguSentuh_Internal{
-        boolean sentuhInt(Array<View> view, MotionEvent event, boolean diDalam);
+        boolean sentuh_Int(Array<View> view, MotionEvent event, boolean diDalam);
     }
 
     //Batas milik View yang terdaftar

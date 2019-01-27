@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -24,32 +25,51 @@
         android:background="@color/colorPrimary"
         android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/timeline_header"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:orientation="vertical"
             android:background="@color/abu">
-            <TextView
-                android:id="@+id/tl_judul"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="10dp"
-                android:text="How to gain inspiration?"
-                android:textColor="@color/hitam"
-                android:textSize="20sp" />
-            <TextView
-                android:id="@+id/tl_majority"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="10dp"
-                android:text="Problem Majority"
-                android:textColor="@color/hitam"
-                android:textSize="15sp" />
-        </LinearLayout>
+            <sidev17.siits.proshare.Utils.View.MenuBarView
+                android:id="@+id/tl_opsi"
+                android:layout_width="50dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:padding="10dp"
+                android:layout_margin="10dp"
+                android:tint="@color/biruLaut"
+                app:BAR_latarInduk="@drawable/latar_kotak_tumpul_bawah"
+                app:warna_latar="@color/abuTua"
+                app:warna_induk="@color/biruLaut"
+                app:warna_tersedia="#FFFFFF"
+                android:src="@drawable/obj_titik_tiga_vertical"/>
+            <LinearLayout
+                android:layout_toLeftOf="@id/tl_opsi"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <TextView
+                    android:id="@+id/tl_judul"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="10dp"
+                    android:text="How to gain inspiration?"
+                    android:textColor="@color/hitam"
+                    android:textSize="20sp" />
+                <TextView
+                    android:id="@+id/tl_majority"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Problem Majority"
+                    android:textColor="@color/hitam"
+                    android:textSize="15sp" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <RelativeLayout
             android:id="@+id/tl_info_orang"

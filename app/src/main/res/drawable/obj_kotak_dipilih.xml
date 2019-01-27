@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="212dp"
+    android:height="212dp"
+    android:viewportWidth="212"
+    android:viewportHeight="212">
+
+    <path
+        android:fillColor="#090e15"
+        android:fillAlpha="0.13"
+        android:strokeAlpha="0.13"
+        android:strokeWidth="1"
+        android:pathData="M 0.00 0.00 L 212.00 0.00 L 212.00 0.44 L 211.14 1.08 C 141.09 0.89 71.04 1.05 0.99 1.00 L 0.00 1.00 L 0.00 0.00 Z" />
+    <path
+        android:fillColor="#385784"
+        android:fillAlpha="0.77"
+        android:strokeAlpha="0.77"
+        android:strokeWidth="1"
+        android:pathData="M 0.00 1.00 L 0.99 1.00 C 1.02 66.32 0.99 131.65 1.00 196.97 C 0.93 201.98 1.00 206.99 1.16 212.00 L 0.00 212.00 L 0.00 1.00 Z" />
+    <path
+        android:fillColor="#4972ad"
+        android:fillAlpha="1.00"
+        android:strokeAlpha="1.00"
+        android:strokeWidth="1"
+        android:pathData="M 0.99 1.00 C 71.04 1.05 141.09 0.89 211.14 1.08 C 210.80 71.38 211.11 141.70 210.99 212.00 L 1.16 212.00 C 1.00 206.99 0.93 201.98 1.00 196.97 C 0.99 131.65 1.02 66.32 0.99 1.00 M 201.16 8.07 C 197.80 11.31 195.15 15.20 192.03 18.66 C 190.43 16.72 188.93 14.67 187.02 13.03 C 184.83 11.84 181.62 14.78 183.09 16.97 C 184.91 19.74 187.23 22.16 189.35 24.71 C 190.37 26.27 192.97 26.88 194.19 25.23 C 197.96 20.95 201.64 16.57 205.18 12.10 C 207.25 9.82 203.41 6.04 201.16 8.07 M 8.22 8.86 C 8.22 73.89 8.23 138.92 8.22 203.95 C 73.25 203.96 138.28 203.95 203.31 203.95 C 203.33 152.56 203.30 101.17 203.33 49.78 C 189.65 36.12 176.05 22.38 162.28 8.81 C 110.93 8.93 59.57 8.82 8.22 8.86 Z" />
+    <path
+        android:fillColor="#152234"
+        android:fillAlpha="0.30"
+        android:strokeAlpha="0.30"
+        android:strokeWidth="1"
+        android:pathData="M 211.14 1.08 L 212.00 0.44 L 212.00 212.00 L 210.99 212.00 C 211.11 141.70 210.80 71.38 211.14 1.08 Z" />
+    <path
+        android:fillColor="#ffffff"
+        android:fillAlpha="1.00"
+        android:strokeAlpha="1.00"
+        android:strokeWidth="1"
+        android:pathData="M 201.16 8.07 C 203.41 6.04 207.25 9.82 205.18 12.10 C 201.64 16.57 197.96 20.95 194.19 25.23 C 192.97 26.88 190.37 26.27 189.35 24.71 C 187.23 22.16 184.91 19.74 183.09 16.97 C 181.62 14.78 184.83 11.84 187.02 13.03 C 188.93 14.67 190.43 16.72 192.03 18.66 C 195.15 15.20 197.80 11.31 201.16 8.07 Z" />
+</vector>

@@ -45,11 +45,13 @@
                         <ImageView
                             android:clickable="true"
                             android:id="@+id/addphoto_profile"
-                            android:padding="40dp"
-                            android:layout_width="120dp"
-                            android:layout_height="120dp"
-                            android:src="@drawable/obj_camera"
-                            android:tint="@color/abuLebihTua"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:padding="10dp"
+                            android:src="@drawable/tab_tambah_gambar"
+                            android:background="@drawable/latar_lingkaran"
+                            android:backgroundTint="@color/abuSangatTua"
+                            android:tint="#FFFFFF"
                             android:layout_alignParentBottom="true"
                             android:layout_alignParentRight="true"/>
                     </RelativeLayout>

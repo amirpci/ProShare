@@ -41,6 +41,9 @@ public class GaleriPreview extends AppCompatActivity {
     public static final int PATH_DEFAULT= 21;
     public static final int PATH_TERTENTU= 22;
 
+    public static final int JENIS_AMBIL_BANYAK= 31;
+    public static final int JENIS_AMBIL_SATU= 30;
+
     private String pathFoto[];
     private ArrayList<String> judul;
     private int batasHalaman= 10;
@@ -52,6 +55,9 @@ public class GaleriPreview extends AppCompatActivity {
     private int kelompokHalamanSkrg= 0;
     private int posisiFoto;
     private int jenisPath;
+
+    private int jenisPengambilan= JENIS_AMBIL_BANYAK;
+    private int posisiTrahir= -1;
 
     private Array<Integer> posisiAwal= new Array<>();
     private boolean samaDenganAwal= true;
@@ -72,10 +78,12 @@ public class GaleriPreview extends AppCompatActivity {
     private View footer;
 
     private TextView noUrutDipilih;
+    private ImageView centangDipilih;
     private View indikatorDipilih;
 
     private GaleriLoader loader;
     private boolean zoomIn= false;
+    private int jenisFoto;
 
     private DisplayMetrics metrikUtama;
     private int panjangScreen;
@@ -92,18 +100,20 @@ public class GaleriPreview extends AppCompatActivity {
         judulHalaman = findViewById(R.id.preview_judul);
         judulFoto= findViewById(R.id.preview_foto_judul);
         noUrutDipilih = findViewById(R.id.tambah_cell_centang_no);
+        centangDipilih= findViewById(R.id.tambah_cell_centang_gambar);
         indikatorDipilih= findViewById(R.id.cell_centang);
         wadahFoto= findViewById(R.id.preview_foto_wadah);
 
         initTmbOk();
         initHeaderFooter();
         pengaturanAwal();
-        initLoader(pathFoto, GaleriLoader.JENIS_FOTO);
+        initLoader(pathFoto, jenisFoto);
 
         metrikUtama= new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrikUtama);
         panjangScreen= metrikUtama.widthPixels;
         lebarScreen= metrikUtama.heightPixels;
+
 
         indikatorDipilih.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,14 +174,22 @@ public class GaleriPreview extends AppCompatActivity {
 //        ParcelHolder<Bitmap> holder= intentSebelumnya.getParcelableExtra("foto");
 //        foto= intentSebelumnya.getParcelableArrayListExtra("foto");
         pathFoto= intentSebelumnya.getStringArrayExtra("path");
-        jenisPath= (pathFoto== null) ? intentSebelumnya.getIntExtra("jenisPath", PATH_DEFAULT)
-                    : PATH_TERTENTU;
+        jenisPath= (pathFoto== null) ? PATH_DEFAULT
+                    : intentSebelumnya.getIntExtra("jenisPath", PATH_TERTENTU);
+
+        jenisPengambilan= intentSebelumnya.getIntExtra("jenisPengambilan", JENIS_AMBIL_BANYAK);
+        Toast.makeText(this, "jenisPengambilan= " +jenisPengambilan, Toast.LENGTH_SHORT).show();
+
+        jenisFoto= intentSebelumnya.getIntExtra("jenisFoto", GaleriLoader.JENIS_FOTO);
 
         if(jenisPath == PATH_DEFAULT) {
             pathFoto= ambilPathGambar();
             judul= ambilDaftarJudul();
-        } else if(jenisPath == PATH_TERTENTU)
+        } else if(jenisPath == PATH_TERTENTU){
             judul= intentSebelumnya.getStringArrayListExtra("judul");
+            if(judul == null)
+                judul= ambilDaftarJudul();
+        }
 
         posisiFoto = intentSebelumnya.getIntExtra("posisiFoto", 0);
         indikatorDitampilkan= intentSebelumnya.getBooleanExtra("indikatorDitampilkan", true);
@@ -249,7 +267,7 @@ public class GaleriPreview extends AppCompatActivity {
         if(!adapterDiAwal)
             posisiFoto++;
         wadahFoto.setCurrentItem(posisiFoto);
-        Toast.makeText(this, "posisi= " + posisiFoto, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, "posisi= " + posisiFoto, Toast.LENGTH_SHORT).show();
     }
     private boolean perbaruiPosisiLoader(int arah){
         return perbaruiPosisiLoader(arah, kelompokHalamanSkrg);
@@ -304,6 +322,7 @@ public class GaleriPreview extends AppCompatActivity {
         int urutanDipilih[]= intentSebelumnya.getIntArrayExtra("urutanDipilih");
 
         if(posisiDipilih != null && posisiDipilih.length > 0) {
+            posisiTrahir= posisiDipilih[0];
             loader.aturIndDipilih(posisiDipilih, urutanDipilih);
 
             for(int i= 0; i< urutanDipilih.length; i++)
@@ -318,43 +337,71 @@ public class GaleriPreview extends AppCompatActivity {
                         posisiDipilih[u]= posisiSmtr;
                     }
             posisiAwal.dariArrayPrimitif(posisiDipilih);
-            Toast.makeText(this, "ATUR!!!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "ATUR!!!", Toast.LENGTH_SHORT).show();
         }
 
         loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
             @Override
             public void pilihFoto(View v, final int posisi) {
-                if(samaDenganAwal){
-                    tmbOk(true);
-                }
-                else{
-                    if((posisiAwal.indekAwal(posisi) +1) == loader.ambilUrutanDipilih(posisi))
-                        perbedaanDipilih--;
-                    if(perbedaanDipilih == 0 && posisiAwal.ukuran() == loader.ambilUrutanDipilih()[0].length) {
+                if(jenisPengambilan == JENIS_AMBIL_SATU){
+                    if(posisiTrahir != -1)
+                        loader.batalPilihFoto(posisiTrahir);
+                    if(posisiAwal.ukuran() == 0
+                            || (posisiAwal.ukuran() > 0 && posisiAwal.ambil(0) != posisi)){
+                        tmbOk(true);
+                    } else if(posisiAwal.ukuran() > 0 && posisi == posisiAwal.ambil(0))
                         tmbOk(false);
+                    posisiTrahir= posisi;
+                } else if(jenisPengambilan == JENIS_AMBIL_BANYAK){
+                    if(samaDenganAwal){
+                        tmbOk(true);
+                    }
+                    else{
+                        if((posisiAwal.indekAwal(posisi) +1) == loader.ambilUrutanDipilih(posisi))
+                            perbedaanDipilih--;
+                        if(perbedaanDipilih == 0 && posisiAwal.ukuran() == loader.ambilUrutanDipilih()[0].length) {
+                            tmbOk(false);
+                        }
                     }
                 }
             }
             @Override
             public void batalPilihFoto(View v, int posisi) {
-                if(posisiAwal.indekAwal(posisi) != -1) {
-                    perbedaanDipilih++;
-                    tmbOk(true);
-                } else if(posisiAwal.ukuran() == loader.ambilUrutanDipilih()[0].length){
-                    tmbOk(false);
+                if(jenisPengambilan == JENIS_AMBIL_SATU){
+                    if(posisi == wadahFoto.getCurrentItem()){
+                        if(posisiAwal.ukuran() > 0 && posisiAwal.ambil(0) == posisi){
+                            posisiTrahir = -1;
+                            tmbOk(true);
+                        }
+                    }
+                } else if(jenisPengambilan == JENIS_AMBIL_BANYAK){
+                    if(posisiAwal.indekAwal(posisi) != -1) {
+                        perbedaanDipilih++;
+                        tmbOk(true);
+                    } else if(posisiAwal.ukuran() == loader.ambilUrutanDipilih()[0].length){
+                        tmbOk(false);
 
-                    Toast.makeText(GaleriPreview.this, "BATASL!!! " +posisiAwal.ukuran(), Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(GaleriPreview.this, "BATASL!!! " +posisiAwal.ukuran(), Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
     }
     private void pasangIndikatorDipilih(boolean dipilih){
         if(dipilih){
-            noUrutDipilih.setText(Integer.toString(loader.ambilUrutanDipilih(posisiFoto)));
+            if(jenisPengambilan == JENIS_AMBIL_BANYAK){
+                noUrutDipilih.setText(Integer.toString(loader.ambilUrutanDipilih(posisiFoto)));
+//                Toast.makeText(this, "BANYAK!!!", Toast.LENGTH_SHORT).show();
+            }
+            else if(jenisPengambilan == JENIS_AMBIL_SATU)
+                centangDipilih.setImageResource(R.drawable.obj_centang);
             noUrutDipilih.getBackground().setTint(getResources().getColor(R.color.biruLaut));
             noUrutDipilih.getBackground().setAlpha(255);
         } else{
-            noUrutDipilih.setText("");
+            if(jenisPengambilan == JENIS_AMBIL_BANYAK)
+                noUrutDipilih.setText("");
+            else if(jenisPengambilan == JENIS_AMBIL_SATU)
+                centangDipilih.setImageDrawable(null);
             noUrutDipilih.getBackground().setAlpha(0);
         }
         noUrutDipilih.setSelected(dipilih);

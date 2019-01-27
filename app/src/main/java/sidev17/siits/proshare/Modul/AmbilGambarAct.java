@@ -11,10 +11,10 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,14 +24,18 @@ import sidev17.siits.proshare.Modul.Worker.GaleriPreview;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.ArrayMod;
-import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 
 public class AmbilGambarAct extends AppCompatActivity {
+    public static final int JENIS_AMBIL_BANYAK= 31;
+    public static final int JENIS_AMBIL_SATU= 30;
 
     private GridView wadahGambar;
     private GaleriLoader loader;
     private ImageView tmbKirim;
+
+    private ImageView indikatorDipilihSatu;
+    private int posisiTrahir= -1;
 
     private DisplayMetrics display;
 
@@ -39,6 +43,7 @@ public class AmbilGambarAct extends AppCompatActivity {
     private int posisiDipilih[]= new int[0];
     private int urutanDipilih[]= new int[0];
 
+    private int jenisPengambilan= JENIS_AMBIL_BANYAK;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +56,7 @@ public class AmbilGambarAct extends AppCompatActivity {
         wadahGambar= findViewById(R.id.wadah_gambar);
         pathFoto= ambilPathGambar();
         initLoader(pathFoto, GaleriLoader.JENIS_FOTO);
-        isiIndDipilih();
+        ambilData();
         tmbKirim= findViewById(R.id.tambah_ok);
         tmbKirim.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,6 +66,7 @@ public class AmbilGambarAct extends AppCompatActivity {
                 hasil.putExtra("pathFoto", loader.ambilPathDipilih());
                 hasil.putExtra("posisiDipilih", indDipilih[0]);
                 hasil.putExtra("urutanDipilih", indDipilih[1]);
+//                hasil.putExtra("jenisPengambilan", jenisPengambilan);
                 if(loader.ambilPathDipilih().length > 0)
                     setResult(RESULT_OK, hasil);
                 finish();
@@ -90,6 +96,8 @@ public class AmbilGambarAct extends AppCompatActivity {
             urutanDipilih= data.getIntArrayExtra("urutanDipilih");
             if(posisiDipilih != null && posisiDipilih.length > 0){
                 wadahGambar.setAdapter(null);
+                if(jenisPengambilan == JENIS_AMBIL_SATU)
+                    ((ViewGroup)indikatorDipilihSatu.getParent()).removeView(indikatorDipilihSatu);
                 loader.aturIndDipilih(posisiDipilih, urutanDipilih);
                 posisiTrahir= posisiDipilih[posisiDipilih.length-1];
                 wadahGambar.setAdapter(new AdapterPropertiCell());
@@ -114,18 +122,31 @@ public class AmbilGambarAct extends AppCompatActivity {
         }
     }
 
-    private void isiIndDipilih(){
-        int posisiDipilih[] = getIntent().getIntArrayExtra("posisiDipilih");
-        int urutanDipilih[] = getIntent().getIntArrayExtra("urutanDipilih");
+    private void ambilData(){
+        Intent dataSebelumnya= getIntent();
+
+        int posisiDipilih[] = dataSebelumnya.getIntArrayExtra("posisiDipilih");
+        int urutanDipilih[] = dataSebelumnya.getIntArrayExtra("urutanDipilih");
+
+        jenisPengambilan= dataSebelumnya.getIntExtra("jenisPengambilan", JENIS_AMBIL_BANYAK);
+        Toast.makeText(this, "jenisPengambilan= " +jenisPengambilan, Toast.LENGTH_SHORT).show();
 
         if(posisiDipilih != null && posisiDipilih.length > 0) {
+            jenisPengambilan= JENIS_AMBIL_BANYAK;
             this.posisiDipilih= posisiDipilih;
             this.urutanDipilih= urutanDipilih;
-//            Toast.makeText(this, "posisiDipilih= " +posisiDipilih.length, Toast.LENGTH_SHORT).show();
             loader.aturIndDipilih(posisiDipilih, urutanDipilih);
         }
-//        for(int i= 0; i< posisiDipilih.length; i++)
-//            loader.pilihFoto(posisiDipilih[i]);
+    }
+    private void initIndikatorDipilihKotak(View vInduk){
+        if(jenisPengambilan == JENIS_AMBIL_SATU){
+            RelativeLayout.LayoutParams lp= new RelativeLayout.LayoutParams(vInduk.getWidth(), vInduk.getHeight());
+            lp.addRule(RelativeLayout.CENTER_HORIZONTAL);
+            lp.addRule(RelativeLayout.CENTER_VERTICAL);
+            indikatorDipilihSatu= new ImageView(this);
+            indikatorDipilihSatu.setImageResource(R.drawable.obj_kotak_dipilih);
+            indikatorDipilihSatu.setLayoutParams(lp);
+        }
     }
 
     class AdapterPropertiCell extends BaseAdapter {
@@ -175,12 +196,13 @@ public class AmbilGambarAct extends AppCompatActivity {
                 loader.pilihFoto(posisiDipilih[penghitung++]);
             }
 */
+/*
             try{
                 view.findViewById(R.id.tambah_cell_pratinjau);
             } catch (Exception e){
                 throw new RuntimeException(e.getMessage() +" posisi= " +position +" ukuran= " +loader.ambilUrutanDipilih()[0].length);
             }
-
+*/
             ImageView bg= view.findViewById(R.id.tambah_cell_pratinjau);
             bg.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -194,6 +216,7 @@ public class AmbilGambarAct extends AppCompatActivity {
                     int indDipilih[][]= loader.ambilUrutanDipilih();
                     kePreview.putExtra("posisiDipilih", indDipilih[0]);
                     kePreview.putExtra("urutanDipilih", indDipilih[1]);
+                    kePreview.putExtra("jenisPengambilan", jenisPengambilan);
 
                     startActivityForResult(kePreview, 0);
                 }
@@ -220,13 +243,21 @@ public class AmbilGambarAct extends AppCompatActivity {
         loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
             @Override
             public void pilihFoto(View v, final int posisi) {
-                TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
-                noUrut.setText(Integer.toString(loader.ambilUrutanDipilih(posisi)));
-                noUrut.getBackground().setTint(getResources().getColor(R.color.biruLaut));
-                noUrut.getBackground().setAlpha(255);
-
-//                TextView centang = v.findViewById(R.id.tambah_cell_centang_no);
-                noUrut.setSelected(true);
+                if(jenisPengambilan == JENIS_AMBIL_BANYAK){
+                    TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
+                    noUrut.setText(Integer.toString(loader.ambilUrutanDipilih(posisi)));
+                    noUrut.getBackground().setTint(getResources().getColor(R.color.biruLaut));
+                    noUrut.getBackground().setAlpha(255);
+                    noUrut.setSelected(true);
+                } else if(jenisPengambilan == JENIS_AMBIL_SATU){
+                    if(loader.ambilUrutanDipilih(posisi) > 1)
+                        loader.batalPilihFoto(posisiTrahir);
+                    posisiTrahir= posisi;
+                    if(indikatorDipilihSatu == null)
+                        initIndikatorDipilihKotak(v);
+                    ViewGroup vg= v.findViewById(R.id.tambah_cell_kotak_dipilih);
+                    vg.addView(indikatorDipilihSatu);
+                }
 /*
                 ImageView bg= v.findViewById(R.id.tambah_cell_pratinjau);
                 bg.setOnClickListener(new View.OnClickListener() {
@@ -244,29 +275,27 @@ public class AmbilGambarAct extends AppCompatActivity {
             }
             @Override
             public void batalPilihFoto(View v, int posisi) {
-                int indDipilih[][]= loader.ambilUrutanDipilih();
-                Array<View> viewDipilih= loader.ambilViewDipilih();
+                if(jenisPengambilan == JENIS_AMBIL_BANYAK){
+                    int indDipilih[][]= loader.ambilUrutanDipilih();
+                    Array<View> viewDipilih= loader.ambilViewDipilih();
 //                int indYgDibatalkan= loader.ambilUrutanDipilih(posisi) -1;
-                int mulai= ArrayMod.cariIndDlmArray(indDipilih[0], posisi);
-                int indBaru= indDipilih[1][mulai];
-                int batas= indDipilih[0].length;
+                    int mulai= ArrayMod.cariIndDlmArray(indDipilih[0], posisi);
+                    int indBaru= indDipilih[1][mulai];
+                    int batas= indDipilih[0].length;
 
-                TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
-                noUrut.setText("");
-                noUrut.getBackground().setAlpha(0);
+                    TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
+                    noUrut.setText("");
+                    noUrut.getBackground().setAlpha(0);
+                    noUrut.setSelected(false);
 
-                for(int i= indBaru; i< batas; i++) {
-                    noUrut = viewDipilih.ambil(i).findViewById(R.id.tambah_cell_centang_no);
-                    noUrut.setText(Integer.toString(indBaru++));
+                    for(int i= indBaru; i< batas; i++) {
+                        noUrut = viewDipilih.ambil(i).findViewById(R.id.tambah_cell_centang_no);
+                        noUrut.setText(Integer.toString(indBaru++));
+                    }
+                } else if(jenisPengambilan == JENIS_AMBIL_SATU){
+                    ViewGroup vg= v.findViewById(R.id.tambah_cell_kotak_dipilih);
+                    vg.removeView(indikatorDipilihSatu);
                 }
-
-//                TextView centang = v.findViewById(R.id.tambah_cell_centang_no);
-                noUrut= v.findViewById(R.id.tambah_cell_centang_no);
-                noUrut.setSelected(false);
-/*
-                ImageView bg= v.findViewById(R.id.tambah_cell_pratinjau);
-                bg.setOnClickListener(null);
-*/
             }
         });
 
@@ -284,9 +313,9 @@ public class AmbilGambarAct extends AppCompatActivity {
                         if (!indDipilih.isSelected()) {
                             loader.pilihFoto(posisi);
 /*
-                            TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
+                            TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilBitmapDipilih());
                             liveQuestion.setAdapter(adpDipilih);
-                            if(loader.ambilFotoDipilih().size() <= 3)
+                            if(loader.ambilBitmapDipilih().size() <= 3)
                                 aturTinggiGrid(liveQuestion, lebar);
                             else
                                 aturTinggiGrid(liveQuestion, lebar+90);
@@ -294,11 +323,11 @@ public class AmbilGambarAct extends AppCompatActivity {
                         } else {
                             loader.batalPilihFoto(posisi);
 /*
-                            TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilFotoDipilih());
+                            TambahPertanyaanWkr.AdapterPropertiDipilih adpDipilih= new TambahPertanyaanWkr.AdapterPropertiDipilih(lebar, loader.ambilBitmapDipilih());
                             liveQuestion.setAdapter(adpDipilih);
-                            if(loader.ambilFotoDipilih().size() == 0)
+                            if(loader.ambilBitmapDipilih().size() == 0)
                                 aturTinggiGrid(liveQuestion, 0);
-                            else if(loader.ambilFotoDipilih().size() <= 3)
+                            else if(loader.ambilBitmapDipilih().size() <= 3)
                                 aturTinggiGrid(liveQuestion, lebar);
                             else
                                 aturTinggiGrid(liveQuestion, lebar+90);

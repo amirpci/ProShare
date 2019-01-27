@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
@@ -15,12 +14,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.Ukuran;
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Utils.ViewTool.Batas;
 import sidev17.siits.proshare.Utils.Warna;
 
@@ -33,16 +31,26 @@ public class MenuBarView extends ImgViewTouch {
     public static final int BAR_DI_BAWAH= 512;
     public static final int BAR_DI_KANAN= 513;
     public static final int BAR_DI_KIRI= 514;
+    //
+    //untuk #BAR_DI_ATAS dan #BAR_DI_BAWAH
     public static final int BAR_RATA_KANAN= 521;
     public static final int BAR_RATA_KIRI= 522;
-    public static final int BAR_RATA_TENGAH= 523;
+    //
+    //untuk #BAR_DI_KANAN dan #BAR_DI_KIRI
     public static final int BAR_RATA_ATAS= 524;
     public static final int BAR_RATA_BAWAH= 525;
+    //
+    //untuk semua letak bar
+    public static final int BAR_RATA_TENGAH= 523;
 
     public static final int WARNA_TERSEDIA= 21;
     public static final int WARNA_TAK_TERSEDIA= 22;
     public static final int WARNA_KUAT= 23;
     public static final int WARNA_LEMAH= 24;
+
+    public static final int LATAR_KOSONG= -30;
+    public static final int LATAR_WARNA= -31;
+    public static final int LATAR_KOTAK_TUMPUL= -32;
 
     public static final int ITEM_TERSEDIA= 31;
     public static final int ITEM_TAK_TERSEDIA= 32;
@@ -51,7 +59,9 @@ public class MenuBarView extends ImgViewTouch {
     private DisplayMetrics resolusi;
     private int arahBar;
     private int letakBar;
+    private boolean letakBarDisesuaikan= false;
     private int rataanBar;
+    private boolean rataanBarDisesuaikan= false;
     private int pjgBar;
     private int lbrBar;
     private float letakBarX = -1;
@@ -62,6 +72,9 @@ public class MenuBarView extends ImgViewTouch {
     private int padding;
     private int elevasiBar;
 
+    private int pjgInduk;
+    private int lbrInduk;
+
     private RelativeLayout viewBar;
     private Array<ImgViewTouch> daftarItem= new Array<>();
     private Array<Integer> daftarItemTersedia= new Array<>();
@@ -69,8 +82,8 @@ public class MenuBarView extends ImgViewTouch {
     private int ukuranItem;
     private int jarakAntarItem= 0;
 
-    private int sumberLatarInduk_Awal = -1;
-    private int sumberLatarInduk_Akhir = -1;
+    private int sumberLatarInduk_Awal= LATAR_KOSONG;
+    private int sumberLatarInduk_Akhir= LATAR_KOSONG;
     private int sumberGambarInduk= -1;
     private int sumberGambarIndukAwal= -1;
     private int sumberLatarBar= -1;
@@ -80,7 +93,9 @@ public class MenuBarView extends ImgViewTouch {
     private String warnaTakTersedia;
     private String warnaTersedia;
     private String warnaLatar;
-    private String warnaInduk;
+    private String warnaInduk; //warna item / gambar induk
+
+    private boolean pengaturanAwal= true;
 
     private PenungguKlik_BarView pngKlikBar;
     private Batas batas;
@@ -109,7 +124,7 @@ public class MenuBarView extends ImgViewTouch {
         aturWarnaTersedia("#000000");
         aturLatarBar(R.drawable.latar_kotak_tumpul);
 
-        aturLetakRelatif(BAR_DI_KANAN);
+        aturLetakBarRelatif(BAR_DI_KANAN);
         setElevation(elevasiBar);
 */
     }
@@ -182,20 +197,20 @@ public class MenuBarView extends ImgViewTouch {
 
         aturPanjangInternal(ViewGroup.LayoutParams.WRAP_CONTENT);
         aturLebarInternal(ViewGroup.LayoutParams.WRAP_CONTENT);
+//        sesuaikanUkuranBar();
         aturWarnaKuat("#000000");
         aturWarnaLemah("#BFBFBF");
-        aturWarnaLatar("#FFFFFF");
-//        aturUkuranItem(Ukuran.DpKePx(30));
+        aturWarnaLatar("#FFFFFF", false);
         initInduk();
 
-        aturArahBar(ARAH_HORIZONTAL);
-
         inisiasiViewBar();
+        aturArahBar(ARAH_HORIZONTAL);
         aturWarnaTakTersedia("#888888");
         aturWarnaTersedia("#000000");
         aturLatarBar(R.drawable.latar_kotak_tumpul);
 
-        aturLetakRelatif(BAR_DI_KANAN);
+        aturLetakBarRelatif(BAR_DI_KANAN);
+        aturRataanBarRelatif(BAR_RATA_ATAS);
         setElevation(elevasiBar);
 
         batasDefault();
@@ -205,18 +220,28 @@ public class MenuBarView extends ImgViewTouch {
             aturWarnaKuat(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_kuat, Color.parseColor(warnaKuat))));
             aturWarnaLemah(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_lemah, Color.parseColor(warnaLemah))));
             aturWarnaInduk(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_induk, Color.parseColor(warnaKuat))));
-            aturWarnaLatar(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_latar, Color.parseColor(warnaKuat))));
-            aturWarnaTersedia(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_tersedia, Color.parseColor(warnaTersedia))));
-            aturWarnaTakTersedia(Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_tak_tersedia, Color.parseColor(warnaTakTersedia))));
+
+            String warnaTersedia= Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_tersedia, Color.parseColor(this.warnaTersedia)));
+            String warnaTakTersedia= Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_tak_tersedia, Color.parseColor(this.warnaTakTersedia)));
+            String warnaLatar= Warna.ambilStringWarna(a.getColor(R.styleable.MenuBarView_warna_latar, Color.parseColor(warnaKuat)));
+
+            if(warnaTersedia.equals(this.warnaTersedia) && warnaTakTersedia.equals(this.warnaTakTersedia))
+                aturWarnaLatar(warnaLatar);
+            else{
+                aturWarnaTersedia(warnaTersedia);
+                aturWarnaTakTersedia(warnaTakTersedia);
+                aturWarnaLatar(warnaLatar, false);
+            }
 
             aturLatarInduk_Akhir(a.getResourceId(R.styleable.MenuBarView_latarInduk_AKHIR, -1));
-            aturLatarInduk_Awal(a.getResourceId(R.styleable.MenuBarView_latarInduk_AWAL, -1));
+            aturLatarInduk_Awal(a.getResourceId(R.styleable.MenuBarView_latarInduk_AWAL, LATAR_KOSONG));
             aturGambarInduk(a.getResourceId(R.styleable.MenuBarView_gambarInduk_AKHIR, -1));
-            aturGambarInduk(a.getResourceId(R.styleable.MenuBarView_gambarInduk_AWAL, -1));
+            aturGambarIndukDefault(a.getResourceId(R.styleable.MenuBarView_gambarInduk_AWAL, -1));
 
             aturLatarBar(a.getResourceId(R.styleable.MenuBarView_BAR_latarInduk, -1));
         }
         penungguInternal();
+        sesuaikanUkuranInduk();
     }
 /*
     @Override
@@ -273,7 +298,7 @@ Overrides - Bawahan
         final MenuBarView superView= this;
         aturPenungguKlik_Internal(new PenungguKlik_Internal() {
             @Override
-            public void klik(View v) {
+            public void klik_Int(View v) {
                 boolean menuBisaDitampilkanAwal= menuBisaDitampilkan;
                 if(pngKlikBar != null)
                     pngKlikBar.klik(superView, menuDitampilkan);
@@ -290,9 +315,13 @@ Overrides - Bawahan
     private final void klikInduk(boolean menuBisaDitampilkan){
         if(menuBisaDitampilkan){
             if(jmlItem > 0 && !menuDitampilkan) {
-                if(letakBarX == -1 || letakBarY == -1){
-                    aturLetakRelatif(letakBar);
-                    sesuaikanLetakRelatif();
+                if(!letakBarDisesuaikan){
+                    aturLetakBarRelatif(letakBar, true);
+                    sesuaikanLetakBarRelatif();
+                }
+                if(!rataanBarDisesuaikan){
+                    aturRataanBarRelatif(rataanBar, true);
+                    sesuaikanRataanBarRelatif();
                 }
                 if(!aksiSentuhItemDefault)
                     aturAksiSentuhItemDefault();
@@ -365,8 +394,9 @@ Batas View
         batas= new Batas(this, konteks);
         batas.tambahBatas(viewBar);
         batas.aturPenungguSentuh_Internal(new Aktifitas.PenungguSentuh_Internal() {
+
             @Override
-            public boolean sentuhInt(Array<View> view, MotionEvent event, boolean diDalam) {
+            public boolean sentuh_Int(Array<View> view, MotionEvent event, boolean diDalam) {
                 if(!diDalam && event.getAction() == MotionEvent.ACTION_UP && menuBisaDitampilkan) {
                     ((MenuBarView) view.ambil(0)).klik(false);
 //                    if(diDalam);
@@ -402,6 +432,8 @@ Arah - Ukuran - Letak Latar
 =========================
 */
     public void aturArahBar(int kategoriArah){
+        if(kategoriArah != ARAH_HORIZONTAL && kategoriArah != ARAH_VERTIKAL)
+            return;
         arahBar= kategoriArah;
         RelativeLayout.LayoutParams lp;
         for(int i= 0; i< jmlItem; i++){
@@ -420,51 +452,68 @@ Arah - Ukuran - Letak Latar
                 if(i > 0)
                     lp.addRule(RelativeLayout.BELOW, daftarItem.ambil(i - 1).getId());
             }
-            daftarItem.ambil(i).setLayoutParams(lp);
+//            daftarItem.ambil(i).setLayoutParams(lp);
         }
+        sesuaikanUkuranBar();
     }
 
-    public void aturLetakRelatif(int letak){
-        Point layar= new Point();
-        //ambil ukuran view sebelum dirender
-        ((Activity) konteks).getWindowManager().getDefaultDisplay().getSize(layar);
-        int pjgLayar= layar.x;
-        int lbrLayar= layar.y;
+    public void aturLetakBarRelatif(int letak){
+        if(letak != BAR_DI_ATAS && letak != BAR_DI_BAWAH
+                && letak != BAR_DI_KANAN && letak != BAR_DI_KIRI)
+            return;
+        aturLetakBarRelatif(letak, false);
+    }
+    //untuk verifikasi letak relatif bar karena membutuhkan #getWidth atau #getHeight
+    //yang didapat setelah view tergambar di layout.
+    //Hanya dipanggil secara internal
+    private void aturLetakBarRelatif(int letak, boolean udahDigambar){
+        if(udahDigambar){
+            Point layar= new Point();
+            //ambil ukuran view sebelum dirender
+            ((Activity) konteks).getWindowManager().getDefaultDisplay().getSize(layar);
+            int pjgLayar= layar.x;
+            int lbrLayar= layar.y;
 
-        int letakAbs[]= new int[2];
-        getLocationOnScreen(letakAbs);
-        int x= letakAbs[0];
-        int y= letakAbs[1];
+            //ambil letak absolut view induk
+            int letakAbs[]= new int[2];
+            getLocationOnScreen(letakAbs);
+            int x= letakAbs[0];
+            int y= letakAbs[1];
 
-        //measure(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        //layout(getLeft(), getTop(), getRight(), getBottom());
+            //measure(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            //layout(getLeft(), getTop(), getRight(), getBottom());
 
-        switch(letak) {
-            case BAR_DI_BAWAH:
-                if (y +getHeight() +viewBar.getHeight()> lbrLayar)
-                    letak = BAR_DI_ATAS;
-                aturArahBar(ARAH_VERTIKAL);
-                break;
-            case BAR_DI_KANAN:
-                if (x +getWidth() +viewBar.getWidth()> pjgLayar)
-                    letak = BAR_DI_KIRI;
-                aturArahBar(ARAH_HORIZONTAL);
-                break;
-            case BAR_DI_ATAS:
-                if(y -viewBar.getHeight() <= 0)
-                    letak= BAR_DI_BAWAH;
-                aturArahBar(ARAH_VERTIKAL);
-                break;
-            case BAR_DI_KIRI:
-                if(x -viewBar.getWidth() <= 0)
-                    letak= BAR_DI_KANAN;
-                aturArahBar(ARAH_HORIZONTAL);
-                break;
+            switch(letak) {
+                case BAR_DI_BAWAH:
+                    aturArahBar(ARAH_VERTIKAL);
+                    if (y +getHeight() +lbrBar > lbrLayar)
+                        letak = BAR_DI_ATAS;
+                    break;
+                case BAR_DI_KANAN:
+                    aturArahBar(ARAH_HORIZONTAL);
+                    if (x +getWidth() +pjgBar > pjgLayar)
+                        letak = BAR_DI_KIRI;
+                    break;
+                case BAR_DI_ATAS:
+                    aturArahBar(ARAH_VERTIKAL);
+                    if(y -lbrBar <= 0)
+                        letak= BAR_DI_BAWAH;
+                    break;
+                case BAR_DI_KIRI:
+                    aturArahBar(ARAH_HORIZONTAL);
+                    if(x -pjgBar <= 0)
+                        letak= BAR_DI_KANAN;
+                    break;
+            }
+//            Toast.makeText(konteks, "letak= " +letak, Toast.LENGTH_SHORT).show();
         }
         letakBar= letak;
+        letakBarDisesuaikan= false;
     }
-    private void sesuaikanLetakRelatif(){
-        //letak absolut view di layar
+    //untuk penyesuaian letak relatif bar setelah kategori letak relatif sudah ditetapkan.
+    //Menyesuaikan x dan y bar.
+    private void sesuaikanLetakBarRelatif(){
+        //letak absolut view induk di layar
         int letakAbs[]= new int[2];
         getLocationOnScreen(letakAbs);
 
@@ -477,31 +526,126 @@ Arah - Ukuran - Letak Latar
                 x+= getWidth();
                 break;
             case BAR_DI_ATAS:
-                y-= viewBar.getHeight();
+                y-= lbrBar;
                 break;
             case BAR_DI_KIRI:
-                x-= viewBar.getWidth();
+                x-= pjgBar;
                 break;
         }
         aturLetakBar(x, y);
+        letakBarDisesuaikan= true;
+    }
+    public int letakBarRelatif(){
+        return letakBar;
     }
 
-    public void aturRataanRelatif(int rataan){
+    public void aturRataanBarRelatif(int rataan){
+        if(rataan != BAR_RATA_ATAS && rataan != BAR_RATA_BAWAH
+                && rataan != BAR_RATA_KANAN && rataan != BAR_RATA_KIRI)
+            return;
+        aturRataanBarRelatif(rataan, false);
+    }
+    private void aturRataanBarRelatif(int rataan, boolean udahDigambar){
+        if(letakBar == BAR_DI_ATAS || letakBar == BAR_DI_BAWAH){
+            if(rataan == BAR_RATA_ATAS || rataan == BAR_RATA_BAWAH)
+                rataan= BAR_RATA_KIRI;
+        } else if(letakBar == BAR_DI_KIRI || letakBar == BAR_DI_KANAN){
+            if(rataan == BAR_RATA_KIRI || rataan == BAR_RATA_KANAN)
+                rataan= BAR_RATA_ATAS;
+        }
+        if(udahDigambar){
+            Point layar= new Point();
+            //ambil ukuran view sebelum dirender
+            ((Activity) konteks).getWindowManager().getDefaultDisplay().getSize(layar);
+            int pjgLayar= layar.x;
+            int lbrLayar= layar.y;
+
+            //ambil letak absolut view induk
+            int letakAbs[]= new int[2];
+            getLocationOnScreen(letakAbs);
+            int x= letakAbs[0];
+            int y= letakAbs[1];
+
+            //measure(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            //layout(getLeft(), getTop(), getRight(), getBottom());
+
+            switch(rataan) {
+                case BAR_RATA_KIRI:
+                    if(x +pjgBar > pjgLayar)
+                        rataan= BAR_RATA_KANAN;
+                    break;
+                case BAR_RATA_ATAS:
+                    if(y +lbrBar > lbrLayar)
+                        rataan= BAR_RATA_BAWAH;
+                    break;
+                case BAR_RATA_KANAN:
+                    if (x +getWidth() -pjgBar < 0)
+                        rataan= BAR_RATA_KIRI;
+                    break;
+                case BAR_RATA_BAWAH:
+                    if (y +getHeight() -lbrBar < 0)
+                        rataan= BAR_RATA_ATAS;
+                    break;
+            }
+//            Toast.makeText(konteks, "rataan= " +rataan, Toast.LENGTH_SHORT).show();
+        }
         rataanBar= rataan;
+        rataanBarDisesuaikan= false;
     }
-    private void cekRataan(){
-        Point layar= new Point();
-        ((Activity) konteks).getWindowManager().getDefaultDisplay().getSize(layar);
-        int pjgLayar= layar.x;
-        int lbrLayar= layar.y;
+    //harus dipanggil secara internal tepat setelah #sesuaikanLetakBarRelatif
+    private void sesuaikanRataanBarRelatif(){
+        //ambil letak absolut view induk di layar
+        int letakAbs[]= new int[2];
+        getLocationOnScreen(letakAbs);
+        int x= letakAbs[0];
+        int y= letakAbs[1];
+
+        //hanya perlu menyesuaikan #BAR_RATA_KANAN dan #BAR_RATA_BAWAH karena secara default
+        //rataan bar sudah #BAR_RATA_KIRI untuk #BAR_DI_ATAS dan #BAR_DI_BAWAH
+        //sedangkan #BAR_RATA_ATAS untuk #BAR_DI_KIRI dan #BAR_DI_KANAN
+        switch(rataanBar){
+            case BAR_RATA_KANAN:
+                x+= getWidth() -pjgBar;
+                aturLetakBarX(x);
+                break;
+            case BAR_RATA_BAWAH:
+                y+= getHeight() -lbrBar;
+                aturLetakBarY(y);
+                break;
+        }
+        rataanBarDisesuaikan= true;
+    }
+    public int rataanBarRelatif(){
+        return rataanBar;
     }
 
+    private void sesuaikanUkuranBar(){
+        int ukuran[]= Ukuran.ukuranView(viewBar);
+
+        int panjang= (ukuran[0] > ukuran[1]) ? ukuran[0] : ukuran[1];
+        int pendek= (ukuran[0] > ukuran[1]) ? ukuran[1] : ukuran[0];
+
+        if(arahBar == ARAH_HORIZONTAL){
+            pjgBar= panjang;
+            lbrBar= pendek;
+        } else if(arahBar == ARAH_VERTIKAL){
+            pjgBar= pendek;
+            lbrBar= panjang;
+        }
+    }
+    private void sesuaikanUkuranInduk(){
+        int ukuran[]= Ukuran.ukuranView(this);
+
+        pjgInduk= ukuran[0];
+        lbrInduk= ukuran[1];
+    }
     public void aturUkuranBar(int pjg, int lbr){
         this.pjgBar = pjg;
         this.lbrBar = lbr;
         RelativeLayout.LayoutParams lp= ambilLpBar();
         lp.width= pjg;
         lp.height= lbr;
+        sesuaikanUkuranBar();
     }
     public void aturPanjang(int pjg){
         aturUkuranBar(pjg, lbrBar);
@@ -530,7 +674,7 @@ Arah - Ukuran - Letak Latar
     public void aturLetakBarX(float x){
         letakBarX = x;
         viewBar.setX(letakBarX);
-        viewBar.setTranslationX(letakBarX);
+//        viewBar.setTranslationX(letakBarX);
 //        viewBar.setScrollX((int)-x);
 //        Cek.toast(konteks, "" +viewBar.getX());
     }
@@ -540,7 +684,7 @@ Arah - Ukuran - Letak Latar
     public void aturLetakBarY(float y){
         letakBarY = y;
         viewBar.setY(letakBarY);
-        viewBar.setTranslationY(y);
+//        viewBar.setTranslationY(y);
     }
     public float ambilLetakBarY(){
         return letakBarY;
@@ -566,19 +710,17 @@ Warna
             this.warnaLemah= warnaLemah;
     }
     public void aturWarnaLatar(String warnaLatar){
-        if(Warna.cekWarnaSah(warnaLatar)) {
-            this.warnaLatar = warnaLatar;
-            sesuaikanWarnaLatar();
-        }
+        aturWarnaLatar(warnaLatar, pengaturanAwal);
     }
-    public void aturWarnaLatar(String warnaLatar, boolean sesuaikan){
+    public void aturWarnaLatar(String warnaLatar, boolean sesuaikanWarnaItem){
         if(Warna.cekWarnaSah(warnaLatar)) {
             this.warnaLatar = warnaLatar;
             sesuaikanWarnaLatar();
-            if(sesuaikan) {
+            if(sesuaikanWarnaItem) {
                 aturWarnaTersedia(false);
                 aturWarnaTakTersedia(false);
                 sesuaikanKetersediaanItem();
+                pengaturanAwal= false;
             }
         }
     }
@@ -697,10 +839,14 @@ Warna
     }
 
     private void sesuaikanWarnaLatar(){
-        if(viewBar != null)
+        if(viewBar != null){
             viewBar.getBackground().setTint(Color.parseColor(warnaLatar));
-        if(getBackground() != null)
+            viewBar.getBackground().setAlpha(255);
+        }
+        if(getBackground() != null){
             getBackground().setTint(Color.parseColor(warnaLatar));
+            getBackground().setAlpha(255);
+        }
     }
 
 
@@ -719,9 +865,8 @@ ImageView Induk
     }
     private void initInduk(){
         setBackgroundResource(R.drawable.latar_kotak_tumpul);
-        Drawable d= getBackground();
-        d.setTint(Color.parseColor(warnaLatar));
-        d.setAlpha(0);
+        getBackground().setTint(Color.parseColor(warnaLatar));
+        getBackground().setAlpha(0);
     }
 
     public void aturGambarIndukDefault(int sumber){
@@ -737,25 +882,47 @@ ImageView Induk
             setImageResource(sumberGambarIndukAwal);
     }
     public void aturLatarInduk_Awal(int sumber){
-        if(sumber != -1)
-            sumberLatarInduk_Awal = sumber;
-    }
-    public void aturLatarInduk_Akhir(int sumber){
         if(sumber != -1){
+            sumberLatarInduk_Awal= sumber;
+            latarIndukAwal();
+        }
+    }
+    public void aturLatarInduk_Akhir(int sumber) {
+        if(sumber != -1)
             sumberLatarInduk_Akhir = sumber;
-            setBackgroundResource(sumber);
+    }
+/*
+            if(sumberLatarInduk_Akhir != LATAR_WARNA && sumberLatarInduk_Akhir != LATAR_KOTAK_TUMPUL
+                    && sumberLatarInduk_Akhir != LATAR_KOSONG)
+                setBackgroundResource(sumber);
+
         } else
             latarIndukAwal();
-    }
+*/
+
 
     public int latarIndukAwal(){
-        if(sumberLatarInduk_Awal != -1)
+        if(sumberLatarInduk_Awal == LATAR_WARNA)
+            setBackgroundColor(Color.parseColor(warnaLatar));
+        else if(sumberLatarInduk_Awal == LATAR_KOSONG)
+            getBackground().setAlpha(0);
+        else if(sumberLatarInduk_Awal != -1){
             setBackgroundResource(sumberLatarInduk_Awal);
+            getBackground().setAlpha(255);
+            getBackground().setTint(Color.parseColor(warnaLatar));
+        }
         return sumberLatarInduk_Awal;
     }
     public int latarIndukAkhir(){
-        if(sumberLatarInduk_Akhir != -1)
+        if(sumberLatarInduk_Akhir == LATAR_WARNA)
+            setBackgroundColor(Color.parseColor(warnaLatar));
+        else if(sumberLatarInduk_Akhir == LATAR_KOSONG)
+            getBackground().setAlpha(0);
+        else if(sumberLatarInduk_Akhir != -1){
             setBackgroundResource(sumberLatarInduk_Akhir);
+            getBackground().setAlpha(255);
+            getBackground().setTint(Color.parseColor(warnaLatar));
+        }
         return sumberLatarInduk_Akhir;
     }
 
@@ -766,6 +933,7 @@ View Bar
 */
     public void aturElevasiBar(int elevasi){
         elevasiBar = elevasi;
+        setElevation(elevasiBar);
     }
     private void inisiasiViewBar(){
         RelativeLayout.LayoutParams lpInduk= new RelativeLayout.LayoutParams(pjgBar, lbrBar);
@@ -789,6 +957,7 @@ View Bar
         if(idLatar != -1) {
             sumberLatarBar= idLatar;
             viewBar.setBackgroundResource(idLatar);
+            viewBar.getBackground().setAlpha(255);
             viewBar.getBackground().setTint(Color.parseColor(warnaLatar));
         }
     }
@@ -868,11 +1037,11 @@ Item
     public void aturUkuranItem(int ukuran){
         ukuranItem= ukuran;
         RelativeLayout.LayoutParams lp;
-        for(int i= 1; i< jmlItem; i++){
+        for(int i= 0; i< jmlItem; i++){
             lp= (RelativeLayout.LayoutParams) daftarItem.ambil(i).getLayoutParams();
             lp.width= Ukuran.DpKePx(ukuranItem, resolusi);
             lp.height= Ukuran.DpKePx(ukuranItem, resolusi);
-            daftarItem.ambil(i).setLayoutParams(lp);
+//            daftarItem.ambil(i).setLayoutParams(lp);
         }
     }
     public int ambilUkuranItem(){
@@ -914,7 +1083,7 @@ Item
         itemBaru.setColorFilter(Color.parseColor(warnaLemah));
         itemBaru.aturPenungguKlik_Internal(new PenungguKlik_Internal() {
             @Override
-            public void klik(View v) {
+            public void klik_Int(View v) {
                 if(!v.isSelected())
                     v.setSelected(true);
                 else

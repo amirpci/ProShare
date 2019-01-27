@@ -51,6 +51,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.HashMap;
 import java.util.Map;
 
+import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
@@ -139,11 +140,17 @@ public class ProfileActWkr extends Fragment {
         addPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+/*
                 Intent add = new Intent(Intent.ACTION_PICK);
                 add.setType("image/*");
                 startActivityForResult(add, ambilPhoto);
+*/
+                Intent keAmbilGambar= new Intent(getContext(), AmbilGambarAct.class);
+                keAmbilGambar.putExtra("jenisPengambilan", AmbilGambarAct.JENIS_AMBIL_SATU);
+                startActivityForResult(keAmbilGambar, ambilPhoto);
             }
         });
+        addPhoto.setVisibility(View.GONE);
 
         initMenuBar();
         initBidang();
@@ -263,23 +270,24 @@ public class ProfileActWkr extends Fragment {
         }
     }
 
-    void initMenuBar(){
+    private void initMenuBar(){
         int gmbOpsi[]= {R.drawable.icon_edit,
                 R.drawable.icon_setting};
         int tersedia[]= {menuBar.ITEM_TERSEDIA, menuBar.ITEM_TERSEDIA};
         menuBar.aturGmbItem(gmbOpsi);
         menuBar.aturItemTersedia(tersedia);
 //        menuBar.aturArahBar(menuBar.ARAH_VERTIKAL);
-        menuBar.aturLetakRelatif(menuBar.BAR_DI_BAWAH);
+        menuBar.aturLetakBarRelatif(menuBar.BAR_DI_BAWAH);
         menuBar.aturWarnaTersedia("#FFFFFF");
-        menuBar.aturWarnaTakTersedia();
+//        menuBar.aturWarnaTakTersedia();
         menuBar.aturWarnaKuat(Warna.ambilStringWarna(getResources().getColor(R.color.biruLaut)));
+        menuBar.aturLatarInduk_Akhir(menuBar.LATAR_WARNA);
         menuBar.aturPenungguKlikBar(new MenuBarView.PenungguKlik_BarView() {
             @Override
             public void klik(MenuBarView v, boolean menuDitampilkan) {
                 if(!menuDitampilkan && v.menuBisaDitampilkan()) {
 //                    v.sembunyikanLatar();
-                    v.setBackgroundColor(getResources().getColor(R.color.abuTua));
+//                    v.setBackgroundColor(getResources().getColor(R.color.abuTua));
                 } else if(!menuDitampilkan && !v.menuBisaDitampilkan()){
                     v.menuBisaDitampilkan(true);
                     v.aturGambarInduk(R.drawable.obj_titik_tiga_horizontal);
@@ -321,13 +329,14 @@ public class ProfileActWkr extends Fragment {
                 startActivity(new Intent(getContext(), SettingAct.class));
             }
         });
-        menuBar.latarIndukAwal();
+//        menuBar.latarIndukAwal();
 
         ((Aktifitas)getActivity()).daftarkanBatas(menuBar.ambilBatas());
     }
     void editProfil(boolean enable){
         int visibility= (enable) ? View.VISIBLE : View.GONE;
         editNama.setVisibility(visibility);
+        addPhoto.setVisibility(visibility);
         enablePilihBidang(enable);
     }
     void simpanProfil(String nama, String bidang){
@@ -543,6 +552,10 @@ public class ProfileActWkr extends Fragment {
             uploading.setMessage("uploading...");
             uploading.show();
             alamatPhoto = data.getData();
+
+//=====================YG DIPAKE=================================
+            String pathFoto= data.getStringExtra("pathFoto");
+
             final StorageReference filepath = Utilities.getProfileImageStorageRef(getActivity()).child("myProfile");
             filepath.putFile(alamatPhoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override

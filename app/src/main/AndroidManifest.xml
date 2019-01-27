@@ -69,7 +69,9 @@
         <activity android:name=".Login_Register.ResetPassword" />
         <activity android:name=".Login_Register.Login" />
         <activity android:name=".Modul.SettingAct" />
-        <activity android:name=".Modul.AmbilGambarAct"></activity>
+        <activity android:name=".Modul.AmbilGambarAct" />
+        <activity android:name=".Modul.TemanDaftarAct" />
+        <activity android:name=".Modul.TemanTambahAct"></activity>
     </application>
 
 </manifest>

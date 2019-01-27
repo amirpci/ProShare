@@ -2,7 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="100dp"
     android:layout_height="100dp"
-    android:padding="5dp">
+    android:padding="5dp"
+    android:id="@+id/tambah_cell_kotak_dipilih">
+
 
     <ImageView
         android:id="@+id/tambah_cell_pratinjau"
@@ -46,5 +48,10 @@
         android:layout_margin="5dp"
         android:layout_width="25dp"
         android:layout_height="25dp" />
+<!--
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/obj_kotak_dipilih"/>-->
 
 </RelativeLayout>

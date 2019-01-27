@@ -28,7 +28,7 @@ public class ImgViewTouch extends ImageView {
     public ImgViewTouch(Context context, @Nullable AttributeSet attrs, int defStyleAttr,
                         int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        setOnClickListener(new OnClickListener() {
+        super.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -36,6 +36,17 @@ public class ImgViewTouch extends ImageView {
         });
     }
 
+    @Override
+    public void setOnClickListener(@Nullable OnClickListener l) {
+        throw new UnsupportedOperationException("setOnClickListener(OnClickListener l) gak diperbolehkan di kelas ImgViewTouch." +
+                "\n Gunakan \"aturPenungguKlik(PenungguKlik png)\" !");
+    }
+
+    @Override
+    public void setOnTouchListener(OnTouchListener l) {
+        throw new UnsupportedOperationException("setOnTouchListener(OnTouchListener l) gak diperbolehkan di kelas ImgViewTouch." +
+                "\n Gunakan \"aturPenungguSentuhan(PenungguSentuhan png)\" !");
+    }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
@@ -49,7 +60,7 @@ public class ImgViewTouch extends ImageView {
             diKlik |= true;
         }
         if(pngSentuhanInt != null) {
-            pngSentuhanInt.sentuh(this, event);
+            pngSentuhanInt.sentuh_Int(this, event);
             diKlik |= true;
         }
         return diKlik;
@@ -62,20 +73,20 @@ public class ImgViewTouch extends ImageView {
             diKlik |= true;
         }
         if(pngKlikInt != null) {
-            pngKlikInt.klik(this);
+            pngKlikInt.klik_Int(this);
             diKlik |= true;
         }
         return diKlik;
     }
 
     protected interface PenungguSentuhan_Internal{
-        void sentuh(View v, MotionEvent event);
+        void sentuh_Int(View v, MotionEvent event);
     }
     public interface PenungguSentuhan{
         void sentuh(View v, MotionEvent event);
     }
     protected interface PenungguKlik_Internal{
-        void klik(View v);
+        void klik_Int(View v);
     }
     public interface PenungguKlik{
         void klik(View v);

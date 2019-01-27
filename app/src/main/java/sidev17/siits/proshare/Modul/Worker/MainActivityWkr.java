@@ -13,6 +13,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import sidev17.siits.proshare.Modul.Worker.Tab.ChatExprt;
@@ -25,17 +26,17 @@ import sidev17.siits.proshare.ViewPagerAdapter;
 
 public class MainActivityWkr extends Aktifitas {
 
-    private LinearLayout tmb_Profile;
+    private RelativeLayout tmb_Profile;
     private ImageView garis_Profile;
 
-    private LinearLayout tmb_Tanya;
+    private RelativeLayout tmb_Tanya;
     private ImageView garis_Tanya;
 
-    private LinearLayout tmb_Jawab, tmb_Chat;
+    private RelativeLayout tmb_Jawab, tmb_Chat;
     private ImageView garis_Jawab;
 
-  //  private ViewPagerAdapter adapter;
-   // private ViewPager mvPager;
+    private ViewPagerAdapter adapter;
+    private ViewPager mvPager;
     private boolean click_duaKali=false;
 
     private int halamanFragmen= 0;
@@ -55,11 +56,11 @@ public class MainActivityWkr extends Aktifitas {
 
         final ImageView icon_Profile = (ImageView) findViewById(R.id.tab_profile_ikon_wkr);
         garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis_wkr);
-        tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile_wkr);
-        tmb_Tanya = (LinearLayout) findViewById(R.id.tab_tanya_wkr);
-        tmb_Jawab = (LinearLayout) findViewById(R.id.tab_tl_wkr);
-        tmb_Chat = (LinearLayout) findViewById(R.id.tab_feedback_wkr);
-        /*
+        tmb_Profile = findViewById(R.id.tab_profile_wkr);
+        tmb_Tanya = findViewById(R.id.tab_tanya_wkr);
+        tmb_Jawab = findViewById(R.id.tab_tl_wkr);
+        tmb_Chat = findViewById(R.id.tab_feedback_wkr);
+
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
         adapter.AddFragment(new ProfileActWkr(), "");
@@ -76,7 +77,7 @@ public class MainActivityWkr extends Aktifitas {
 
             @Override
             public void onPageSelected(int position) {
-                gantiWarnaTab(position, tmbTab[0], tmbTab[1],warnaTab);
+                gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
             }
 
             @Override
@@ -84,7 +85,8 @@ public class MainActivityWkr extends Aktifitas {
 
             }
         });
-        */
+        mvPager.setOffscreenPageLimit(4);
+
         //Buat Warna Inisiasi
        saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_wkr), warnaTab[0],
                 tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis_wkr), warnaTab[1]);
@@ -93,7 +95,7 @@ public class MainActivityWkr extends Aktifitas {
         tmb_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ProfileActWkr(), 0);
+//                tampilkan(new ProfileActWkr(), 0);
                 gantiWarnaTab(0, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
@@ -102,7 +104,7 @@ public class MainActivityWkr extends Aktifitas {
         tmb_Tanya.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new DaftarTanyaActWkr(), 1);
+//                tampilkan(new DaftarTanyaActWkr(), 1);
                 gantiWarnaTab(1, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
@@ -111,14 +113,14 @@ public class MainActivityWkr extends Aktifitas {
         tmb_Jawab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ShareActWkr(), 2);
+//                tampilkan(new ShareActWkr(), 2);
                 gantiWarnaTab(2, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
         tmb_Chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ChatExprt(), 3);
+//                tampilkan(new ChatExprt(), 3);
                 gantiWarnaTab(3, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
@@ -151,6 +153,7 @@ public class MainActivityWkr extends Aktifitas {
     void gantiWarnaTab(int posisi, int[] ikon, int[] garis, int[][] warnaTab){
         saringTerpilih(ikon, (ImageView) findViewById(ikon[posisi]), warnaTab[0],
                 garis, (ImageView) findViewById(garis[posisi]), warnaTab[1]);
+        tampilkan(mvPager, posisi);
     }
     void saringTerpilih(int id[], ImageView img) {
         // warna[0]= belum; warna[1]= terpilih;

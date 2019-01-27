@@ -1,8 +1,37 @@
 package sidev17.siits.proshare.Model;
 
+import android.view.View;
+import android.widget.ImageView;
+
 import java.io.Serializable;
 
+import sidev17.siits.proshare.R;
+
 public class Pengguna implements Serializable {
+
+    //untuk masalah pemasangan status pengguna
+    public static class Status{
+        public static final int PENGGUNA_EXPERT_TERVERIFIKASI= 202;
+        public static final int PENGGUNA_EXPERT= 201;
+        public static final int PENGGUNA_BIASA= 200;
+
+        public static boolean pasangIndikatorStatus(ImageView img, int status){
+            if(status == PENGGUNA_BIASA){
+                img.setVisibility(View.GONE);
+                return true;
+            } else if(status == PENGGUNA_EXPERT){
+                img.setVisibility(View.VISIBLE);
+                img.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
+                return true;
+            } else if(status == PENGGUNA_EXPERT_TERVERIFIKASI){
+                img.setVisibility(View.VISIBLE);
+                img.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
+                return true;
+            }
+            return false;
+        }
+    }
+
     private String nama;
     private String email;
     private String password;

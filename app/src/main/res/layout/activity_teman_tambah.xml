@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Modul.TemanTambahAct"
+    android:background="@color/colorAccent">
+
+    <RelativeLayout
+        android:id="@+id/teman_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF">
+        <TextView
+            android:id="@+id/teman_judul"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:layout_marginLeft="10dp"
+            android:padding="5dp"
+            android:text="Cari teman dengan email"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+
+        <RelativeLayout
+            android:id="@+id/teman_kolom_cari"
+            android:layout_below="@id/teman_judul"
+            android:layout_margin="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:background="@drawable/shape_rounded_rectangle">
+            <ImageView
+                android:id="@+id/teman_kolom_cari_icon"
+                android:layout_marginRight="16dp"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:tint="@color/grey"
+                android:src="@drawable/obj_search"/>
+            <EditText
+                android:imeOptions="actionSearch"
+                android:id="@+id/teman_kolom_cari_teks"
+                android:layout_toLeftOf="@id/ic_search"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="email teman anda"
+                android:singleLine="true"
+                android:textColorHint="@color/grey"
+                android:background="@android:color/transparent"/>
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true">
+        <RelativeLayout
+            android:id="@+id/teman_foto"
+            android:layout_width="150dp"
+            android:layout_height="150dp">
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/teman_foto_gambar"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/obj_profilephoto"
+                android:tint="@color/abuSangatTua"/>
+            <ImageView
+                android:id="@+id/teman_foto_status"
+                android:layout_alignParentRight="true"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/obj_centang_lingkaran_full"/>
+            <ImageView
+                android:id="@+id/teman_foto_silang"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/icon_silang_bunder"
+                android:tint="@color/merah"
+                android:background="@drawable/latar_lingkaran"
+                android:backgroundTint="#FFFFFF"/>
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/teman_nama"
+            android:layout_below="@id/teman_foto"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Nama Orang"
+            android:textSize="22sp"
+            android:textColor="#000000"/>
+        <TextView
+            android:id="@+id/teman_bidang"
+            android:layout_below="@id/teman_nama"
+            android:layout_centerHorizontal="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Bidang"
+            android:textSize="15sp"
+            android:textColor="#505050"/>
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/teman_tambah_baru"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:padding="10dp"
+        android:src="@drawable/obj_tambah_lingkaran"
+        android:tint="#FFFFFF"
+        android:background="@color/biruLaut"/>
+
+</RelativeLayout>
