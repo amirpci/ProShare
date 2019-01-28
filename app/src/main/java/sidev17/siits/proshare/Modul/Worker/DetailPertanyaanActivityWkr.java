@@ -185,15 +185,20 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         menuBar.aturAksiKlikItem(0, new ImgViewTouch.PenungguKlik() {
             @Override
             public void klik(View v) {
-                Intent keEdit= new Intent(DetailPertanyaanActivityWkr.this, TambahPertanyaanWkr.class);
+                if(Utilities.isStoragePermissionGranted(DetailPertanyaanActivityWkr.this)){
+                    Intent keEdit= new Intent(DetailPertanyaanActivityWkr.this, TambahPertanyaanWkr.class);
 
-                keEdit.putExtra("judul", judulPertanyaan);
-                keEdit.putExtra("deskripsi", deskripsiPertanyaan);
-                TextView majority= viewPertanyaan.findViewById(R.id.tl_majority);
-                keEdit.putExtra("bidang", majority.getText().toString());
+                    keEdit.putExtra("judul", judulPertanyaan);
+                    keEdit.putExtra("deskripsi", deskripsiPertanyaan);
+                    TextView majority= viewPertanyaan.findViewById(R.id.tl_majority);
+                    keEdit.putExtra("bidang", majority.getText().toString());
 //                keEdit.putExtra("gambarAwal", gambarAwal);
 
-                startActivity(keEdit);
+                    startActivity(keEdit);
+                }else {
+                    Toast.makeText(DetailPertanyaanActivityWkr.this, "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
         menuBar.aturAksiKlikItem(1, new ImgViewTouch.PenungguKlik() {
@@ -855,10 +860,14 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         klip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent keAmbilGambar= new Intent(DetailPertanyaanActivityWkr.this, AmbilGambarAct.class);
-                keAmbilGambar.putExtra("urutanDipilih", urutanDipilih.PRIMITIF.arrayInt());
-                keAmbilGambar.putExtra("posisiDipilih", posisiDipilih.PRIMITIF.arrayInt());
-                startActivityForResult(keAmbilGambar, AMBIL_GAMBAR);
+                if(Utilities.isStoragePermissionGranted(DetailPertanyaanActivityWkr.this)){
+                    Intent keAmbilGambar= new Intent(DetailPertanyaanActivityWkr.this, AmbilGambarAct.class);
+                    keAmbilGambar.putExtra("urutanDipilih", urutanDipilih.PRIMITIF.arrayInt());
+                    keAmbilGambar.putExtra("posisiDipilih", posisiDipilih.PRIMITIF.arrayInt());
+                    startActivityForResult(keAmbilGambar, AMBIL_GAMBAR);
+                }else {
+                    Toast.makeText(DetailPertanyaanActivityWkr.this, "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         kirim.setOnClickListener(new View.OnClickListener() {

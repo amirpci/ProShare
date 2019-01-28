@@ -29,8 +29,8 @@ public class MainActivityExprt extends Aktifitas {
     private LinearLayout tmb_Profile, tmb_Jawab, tmb_Timeline, tmb_Feedback;
     private ImageView garis_Profile, garis_Timeline, garis_Jawab, garis_Feedback;
 
-    //private ViewPagerAdapter adapter;
-   // private ViewPager mvPager;
+    private ViewPagerAdapter adapter;
+    private ViewPager mvPager;
     private boolean click_duaKali=false;
     private PenungguGantiHalaman pngGantiHalaman;
 
@@ -48,16 +48,15 @@ public class MainActivityExprt extends Aktifitas {
         tmb_Timeline = (LinearLayout) findViewById(R.id.tab_timeline_Exprt);
         tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab_Exprt);
         tmb_Feedback = (LinearLayout) findViewById(R.id.tab_feedback_Exprt);
-       // adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        //mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
-       // adapter.AddFragment(new ProfileActWkr(), "");
-        //adapter.AddFragment(new JawabActExprt(), "");
-        //adapter.AddFragment(new TimelineActExprt(), "");
-        //adapter.AddFragment(new FeedbackActExprt(), "");
-        //mvPager.setAdapter(adapter);
 
-        //tampilkan(mvPager, 1);
-/*
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
+        adapter.AddFragment(new ProfileActExprt(), "");
+        adapter.AddFragment(new JawabActExprt(), "");
+        adapter.AddFragment(new TimelineActExprt(), "");
+        adapter.AddFragment(new FeedbackActExprt(), "");
+        mvPager.setAdapter(adapter);
+
         mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -66,7 +65,7 @@ public class MainActivityExprt extends Aktifitas {
 
             @Override
             public void onPageSelected(int position) {
-                gantiWarnaTab(position, tmbTab[0], tmbTab[1],warnaTab);
+                gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
             }
 
             @Override
@@ -74,7 +73,8 @@ public class MainActivityExprt extends Aktifitas {
 
             }
         });
-*/
+        mvPager.setOffscreenPageLimit(4);
+
         //Buat Warna Inisiasi
         saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_Exprt), warnaTab[0],
                 tmbTab[1], (ImageView) findViewById(R.id.tab_profile_garis_Exprt), warnaTab[1]);
@@ -83,7 +83,7 @@ public class MainActivityExprt extends Aktifitas {
         tmb_Profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new ProfileActExprt());
+               // tampilkan(new ProfileActExprt());
                 gantiWarnaTab(0, tmbTab[0], tmbTab[1],warnaTab);
                 //tampilkan(mvPager, 0);
             }
@@ -93,7 +93,7 @@ public class MainActivityExprt extends Aktifitas {
         tmb_Timeline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new TimelineActExprt());
+             //   tampilkan(new TimelineActExprt());
                 gantiWarnaTab(2, tmbTab[0], tmbTab[1],warnaTab);
                 //tampilkan(mvPager, 2);
             }
@@ -103,7 +103,7 @@ public class MainActivityExprt extends Aktifitas {
         tmb_Jawab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new JawabActExprt());
+               // tampilkan(new JawabActExprt());
                 gantiWarnaTab(1, tmbTab[0], tmbTab[1],warnaTab);
                 //tampilkan(mvPager, 1);
             }
@@ -112,7 +112,7 @@ public class MainActivityExprt extends Aktifitas {
         tmb_Feedback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                tampilkan(new FeedbackActExprt());
+               // tampilkan(new FeedbackActExprt());
                 gantiWarnaTab(3, tmbTab[0], tmbTab[1],warnaTab);
             }
         });
@@ -140,6 +140,7 @@ public class MainActivityExprt extends Aktifitas {
     void gantiWarnaTab(int posisi, int[] ikon, int[] garis, int[][] warnaTab){
         saringTerpilih(ikon, (ImageView) findViewById(ikon[posisi]), warnaTab[0],
                 garis, (ImageView) findViewById(garis[posisi]), warnaTab[1]);
+        tampilkan(mvPager, posisi);
     }
 
     void saringTerpilih(int id[], ImageView img) {

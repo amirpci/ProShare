@@ -233,7 +233,7 @@ public class JawabActExprt extends Fragment {
                         String[] output = strings[0];
                         for(int i=0;i<output.length;i++){
                             if(getActivity()!=null)
-                                output[i] = Utilities.ubahBahasa(output[i], Utilities.getUserNegara(getActivity()), getActivity());
+                                output[i] = Utilities.ubahBahasaDariId(output[i], Utilities.getUserBahasa(getActivity()), getActivity());
                         }
                         return  output;
                     }

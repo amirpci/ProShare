@@ -165,9 +165,14 @@ public class ProfileActWkr extends Fragment {
                 add.setType("image/*");
                 startActivityForResult(add, ambilPhoto);
 */
-                Intent keAmbilGambar= new Intent(getContext(), AmbilGambarAct.class);
-                keAmbilGambar.putExtra("jenisPengambilan", AmbilGambarAct.JENIS_AMBIL_SATU);
-                startActivityForResult(keAmbilGambar, ambilPhoto);
+                if(Utilities.isStoragePermissionGranted(getActivity())){
+                    // Toast.makeText(getActivity(), "sudah", Toast.LENGTH_SHORT).show();
+                    Intent keAmbilGambar= new Intent(getContext(), AmbilGambarAct.class);
+                    keAmbilGambar.putExtra("jenisPengambilan", AmbilGambarAct.JENIS_AMBIL_SATU);
+                    startActivityForResult(keAmbilGambar, ambilPhoto);
+                }else {
+                    Toast.makeText(getActivity(), "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
         addPhoto.setVisibility(View.GONE);

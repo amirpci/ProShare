@@ -105,12 +105,12 @@ public class DaftarTanyaActWkr extends Fragment {
             @Override
             public void onClick(View v) {
                 if(Utilities.isStoragePermissionGranted(getActivity())){
-                    Toast.makeText(getActivity(), "sudah", Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(getActivity(), "sudah", Toast.LENGTH_SHORT).show();
                     Intent inten= new Intent(getContext(), TambahPertanyaanWkr.class);
                     inten.putExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr);
                     startActivity(inten);
                 }else {
-                    Toast.makeText(getActivity(), "belum", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
