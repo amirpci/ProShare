@@ -1,8 +1,10 @@
 package sidev17.siits.proshare.Modul;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -10,35 +12,47 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import sidev17.siits.proshare.Model.Pengguna;
+import sidev17.siits.proshare.Model.Teman;
 import sidev17.siits.proshare.Modul.Expert.Tab.FeedbackActExprt;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
+import sidev17.siits.proshare.Utils.PackBahasa;
+import sidev17.siits.proshare.Utils.Terjemahan;
+import sidev17.siits.proshare.Utils.Utilities;
 import sidev17.siits.proshare.Utils.ViewTool.BitmapHandler;
 
 public class TemanDaftarAct extends AppCompatActivity {
 
-    private TextView vJmlTeman;
+    private TextView vJmlTeman, vTemanJudul;
 
     private ImageView vCariTeman;
     private ImageView vTambahTeman;
 
     private ListView vDaftarTeman;
 
+    private Array<Teman> daftarTeman = new Array<>();
     private Array<String> namaTeman= new Array<>();
     private Array<String> bidangTeman= new Array<>();
     private Array<BitmapHandler> fotoTeman= new Array<>();
     private Array<Integer> statusTeman= new Array<>(); //Worker, Expert, Verified Expert
+
+    private AdapterDaftarTeman adp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teman_daftar);
 
+        vTemanJudul= findViewById(R.id.teman_judul);
         vJmlTeman = findViewById(R.id.teman_jml);
         vCariTeman = findViewById(R.id.teman_cari);
         vCariTeman.setOnClickListener(new View.OnClickListener() {
@@ -60,9 +74,11 @@ public class TemanDaftarAct extends AppCompatActivity {
         vDaftarTeman = findViewById(R.id.teman_daftar);
 
         ambilData();
+        ubahBahasa();
+    }
 
-        AdapterDaftarTeman adp= new AdapterDaftarTeman();
-        vDaftarTeman.setAdapter(adp);
+    private void ubahBahasa(){
+        vTemanJudul.setText(PackBahasa.chat[Terjemahan.indexBahasa(this)][0]);
     }
 
     //msh dumy
@@ -75,17 +91,37 @@ public class TemanDaftarAct extends AppCompatActivity {
         namaTeman.tambah(nama);
         bidangTeman.tambah(bidang);
         statusTeman.dariArrayPrimitif(status);
+        Utilities.getKontakRef(this).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                daftarTeman.hapusSemua();
+                for(DataSnapshot snapshot : dataSnapshot.getChildren()){
+                    Teman teman = snapshot.getValue(Teman.class);
+                    daftarTeman.tambah(teman);
+                }
+                //Log.d("loaded panjang ", String.valueOf(daftarTeman.ukuran()+count));
+                adp= new AdapterDaftarTeman();
+                vDaftarTeman.setAdapter(adp);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     private class AdapterDaftarTeman extends BaseAdapter{
         @Override
         public int getCount() {
-            return namaTeman.ukuran();
+            int ukuran = daftarTeman.ukuran();
+            vJmlTeman.setText("("+String.valueOf(ukuran)+")");
+            return ukuran;
         }
 
         @Override
         public Object getItem(int position) {
-            return namaTeman.ambil(position);
+            return daftarTeman.ambil(position);
         }
 
         @Override
@@ -102,9 +138,9 @@ public class TemanDaftarAct extends AppCompatActivity {
             CircleImageView vFotoTeman= viewKolom.findViewById(R.id.tl_orang_gambar);
             ImageView vStatus= viewKolom.findViewById(R.id.tl_orang_centang);
 
-            vNamaTeman.setText(namaTeman.ambil(position));
-            vBidangTeman.setText(bidangTeman.ambil(position));
-            Pengguna.Status.pasangIndikatorStatus(vStatus, statusTeman.ambil(position));
+            vNamaTeman.setText(daftarTeman.ambil(position).getNama());
+            vBidangTeman.setText(daftarTeman.ambil(position).getBidang());
+            Pengguna.Status.pasangIndikatorStatus(vStatus, (int)daftarTeman.ambil(position).getStatus());
 
             return viewKolom;
         }

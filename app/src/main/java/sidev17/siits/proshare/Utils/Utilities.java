@@ -19,6 +19,7 @@ import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -73,11 +74,14 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Target;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,6 +95,8 @@ import sidev17.siits.proshare.Model.Country;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
+import sidev17.siits.proshare.Modul.BidangListener;
+import sidev17.siits.proshare.Modul.TemanTambahAct;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.R;
 
@@ -151,6 +157,24 @@ public class Utilities {
         canvas.drawBitmap(bitmap, rect, rect, paint);
 
         return output;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public static String loadBidangTerjemahan(String bidangIndex, Context c){
+        String respons = dapatkanResponsePost(Konstanta.BIDANGKU, new ParameterReq("majority_id", bidangIndex));
+        try {
+           // Log.d("respons", respons);
+            if(respons !=null) {
+                JSONArray jsonArray = new JSONArray(respons);
+                if (jsonArray.length() > 0)
+                    return jsonArray.getJSONObject(0).getString("bidang");
+                else
+                    return "";
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public static void loadBidang(final String bidang_id, final String languageID, final TextView txt_bidang, final Activity act) {
@@ -916,6 +940,47 @@ public class Utilities {
         return hasil.toString();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public static String dapatkanResponsePost(String request, ParameterReq ... params){
+        String urlParameters = "";
+        for (int i = 0; i < params.length; i++) {
+            urlParameters += params[i].getKey() + "=" + params[i].getVal();
+            if (i < params.length - 1)
+                urlParameters += "&";
+        }
+        Log.d(urlParameters, "ok");
+        byte[] postData = urlParameters.getBytes(Charset.forName("UTF-8"));
+        int postDataLength = postData.length;
+        try {
+            URL url = new URL(request);
+            HttpURLConnection conn = null;
+
+            conn = (HttpURLConnection) url.openConnection();
+
+            conn.setDoOutput(true);
+            conn.setInstanceFollowRedirects(false);
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            conn.setRequestProperty("charset", "utf-8");
+            conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+            conn.setUseCaches(false);
+            try (DataOutputStream wr = new DataOutputStream(conn.getOutputStream())) {
+                wr.write(postData);
+                StringBuilder hasil = new StringBuilder();
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    hasil.append(line);
+                }
+                br.close();
+                return hasil.toString();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static String cekNull(String str){
         if(str==null)
             return "null";
@@ -1066,6 +1131,11 @@ public class Utilities {
         return FirebaseDatabase.getInstance()
                 .getReference("Chats");
     }
+
+    public static DatabaseReference getKontakRef(Context c){
+        return FirebaseDatabase.getInstance().getReference("Kontak").child(getUserID(c).replace(".", ","));
+    }
+
     //untuk mendapatkan data pengguna
     public static Pengguna getCurrentUser(Context c){
         getUserRef(getUserID(c)).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -1139,18 +1209,5 @@ public class Utilities {
 
             }
         });
-    }
-
-    static class URL{
-        private String url;
-        public URL(){
-
-        }
-        public void setUrl(String url){
-            this.url = url;
-        }
-        public String getUrl(){
-            return url;
-        }
     }
 }

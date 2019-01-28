@@ -15,4 +15,11 @@ public class PackBahasa {
                                         {"設定","アカウント","パスワードの変更","ログアウト","アカウントの閉鎖","言語","言語の変更", "言語を選択する"}};
     public static String[] BahasaAdd = {"Your Title Goes Here", "Your insert description here about your problem.", "insert your link here"};
     public static String[] BahasaTimeline = {"search your question"};
+    public static String[][] chat = {{"Friends", "Find friend by email", "your friend's email", "Email not found!"},
+                                    {"Teman", "Cari teman dengan email", "email teman anda", "Email tidak ditemukan!"},
+                                    {"友達","メールで友達を探す","友達のメールアドレス","メールが見つかりません！"}};
+    public static String[][] chatToast = {{"Successfully added friend!", "Failed to add friend!", "Already added as friend!"},
+            { "Berhasil menambahkan teman!", "Gagal menambahkan teman!", "Sudah ditambahkan sebagai teman!"},
+            { "友達を追加することができました！", "友達を追加できませんでした！", "すでに友達を追加しました！"}};
+    public static String[] errorToast = {"Might error occured!", "Mungkin terjadi kesalahan!", };
 }

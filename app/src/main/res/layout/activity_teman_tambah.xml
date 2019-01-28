@@ -59,6 +59,8 @@
 
 
     <RelativeLayout
+        android:id="@+id/teman_informasi"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
@@ -66,7 +68,8 @@
         <RelativeLayout
             android:id="@+id/teman_foto"
             android:layout_width="150dp"
-            android:layout_height="150dp">
+            android:layout_height="150dp"
+            android:layout_centerHorizontal="true">
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/teman_foto_gambar"
                 android:layout_centerVertical="true"
@@ -109,12 +112,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Bidang"
+            android:text=""
             android:textSize="15sp"
             android:textColor="#505050"/>
     </RelativeLayout>
 
     <ImageView
+        android:visibility="gone"
         android:id="@+id/teman_tambah_baru"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
