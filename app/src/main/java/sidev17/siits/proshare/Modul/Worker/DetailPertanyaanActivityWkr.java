@@ -8,12 +8,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -76,6 +78,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     private String majorPemilik;
     private int statusPemilik;
 
+    private int totalVote = 0;
+    private int voteStatus = 0;
     private String judulPertanyaan;
     private String majorityPertanyaan;
     private String deskripsiPertanyaan;
@@ -83,6 +87,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     private String urlFotoOrang;
     private String waktu;
     private String id_masalah;
+    private int statusPertanyaan;
     private ArrayList<String> gambar;
     private ArrayList<String> fotoLampiran;
     private ArrayList<String> videoLampiran;
@@ -201,9 +206,26 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         daftarkanBatas(menuBar.ambilBatas());
     }
 
-    private void hapusPertanyaan(){
+    private void hapusPertanyaan() {
         //lakukan sesuatu...
         //kalau bisa pake konfirmasi dulu
+    }
+
+    public void setTotalVote(int totalVote){
+        this.totalVote = totalVote;
+    }
+
+    public int getTotalVote(){
+        return totalVote;
+    }
+
+    public int getVoteStatus() {
+        return voteStatus;
+    }
+
+    public void setVoteStatus(int voteStatus) {
+        this.voteStatus = voteStatus;
+
     }
 
     private void isiDataPertanyaan(){
@@ -232,6 +254,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         majorityPertanyaan = paketDetailPertanyaan.getString("majority");
         waktu = paketDetailPertanyaan.getString("waktu");
         id_masalah = paketDetailPertanyaan.getString("pid");
+        statusPertanyaan = paketDetailPertanyaan.getInt("status", 0);
         gambar= ambilGambarDariServer();
         Toast.makeText(this, id_masalah, Toast.LENGTH_SHORT).show();
         cekSolusi();
@@ -269,16 +292,54 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         final ImageView tmbVoteUp= view.findViewById(R.id.komentar_vote_up);
         final ImageView tmbVoteDown= view.findViewById(R.id.komentar_vote_down);
         final TextView voteJumlah = view.findViewById(R.id.komentar_vote_posisi);
-        Utilities.loadVoteCountSolusi(tmbVoteUp, tmbVoteDown, voteJumlah, this, solusi.get(ind).getId_solusi());
+        Utilities.loadVoteCountSolusi(tmbVoteUp, tmbVoteDown, voteJumlah, this, solusi.get(ind).getId_solusi(), solusi.get(ind));
         tmbVoteUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (solusi.get(ind).getVoteStatus() == 1) {
+                    solusi.get(ind).setVoteStatus(0);
+                    solusi.get(ind).setTotalVote(solusi.get(ind).getTotalVote()-1);
+                    voteJumlah.setText(String.valueOf(solusi.get(ind).getTotalVote()));
+                    tampilanToastDiterjemahkan("You Unvoted");
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                } else {
+                    if(solusi.get(ind).getVoteStatus() == 0) {
+                        solusi.get(ind).setTotalVote(solusi.get(ind).getTotalVote() + 1);
+                        voteJumlah.setText(String.valueOf(solusi.get(ind).getTotalVote()));
+                    } else{
+                        solusi.get(ind).setTotalVote(solusi.get(ind).getTotalVote() + 2);
+                        voteJumlah.setText(String.valueOf(solusi.get(ind).getTotalVote()));
+                    }
+                    solusi.get(ind).setVoteStatus(1);
+                    tampilanToastDiterjemahkan("You Voted Up");
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                }
                 Utilities.voteSolusi("1", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(ind).getId_solusi());
             }
         });
         tmbVoteDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (solusi.get(ind).getVoteStatus() == -1) {
+                    solusi.get(ind).setVoteStatus(0);
+                    solusi.get(ind).setTotalVote(solusi.get(ind).getTotalVote()+1);
+                    voteJumlah.setText(String.valueOf(solusi.get(ind).getTotalVote()));
+                    tampilanToastDiterjemahkan("You Unvoted");
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                } else {
+                    if(solusi.get(ind).getVoteStatus() == 0) {
+                        solusi.get(ind).setTotalVote(solusi.get(ind).getTotalVote() - 1);
+                        voteJumlah.setText(String.valueOf(solusi.get(ind).getTotalVote()));
+                    } else{
+                        solusi.get(ind).setTotalVote(solusi.get(ind).getTotalVote() - 2);
+                        voteJumlah.setText(String.valueOf(solusi.get(ind).getTotalVote()));
+                    }
+                    solusi.get(ind).setVoteStatus(-1);
+                    tampilanToastDiterjemahkan("You Voted Down");
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                }
                 Utilities.voteSolusi("0", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(ind).getId_solusi());
             }
         });
@@ -341,16 +402,54 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         final ImageView tmbVoteDown= viewSolusi.findViewById(R.id.komentar_vote_down);
         final ImageView tmbVoteUp= viewSolusi.findViewById(R.id.komentar_vote_up);
         final TextView voteJumlah = viewSolusi.findViewById(R.id.komentar_vote_posisi);
-        Utilities.loadVoteCountSolusi(tmbVoteUp, tmbVoteDown, voteJumlah, this, solusi.get(0).getId_solusi());
+        Utilities.loadVoteCountSolusi(tmbVoteUp, tmbVoteDown, voteJumlah, this, solusi.get(0).getId_solusi(), solusi.get(0));
         tmbVoteUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (solusi.get(0).getVoteStatus() == 1) {
+                    solusi.get(0).setVoteStatus(0);
+                    solusi.get(0).setTotalVote(solusi.get(0).getTotalVote()-1);
+                    voteJumlah.setText(String.valueOf(solusi.get(0).getTotalVote()));
+                    tampilanToastDiterjemahkan("You Unvoted");
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                } else {
+                    if(solusi.get(0).getVoteStatus() == 0) {
+                        solusi.get(0).setTotalVote(solusi.get(0).getTotalVote() + 1);
+                        voteJumlah.setText(String.valueOf(solusi.get(0).getTotalVote()));
+                    } else{
+                        solusi.get(0).setTotalVote(solusi.get(0).getTotalVote() + 2);
+                        voteJumlah.setText(String.valueOf(solusi.get(0).getTotalVote()));
+                    }
+                    solusi.get(0).setVoteStatus(1);
+                    tampilanToastDiterjemahkan("You Voted Up");
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                }
                 Utilities.voteSolusi("1", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(0).getId_solusi());
             }
         });
         tmbVoteDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (solusi.get(0).getVoteStatus() == -1) {
+                    solusi.get(0).setVoteStatus(0);
+                    solusi.get(0).setTotalVote(solusi.get(0).getTotalVote()+1);
+                    voteJumlah.setText(String.valueOf(solusi.get(0).getTotalVote()));
+                    tampilanToastDiterjemahkan("You Unvoted");
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                } else {
+                    if(solusi.get(0).getVoteStatus() == 0) {
+                        solusi.get(0).setTotalVote(solusi.get(0).getTotalVote() - 1);
+                        voteJumlah.setText(String.valueOf(solusi.get(0).getTotalVote()));
+                    } else{
+                        solusi.get(0).setTotalVote(solusi.get(0).getTotalVote() - 2);
+                        voteJumlah.setText(String.valueOf(solusi.get(0).getTotalVote()));
+                    }
+                    solusi.get(0).setVoteStatus(-1);
+                    tampilanToastDiterjemahkan("You Voted Down");
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                }
                 Utilities.voteSolusi("0", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(0).getId_solusi());
             }
         });
@@ -399,6 +498,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         TextView teksWaktu = viewPertanyaan.findViewById(R.id.tl_waktu);
         CircleImageView fotoProfil = viewPertanyaan.findViewById(R.id.tl_orang_gambar);
         lampiran = viewPertanyaan.findViewById(R.id.lampiran_pertanyaan);
+        final LinearLayout statusPertanyaan = viewPertanyaan.findViewById(R.id.tl_status);
         final TextView voteJumlah = viewPertanyaan.findViewById(R.id.tl_vote_posisi);
         initOrang(teksNama, teksStatusOrang, fotoProfil);
 
@@ -420,12 +520,46 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         tmbVoteUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (voteStatus == 1) {
+                    voteStatus = 0;
+                    voteJumlah.setText(String.valueOf(--totalVote));
+                    tampilanToastDiterjemahkan("You Unvoted");
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                } else {
+                    if(voteStatus == 0)
+                        voteJumlah.setText(String.valueOf(++totalVote));
+                    else{
+                        totalVote += 2;
+                        voteJumlah.setText(String.valueOf(totalVote));
+                    }
+                    voteStatus = 1;
+                    tampilanToastDiterjemahkan("You Voted Up");
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                }
                 Utilities.voteProblem("1", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, id_masalah);
             }
         });
         tmbVoteDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (voteStatus == -1) {
+                    voteStatus = 0;
+                    voteJumlah.setText(String.valueOf(++totalVote));
+                    tampilanToastDiterjemahkan("You Unvoted");
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                } else {
+                    if(voteStatus == 0)
+                        voteJumlah.setText(String.valueOf(--totalVote));
+                    else{
+                        totalVote -= 2;
+                        voteJumlah.setText(String.valueOf(totalVote));
+                    }
+                    voteStatus = -1;
+                    tampilanToastDiterjemahkan("You Voted Down");
+                    tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
+                    tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                }
                 Utilities.voteProblem("0", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, id_masalah);
             }
         });
@@ -446,11 +580,70 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         Utilities.loadBidang(majorityPertanyaan, Utilities.getUserNegara(this), teksMajority, this);
         teksDeskripsi.setText(Utilities.ubahBahasa(deskripsiPertanyaan, Utilities.getUserNegara(this), this));
         Utilities.loadFotoLampiran(fotoLampiran, videoLampiran, lampiran, this, id_masalah);
+        switch (this.statusPertanyaan){
+            case Konstanta.PROBLEM_STATUS_UNVERIFIED:
+                View v = getLayoutInflater().inflate(R.layout.pertanyaan_status_unverfied, null, false);
+                Button verify = v.findViewById(R.id.tl_verify);
+                Button reject = v.findViewById(R.id.tl_reject);
+                verify.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        verifikasiPertanyaan(statusPertanyaan);
+                    }
+                });
+                reject.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tolakPertanyaan(statusPertanyaan);
+                    }
+                });
+                statusPertanyaan.addView(v);
+                break;
+            case Konstanta.PROBLEM_STATUS_VERIFIED:
+                View v2 = getLayoutInflater().inflate(R.layout.pertanyaan_status_verfied, null, false);
+                statusPertanyaan.addView(v2);
+                break;
+            case Konstanta.PROBLEM_STATUS_REJECTED:
+                View v3 = getLayoutInflater().inflate(R.layout.pertanyaan_status_rejected, null, false);
+                statusPertanyaan.addView(v3);
+                break;
+        }
      //   Toast.makeText(this, waktu, Toast.LENGTH_SHORT).show();
     }
 
+    private void tampilanToastDiterjemahkan(String pesan){
+        new AsyncTask<String, Void, String>(){
 
-   //buat download full image dari server
+            @Override
+            protected String doInBackground(String... strings) {
+                String output = strings[0];
+                if(getApplicationContext()!=null)
+                    Utilities.ubahBahasa(output, Utilities.getUserNegara(getApplicationContext()), getApplicationContext());
+                return output;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                if(DetailPertanyaanActivityWkr.this!=null)
+                    Toast.makeText(DetailPertanyaanActivityWkr.this, s, Toast.LENGTH_SHORT).show();
+            }
+        }.execute(pesan);
+    }
+
+    private void tolakPertanyaan(LinearLayout statusPertanyaan) {
+        statusPertanyaan.removeAllViews();
+        View v3 = getLayoutInflater().inflate(R.layout.pertanyaan_status_rejected, null, false);
+        statusPertanyaan.addView(v3);
+    }
+
+    private void verifikasiPertanyaan(LinearLayout statusPertanyaan) {
+        statusPertanyaan.removeAllViews();
+        View v2 = getLayoutInflater().inflate(R.layout.pertanyaan_status_verfied, null, false);
+        statusPertanyaan.addView(v2);
+    }
+
+
+    //buat download full image dari server
    private class GetXMLTask extends AsyncTask<String, Void, ArrayList<Bitmap>> {
         @Override
         protected ArrayList<Bitmap> doInBackground(String... urls) {

@@ -44,4 +44,7 @@ public class Konstanta {
     public static final Language BAHASA_INDONESIA = Language.INDONESIAN;
     public static final Language BAHASA_INGGRIS = Language.ENGLISH;
     public static final Language BAHASA_JEPANG = Language.JAPANESE;
+    public static final int PROBLEM_STATUS_UNVERIFIED = 311;
+    public static final int PROBLEM_STATUS_VERIFIED = 312;
+    public static final int PROBLEM_STATUS_REJECTED = 313;
 }

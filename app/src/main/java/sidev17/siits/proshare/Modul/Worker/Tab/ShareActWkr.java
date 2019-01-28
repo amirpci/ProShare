@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -248,7 +249,6 @@ public class ShareActWkr extends Fragment {
                             try {
                                 ArrayList<Permasalahan> semuaPermasalahan = new ArrayList<>();
                                 JSONArray jsonArr = new JSONArray(response);
-                                Toast.makeText(getActivity(), "Berhasil loading! dengan panjang "+String.valueOf(jsonArr.length()), Toast.LENGTH_SHORT).show();
                                 for(int i=0; i<jsonArr.length(); i++){
                                     try {
                                         JSONObject jsonObject = jsonArr.getJSONObject(i);
@@ -364,14 +364,16 @@ public class ShareActWkr extends Fragment {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+
                         Masalah.clear();
                         try {
                             JSONArray jsonArr = new JSONArray(response);
-//                            Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                            Log.d("loaddata", "ok"+String.valueOf(jsonArr.length()));
                             for(int i=0; i<jsonArr.length(); i++){
                                 try {
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
                                     Permasalahan masalah = new Permasalahan();
+                                    Log.d("loadData ", jsonObject.getString("problem_title")+"\n");
                                     masalah.setproblem_desc(jsonObject.getString("problem_desc"));
                                     masalah.setproblem_title(jsonObject.getString("problem_title"));
                                     masalah.setproblem_owner(jsonObject.getString("problem_owner"));
@@ -396,7 +398,8 @@ public class ShareActWkr extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loadingDitemukan.setVisibility(View.GONE);
-                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+                if(getActivity()!=null)
+                Toast.makeText(getActivity(), "Network problem occured!", Toast.LENGTH_SHORT).show();
             }
         });
         Volley.newRequestQueue(getActivity()).add(stringRequest);
@@ -574,7 +577,7 @@ public class ShareActWkr extends Fragment {
 
         public class vH extends RecyclerView.ViewHolder{
             private TextView judul, isi;
-            private ImageView centang;
+            private ImageView centang, foto;
             private View view;
             public vH(View itemView) {
                 super(itemView);
@@ -582,6 +585,7 @@ public class ShareActWkr extends Fragment {
                 centang = (ImageView) itemView.findViewById(R.id.daftar_pertanyaan_centang);
                 judul = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_judul);
                 isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);
+                foto = (ImageView)itemView.findViewById(R.id.daftar_pertanyaan_gambar);
             }
             public void bind(final int posisi){
                 if(masalah.get(posisi).getStatus()==PENGGUNA_EXPERT){
@@ -606,6 +610,30 @@ public class ShareActWkr extends Fragment {
                         startActivity(inten);
                     }
                 });
+                String[] judulIsi = {masalah.get(posisi).getproblem_title(), masalah.get(posisi).getproblem_desc()};
+                new AsyncTask<String[], Void, String[]>(){
+
+                    @Override
+                    protected String[] doInBackground(String[]... strings) {
+                        String[] output = strings[0];
+                        for(int i=0;i<output.length;i++){
+                            if(getActivity()!=null)
+                                output[i] = Utilities.ubahBahasaDariId(output[i], Utilities.getUserBahasa(getActivity()), getActivity());
+                        }
+                        return  output;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String[] strings) {
+                        if(judul!=null && isi!=null){
+                            judul.setText(strings[0]);
+                            isi.setText(strings[1]);
+                        }
+                    }
+                }.execute(judulIsi);
+                //  Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
+                Utilities.updateFoto(masalah.get(posisi).getpid(), foto, act);
             }
         }
     }

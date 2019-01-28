@@ -21,9 +21,10 @@ import sidev17.siits.proshare.Modul.Expert.Tab.ProfileActExprt;
 import sidev17.siits.proshare.Modul.Expert.Tab.TimelineActExprt;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.ViewPagerAdapter;
 
-public class MainActivityExprt extends AppCompatActivity {
+public class MainActivityExprt extends Aktifitas {
 
     private LinearLayout tmb_Profile, tmb_Jawab, tmb_Timeline, tmb_Feedback;
     private ImageView garis_Profile, garis_Timeline, garis_Jawab, garis_Feedback;
@@ -31,7 +32,7 @@ public class MainActivityExprt extends AppCompatActivity {
     //private ViewPagerAdapter adapter;
    // private ViewPager mvPager;
     private boolean click_duaKali=false;
-
+    private PenungguGantiHalaman pngGantiHalaman;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +118,12 @@ public class MainActivityExprt extends AppCompatActivity {
         });
     }
 
+    public interface PenungguGantiHalaman{
+        void gantiHalaman(int halSebelumnnya, int halamanSkrg);
+    }
+    public void aturPenungguGantiHalaman(PenungguGantiHalaman png){
+        pngGantiHalaman= png;
+    }
 
     void tampilkan(Fragment frag) {
         FragmentManager fm = getSupportFragmentManager();

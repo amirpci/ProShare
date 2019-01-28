@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -168,7 +169,8 @@ public class DaftarTanyaActWkr extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loadingPertanyaan.setVisibility(View.GONE);
-                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+                if(getActivity() != null)
+                    Toast.makeText(getActivity(), "Failed to load question!", Toast.LENGTH_SHORT).show();
             }
         }){
             @Override
@@ -224,13 +226,39 @@ public class DaftarTanyaActWkr extends Fragment {
                 foto = (ImageView)itemView.findViewById(R.id.daftar_pertanyaan_gambar);
             }
             public void bind(final int posisi){
-                if(masalah.get(posisi).getStatus()==PENGGUNA_EXPERT){
-                    centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
-                }else if(masalah.get(posisi).getStatus()==PENGGUNA_BIASA){
-                    centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
+                switch (masalah.get(posisi).getStatus()){
+                    case Konstanta.PROBLEM_STATUS_UNVERIFIED:
+                        centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
+                        break;
+                    case Konstanta.PROBLEM_STATUS_VERIFIED:
+                        centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
+                        break;
+                    case Konstanta.PROBLEM_STATUS_REJECTED:
+                        centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_silang);
                 }
                 judul.setText(masalah.get(posisi).getproblem_title());
                 isi.setText(masalah.get(posisi).getproblem_desc());
+                String[] judulIsi = {masalah.get(posisi).getproblem_title(), masalah.get(posisi).getproblem_desc()};
+                new AsyncTask<String[], Void, String[]>(){
+
+                    @Override
+                    protected String[] doInBackground(String[]... strings) {
+                        String[] output = strings[0];
+                        for(int i=0;i<output.length;i++){
+                            if(getActivity()!=null)
+                                output[i] = Utilities.ubahBahasaDariId(output[i], Utilities.getUserBahasa(getActivity()), getActivity());
+                        }
+                        return  output;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String[] strings) {
+                        if(judul!=null && isi!=null){
+                            judul.setText(strings[0]);
+                            isi.setText(strings[1]);
+                        }
+                    }
+                }.execute(judulIsi);
               //  Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
                // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
                 Utilities.updateFoto(masalah.get(posisi).getpid(), foto, act);
@@ -244,6 +272,7 @@ public class DaftarTanyaActWkr extends Fragment {
                         paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
                         paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
                         paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
+                        paketDetailPetanyaan.putInt("status", masalah.get(posisi).getStatus());
                         Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                         startActivity(inten);

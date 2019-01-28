@@ -15,9 +15,12 @@
  */
 package com.rmtheis.yandtran;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -25,6 +28,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 
 /**
  * Makes the generic Yandex API calls. Different service classes can then
@@ -86,6 +90,19 @@ public abstract class YandexTranslatorAPI {
     }
   }
 
+  private static String dapatkanResponse(final URL url) throws Exception {
+    StringBuilder result = new StringBuilder();
+    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+    conn.setRequestMethod("GET");
+    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+    String line;
+    while ((line = rd.readLine()) != null) {
+      result.append(line);
+    }
+    rd.close();
+    return result.toString();
+  }
+
   /**
    * Forms a request, sends it using the GET method and returns the value with the given label from the
    * resulting JSON response.
@@ -108,6 +125,15 @@ public abstract class YandexTranslatorAPI {
         combinedTranslations += s;
       }
       return combinedTranslations.trim();
+  }
+
+  //mendapatkan ID negara
+
+  protected static String dapatkanIdNegara(final URL url) throws Exception{
+    String respons = dapatkanResponse(url);
+    JSONParser parser = new JSONParser();
+    org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(respons);
+    return json.get("lang").toString();
   }
 
   // Helper method to parse a JSONObject containing an array of Strings with the given label.

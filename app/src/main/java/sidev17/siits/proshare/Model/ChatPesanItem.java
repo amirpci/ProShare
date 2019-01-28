@@ -1,6 +1,7 @@
 package sidev17.siits.proshare.Model;
 
 public class ChatPesanItem {
+    private String id;
     private String pesan;
     private String waktu;
     private String pengirim;
@@ -11,6 +12,14 @@ public class ChatPesanItem {
         this.waktu = waktu;
         this.pengirim = pengirim;
         this.penerima = penerima;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPesan() {

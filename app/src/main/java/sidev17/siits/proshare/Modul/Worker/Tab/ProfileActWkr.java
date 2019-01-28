@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
@@ -18,6 +19,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.method.KeyListener;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -36,22 +38,37 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
+import sidev17.siits.proshare.Model.Bidang;
+import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
+import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
@@ -69,6 +86,7 @@ import com.rmtheis.yandtran.language.Language;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.INPUT_METHOD_SERVICE;
@@ -100,6 +118,9 @@ public class ProfileActWkr extends Fragment {
     private ListView daftarSkill;
     private String skill[];
     private int tingkatRekom[];
+
+    private String bahasaSekarang = "en";
+    private ArrayList<Bidang> bidangSekarang;
 
     @Nullable
     @Override
@@ -136,7 +157,6 @@ public class ProfileActWkr extends Fragment {
         profile_photo.setVisibility(View.GONE);
         idUser = FirebaseAuth.getInstance().getUid();
         loadData();
-        gantiBahasa(getActivity());
         addPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -153,15 +173,26 @@ public class ProfileActWkr extends Fragment {
         addPhoto.setVisibility(View.GONE);
 
         initMenuBar();
-        initBidang();
+        loadPilihanMajorityServer();
+        // initBidang(new ArrayList<Bidang>());
 
-        ((MainActivityWkr)getActivity()).aturPenungguGantiHalaman(new MainActivityWkr.PenungguGantiHalaman() {
-            @Override
-            public void gantiHalaman(int halSebelumnnya, int halamanSkrg) {
-                if(!menuBar.menuBisaDitampilkan() || menuBar.menuDitampilkan())
-                    menuBar.klik();
-            }
-        });
+        if(getActivity() instanceof  MainActivityWkr){
+            ((MainActivityWkr)getActivity()).aturPenungguGantiHalaman(new MainActivityWkr.PenungguGantiHalaman() {
+                @Override
+                public void gantiHalaman(int halSebelumnnya, int halamanSkrg) {
+                    if(!menuBar.menuBisaDitampilkan() || menuBar.menuDitampilkan())
+                        menuBar.klik();
+                }
+            });
+        }else{
+            ((MainActivityExprt)getActivity()).aturPenungguGantiHalaman(new MainActivityExprt.PenungguGantiHalaman() {
+                @Override
+                public void gantiHalaman(int halSebelumnnya, int halamanSkrg) {
+                    if(!menuBar.menuBisaDitampilkan() || menuBar.menuDitampilkan())
+                        menuBar.klik();
+                }
+            });
+        }
 /*
         signout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -179,15 +210,92 @@ public class ProfileActWkr extends Fragment {
         return v;
     }
 
-    void initBidang(){
-        //ambil semua bidang dari server
-        String bidangSeluruh[]= {"Batu", "Tanah", "Udara", "Air", "Api"}; //new String[0];
+    void loadPilihanMajorityServer(){
+        new AsyncTask<Void, Void, ArrayList<Bidang>>(){
 
-        bidang.setAdapter(new AdapterBidang(bidangSeluruh));
-        bidang.setSelection(ArrayMod.cariIndDlmArray(bidangSeluruh, "Udara"));
-        bgAwalSpinner= bidang.getBackground();
-        enablePilihBidang(false);
+            @Override
+            protected ArrayList<Bidang> doInBackground(Void... voids) {
+                final ArrayList<Bidang> bdg = new ArrayList<>();
+                URL url = null;
+                try {
+                    url = new URL(Konstanta.DAFTAR_BIDANG);
+                    StringBuilder result = new StringBuilder();
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.setRequestMethod("GET");
+                    BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    String line;
+                    while ((line = rd.readLine()) != null) {
+                        result.append(line);
+                    }
+                    rd.close();
+                    JSONArray response = new JSONArray(result.toString());
+                    bdg.clear();
+                    for (int i = 0; i < response.length(); i++) {
+                        JSONObject obj = response.getJSONObject(i);
+                        Bidang bidang = new Bidang();
+                        bidang.setId(obj.getString("id"));
+                        bidang.setBidang(obj.getString("bidang"));
+                        bdg.add(bidang);
+                    }
+                    bidangSekarang = bdg;
+                } catch (IOException | JSONException e) {
+                    e.printStackTrace();
+                }
+                return bdg;
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<Bidang> bidangs) {
+                muatBidang(bidangs);
+            }
+        }.execute();
     }
+
+    void muatBidang(ArrayList<Bidang> bdg){
+        String[] listBidang = Utilities.listBidangkeArray(bdg);
+        new ubahBahasMajor().execute(listBidang);
+    }
+
+    void resettBidang(){
+        bidang.setAdapter(new AdapterBidang(new String[0]));
+        bidang.setSelection(0);
+        bgAwalSpinner = bidang.getBackground();
+        enablePilihBidang(false);
+        bidang.setGravity(View.TEXT_ALIGNMENT_CENTER);
+    }
+
+    private class ubahBahasMajor extends AsyncTask<String[], Void, String[]> {
+
+        @Override
+        protected String[] doInBackground(String[]... params) {
+            String[] output = params[0];
+            String idBahasa  = Utilities.getUserBahasa(getActivity());
+            bahasaSekarang = idBahasa;
+            for(int i=0; i<params[0].length;i++){
+                if(getActivity()!=null)
+                   output[i] = Utilities.ubahBahasaDariId(params[0][i], idBahasa, getActivity());
+            }
+            return output;
+        }
+
+        @Override
+        protected void onPostExecute(String[] result) {
+            if(getActivity()!=null && bidang!=null) {
+                String bidangSekarang = Utilities.getUserMajor(getActivity());
+                bidang.setAdapter(new AdapterBidang(result));
+                bidang.setSelection(Integer.parseInt(bidangSekarang) - 1);
+                bgAwalSpinner = bidang.getBackground();
+                enablePilihBidang(false);
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {}
+
+        @Override
+        protected void onProgressUpdate(Void... values) {}
+    }
+
     void enablePilihBidang(boolean enable){
         bidang.setEnabled(enable);
         if(enable)
@@ -294,7 +402,7 @@ public class ProfileActWkr extends Fragment {
                     v.aturWarnaInduk("#ffffff");
                     v.aturWarnaLatar("#C9C9C9");
 //                    menuBar.setSelected(false);
-                    simpanProfil(nama.getText().toString(), (String) bidang.getSelectedItem());
+                    simpanProfil(nama.getText().toString(), String.valueOf(bidang.getSelectedItemPosition()+1));
                 }
                 else if(menuDitampilkan){
 //                    v.latarIndukAwal();
@@ -339,18 +447,83 @@ public class ProfileActWkr extends Fragment {
         addPhoto.setVisibility(visibility);
         enablePilihBidang(enable);
     }
-    void simpanProfil(String nama, String bidang){
+    void simpanProfil(final String nama, final String bidang){
         //lakukan sesuatu
+        final DatabaseReference userRef = Utilities.getUserRef(Utilities.getUserID(getActivity()));
+        userRef.child("nama").setValue(nama).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    userRef.child("bidang").setValue(bidang).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (getActivity() != null) {
+                                if (task.isSuccessful()) {
+                                    Utilities.setUserMajor(getActivity(), bidang);
+                                    Utilities.setUserNama(getActivity(), nama);
+                                    Toast.makeText(getActivity(), "Profile succesfully updated!", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(getActivity(), "Failed to update profile!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    Toast.makeText(getActivity(), "Failed to update profile!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         editProfil(false);
-        if(editNama.isSelected())
+        if (editNama.isSelected())
             editNama.performClick();
     }
 
-    void gantiBahasa(Context c){
+    void gantiBahasa(){
+        int index = Terjemahan.indexBahasa(getActivity());
+
         for(int i=0;i<textProfile.length;i++){
-            textProfile[i].setText(Utilities.ubahBahasa(PackBahasa.BahasaProfile[i], Utilities.getUserNegara(c), c));
-            Toast.makeText(c, "test" + String.valueOf(i), Toast.LENGTH_SHORT).show();
+            textProfile[i].setText(PackBahasa.BahasaProfile[index][i]);
         }
+        int indexStatus = 0;
+        switch ((int)Utilities.getUserBidang(getActivity())){
+            case 200:
+                indexStatus = 0;
+                break;
+            case 201:
+                indexStatus = 1;
+                break;
+            case 202:
+                indexStatus = 2;
+        }
+        status.setText(PackBahasa.BahasaStatusAkun[index][indexStatus]);
+        /*new AsyncTask<Void, Void , String[]>(){
+
+
+            @Override
+            protected String[] doInBackground(Void... voids) {
+                String[] bahasa = PackBahasa.BahasaProfile;
+                for (int i = 0; i < textProfile.length; i++) {
+                    if(getActivity()!=null)
+                        bahasa[i] = Utilities.ubahBahasa(bahasa[i], Utilities.getUserNegara(getActivity()), getActivity());
+                }
+                return bahasa;
+            }
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+            }
+
+            @Override
+            protected void onPostExecute(String[] strings) {
+                if(textProfile[0]!=null){
+                    for(int i=0;i<textProfile.length;i++){
+                        textProfile[i].setText(strings[i]);
+                    }
+                }
+            }
+        }.execute();
+        */
     }
     void initEditNama(){
         editNama.setOnClickListener(new View.OnClickListener() {
@@ -436,79 +609,11 @@ public class ProfileActWkr extends Fragment {
     }
 
     void loadData(){
-        loading = new ProgressDialog(getActivity());
-        loading.setMessage("loading...");
-        loading.show();
-        ConnectivityManager connectivity = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = connectivity.getActiveNetworkInfo();
-        if(activeNetwork!=null){
-            Utilities.getUserRef(Utilities.getUserID(getActivity())).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(getActivity()!=null){
-                        Pengguna user = dataSnapshot.getValue(Pengguna.class);
-                        String nama_ = user.getNama();
-                        long status_ = user.getStatus();
-                        String photo_ = user.getPhotoProfile();
-                        String bidang_ = user.getBidang();
-                        String langID = user.getNegara();
-                        Language languageID=null;
-                        switch (langID){
-                            case "2" : languageID=Language.INDONESIAN; break;
-                            case "3" : languageID=Language.ENGLISH; break;
-                            case "4" : languageID=Language.ENGLISH; break;
-                            case "5" : languageID=Language.JAPANESE; break;
-                        }
-                        com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
-                        try {
-                            loadBidang(bidang_, languageID);
-                            switch ((int)status_){
-                                case 200 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Worker", Language.ENGLISH, languageID)); break;
-                                case 201 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Expert", Language.ENGLISH, languageID)); break;
-                                case 202 : status.setText(com.rmtheis.yandtran.translate.Translate.execute("Verified Expert", Language.ENGLISH, languageID)); break;
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                        nama.setText(nama_);
-                        if(photo_!=null){
-                            Glide.with(getActivity()).load(photo_).into(profile_photo);
-                            pp_view.setVisibility(View.GONE);
-                            addPhoto.setVisibility(View.GONE);
-                            profile_photo.setVisibility(View.VISIBLE);
-                        }
-                        Toast.makeText(getActivity(), "coba", Toast.LENGTH_SHORT).show();
-                        loading.dismiss();
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {}
-
-            });
-        }else{
-            loading.dismiss();
-            Toast.makeText(getActivity(), "No internet connection found!", Toast.LENGTH_LONG).show();
-        }
-        /*
-        dataRef.child(idUser).child("Score").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
-                String rating_ = String.valueOf(map.get("Rating"));
-                String rater_ = String.valueOf(map.get("Rater"));
-                String terjawab_ = String.valueOf(map.get("Answered"));
-
-                penilai.setText(rater_);
-                rating.setText(rating_);
-                terjawab.setText(terjawab_);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        }); */
+        bidangSekarang = new ArrayList<>();
+        nama.setText(Utilities.getUserNama(getActivity()));
+        gantiBahasa();
+        if(Utilities.getUserFoto(getActivity())!=null)
+            Utilities.setFotoDariUrlSingle(Utilities.getUserFoto(getActivity()), profile_photo, 150);
     }
 
     private void loadBidang(final String bidang_, final Language languageID) {
@@ -590,6 +695,16 @@ public class ProfileActWkr extends Fragment {
                 }
                 return;
             }
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        gantiBahasa();
+        if(!bahasaSekarang.equalsIgnoreCase(Utilities.getUserBahasa(getActivity()))){
+            resettBidang();
+            muatBidang(bidangSekarang);
         }
     }
 }

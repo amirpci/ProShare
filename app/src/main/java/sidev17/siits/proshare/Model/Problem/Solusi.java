@@ -10,8 +10,26 @@ public class Solusi {
     String fotoOrang;
     String namaOrang;
     String timestamp;
+    int totalVote;
+    int voteStatus;
 
     public Solusi() {
+    }
+
+    public int getTotalVote() {
+        return totalVote;
+    }
+
+    public void setTotalVote(int totalVote) {
+        this.totalVote = totalVote;
+    }
+
+    public int getVoteStatus() {
+        return voteStatus;
+    }
+
+    public void setVoteStatus(int voteStatus) {
+        this.voteStatus = voteStatus;
     }
 
     public String getNamaOrang() {

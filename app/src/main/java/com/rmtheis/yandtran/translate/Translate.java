@@ -15,6 +15,8 @@
  */
 package com.rmtheis.yandtran.translate;
 
+import android.util.Log;
+
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -50,6 +52,12 @@ public final class Translate extends YandexTranslatorAPI {
         + PARAM_TEXT + URLEncoder.encode(text,ENCODING);
     final URL url = new URL(SERVICE_URL + params);
     return retrievePropArrString(url, TRANSLATION_LABEL).trim();
+  }
+
+  public static String deteksiBahasa(final String text, final String key) throws Exception{
+    final String hint = "ja,id,en";
+    final String url = "https://translate.yandex.net/api/v1.5/tr.json/detect?key="+key+"&hint="+hint+"&text="+text.replace(" ", "%20");
+    return dapatkanIdNegara(new URL(url));
   }
 
   private static void validateServiceState(final String text) throws Exception {

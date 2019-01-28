@@ -52,17 +52,13 @@
             android:layout_toLeftOf="@id/chat_latar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/chat_dibaca"
-                android:layout_width="20dp"
-                android:layout_height="20dp"/>
+
             <TextView
                 android:id="@+id/chat_waktu"
-                android:layout_toRightOf="@id/chat_dibaca"
                 android:layout_marginLeft="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="waktu selesai"
+                android:text="09:54 AM"
                 android:gravity="bottom"
                 android:textColor="#000000"
                 android:textSize="10sp"/>

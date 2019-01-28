@@ -15,12 +15,17 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -64,20 +69,29 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.annotation.Target;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import sidev17.siits.proshare.Adapter.RcLampiran;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Country;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
+import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.R;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -85,6 +99,11 @@ import static android.content.Context.MODE_PRIVATE;
 public class Utilities {
 
     private static Pengguna currentUser;
+
+    public static int dpToPx(float dp, Context context) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
+    }
+
     //untuk mendapatkan referensi pengguna
     public static DatabaseReference getUserRef(String email){
         return FirebaseDatabase.getInstance()
@@ -179,14 +198,17 @@ public class Utilities {
                             org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(response);
                             if(json.get("terhapus").toString().equals("1")){
                                 if(json.get("type").toString().equals("1")){
+                                    ((DetailPertanyaanActivityWkr)act).setVoteStatus(1);
                                     voteup.setColorFilter(ContextCompat.getColor(act, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
                                 }else{
+                                    ((DetailPertanyaanActivityWkr)act).setVoteStatus(-1);
                                     votedown.setColorFilter(ContextCompat.getColor(act, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
                                 }
                             }else{
                                 voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                                 votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                             }
+                            ((DetailPertanyaanActivityWkr)act).setTotalVote(Integer.parseInt(json.get("vote_total").toString()));
                             txtCount.setText(json.get("vote_total").toString());
                         } catch (org.json.simple.parser.ParseException e) {
                             e.printStackTrace();
@@ -220,21 +242,31 @@ public class Utilities {
                             org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(response);
                             if(json.get("terhapus").toString().equals("1")){
                                 if(!json.get("type").toString().equals(type)){
-                                    Toast.makeText(act, Utilities.ubahBahasa("Vote changed!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(act, Utilities.ubahBahasa("Vote changed!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
                                     voteProblem(type, voteup, votedown, txtCount, act, id_masalah);
-                                    if(json.get("type").toString().equals("1")){
+                                   // if(type.equalsIgnoreCase("1"))
+                                      //  ((DetailPertanyaanActivityWkr)act).setVoteStatus(1);
+                                   // else
+                                       // ((DetailPertanyaanActivityWkr)act).setVoteStatus(-1);
+
+                                    /*if(json.get("type").toString().equals("1")){
                                         voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                                     }else{
                                         votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    }
-                                }else {
-                                    Toast.makeText(act, Utilities.ubahBahasa("Problem unvoted!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
-                                    loadVoteCountProblem(voteup, votedown,txtCount, act, id_masalah);
-                                }
-                            }else{
-                                Toast.makeText(act, Utilities.ubahBahasa("Problem voted this!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
-                                loadVoteCountProblem(voteup, votedown,txtCount, act, id_masalah);
-                            }
+                                    } */
+                                }//else {
+                                   // ((DetailPertanyaanActivityWkr)act).setVoteStatus(0);
+                                   // Toast.makeText(act, Utilities.ubahBahasa("Problem unvoted!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                 //   loadVoteCountProblem(voteup, votedown,txtCount, act, id_masalah);
+                               // }
+                            }//else{
+                               // if(type.equalsIgnoreCase("1"))
+                                   // ((DetailPertanyaanActivityWkr)act).setVoteStatus(1);
+                                //else
+                                 //   ((DetailPertanyaanActivityWkr)act).setVoteStatus(-1);
+                              //  Toast.makeText(act, Utilities.ubahBahasa("Problem voted!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                               /// loadVoteCountProblem(voteup, votedown,txtCount, act, id_masalah);
+                          //  }
                         } catch (org.json.simple.parser.ParseException e) {
                             e.printStackTrace();
                         }
@@ -258,7 +290,7 @@ public class Utilities {
         Volley.newRequestQueue(act).add(stringRequest);
     }
 
-    public static void loadVoteCountSolusi(final ImageView voteup, final ImageView votedown, final TextView txtCount, final Activity act, final String id_solusi){
+    public static void loadVoteCountSolusi(final ImageView voteup, final ImageView votedown, final TextView txtCount, final Activity act, final String id_solusi, final Solusi solusi){
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SOLUTION_VOTE_COUNT,
                 new Response.Listener<String>() {
                     @Override
@@ -268,14 +300,17 @@ public class Utilities {
                             org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(response);
                             if(json.get("terhapus").toString().equals("1")){
                                 if(json.get("type").toString().equals("1")){
+                                    solusi.setVoteStatus(1);
                                     voteup.setColorFilter(ContextCompat.getColor(act, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
                                 }else{
+                                    solusi.setVoteStatus(-1);
                                     votedown.setColorFilter(ContextCompat.getColor(act, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
                                 }
                             }else{
                                 voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                                 votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                             }
+                            solusi.setTotalVote(Integer.parseInt(json.get("vote_total").toString()));
                             txtCount.setText(json.get("vote_total").toString());
                         } catch (org.json.simple.parser.ParseException e) {
                             e.printStackTrace();
@@ -309,21 +344,21 @@ public class Utilities {
                             org.json.simple.JSONObject json = (org.json.simple.JSONObject) parser.parse(response);
                             if(json.get("terhapus").toString().equals("1")){
                                 if(!json.get("type").toString().equals(type)){
-                                    Toast.makeText(act, Utilities.ubahBahasa("Vote changed!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                  //  Toast.makeText(act, Utilities.ubahBahasa("Vote changed!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
                                     voteSolusi(type, voteup, votedown, txtCount, act, id_solusi);
-                                    if(json.get("type").toString().equals("1")){
-                                        voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    }else{
-                                        votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
-                                    }
-                                }else {
-                                    Toast.makeText(act, Utilities.ubahBahasa("Problem unvoted!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
-                                    loadVoteCountSolusi(voteup, votedown,txtCount, act, id_solusi);
-                                }
-                            }else{
-                                Toast.makeText(act, Utilities.ubahBahasa("Problem voted this!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
-                                loadVoteCountSolusi(voteup, votedown,txtCount, act, id_solusi);
-                            }
+                                   // if(json.get("type").toString().equals("1")){
+                                  //      voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                                  ///  }else{
+                                    //    votedown.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
+                                   // }
+                                }//else {
+                                  //  Toast.makeText(act, Utilities.ubahBahasa("Problem unvoted!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                                //    loadVoteCountSolusi(voteup, votedown,txtCount, act, id_solusi);
+                              //  }
+                            }//else{
+                              //  Toast.makeText(act, Utilities.ubahBahasa("Problem voted this!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
+                              //  loadVoteCountSolusi(voteup, votedown,txtCount, act, id_solusi);
+                            //}
                         } catch (org.json.simple.parser.ParseException e) {
                             e.printStackTrace();
                         }
@@ -348,6 +383,10 @@ public class Utilities {
     }
 
     //Untuk masang foto.
+    public static void setFotoDariUrlSingle(String url, ImageView gambar, int ukuran){
+        Picasso.get().load(url).resize(ukuran,ukuran).centerCrop().into(gambar);
+    }
+
     public static void setFotoDariUrl1(String url, ImageView gambar){
         Picasso.get().load(url).resize(200,200).centerCrop().into(gambar);
     }
@@ -377,43 +416,21 @@ public class Utilities {
             }
         });
     }
-    public static void setFotoDariUrl3(final ArrayList<String> url, final ImageView gambar1, final ImageView gambar2, final ImageView gambar3){
-        Picasso.get().load(url.get(0)).resize(200,200).centerCrop().into(gambar1, new com.squareup.picasso.Callback(){
+    public static void setFotoDariUrl(final ArrayList<String> url, final ImageView ... gambar){
+        for(int i = 0 ; i < gambar.length ; i++){
+            Picasso.get().load(url.get(i)).resize(200,200).centerCrop().into(gambar[i], new com.squareup.picasso.Callback(){
 
-            @Override
-            public void onSuccess() {
-                Log.d("foto1", "sukses");
-            }
+                @Override
+                public void onSuccess() {
+                    Log.d("foto", "sukses");
+                }
 
-            @Override
-            public void onError(Exception e) {
-                Log.d("foto1 gagal", e.toString());
-            }
-        });
-        Picasso.get().load(url.get(1)).resize(100,100).centerCrop().into(gambar2, new com.squareup.picasso.Callback(){
-
-            @Override
-            public void onSuccess() {
-                Log.d("foto2", "sukses");
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.d("foto2 gagal", e.toString());
-            }
-        });
-        Picasso.get().load(url.get(2)).resize(100,100).centerCrop().into(gambar3, new com.squareup.picasso.Callback(){
-
-            @Override
-            public void onSuccess() {
-                Log.d("foto3", "sukses");
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.d("foto3 gagal", e.toString());
-            }
-        });
+                @Override
+                public void onError(Exception e) {
+                    Log.d("foto1 gagal", e.toString());
+                }
+            });
+        }
     }
     public static void loadFotoLampiran(final ArrayList<String> fotoLampiran, final ArrayList<String> videoLampiran, final LinearLayout lampiran, final Activity act, final String id_masalah){
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO,
@@ -498,49 +515,66 @@ public class Utilities {
         // videoLampiran = direclink video yang ada di server
         // viewGroup untuk tumbnail foto dan video di awal
         int panjangLampiran = fotoLampiran.size() + videoLampiran.size();
+        DisplayMetrics dm = new DisplayMetrics();
+        act.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int lebar = dm.widthPixels;
         Toast.makeText(act.getApplicationContext(), String.valueOf(panjangLampiran), Toast.LENGTH_LONG).show();
         if (panjangLampiran != 0) {
             // GetXMLTask task = new GetXMLTask();
             if (panjangLampiran == 1) {
+                int lebar1 = lebar;
                 lampiran.setVisibility(View.VISIBLE);
                 View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_1, null, false);
                 ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                pertanyaanGambar1.getLayoutParams().height = lebar1;
                 if(fotoLampiran.size()!=0)
                     Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
                 lampiran.addView(v);
             } else if (panjangLampiran == 2) {
+                int lebar2 = (lebar - 6)/2;
                 lampiran.setVisibility(View.VISIBLE);
                 View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_2, null, false);
                 ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
                 ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
+                pertanyaanGambar1.getLayoutParams().height = lebar2;
+                pertanyaanGambar2.getLayoutParams().height = lebar2;
                 if(fotoLampiran.size()==2){
                     Utilities.setFotoDariUrl2(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2);
                 }else if(fotoLampiran.size()==1)
                     Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
                 lampiran.addView(v);
             } else if (panjangLampiran == 3) {
+                int lebar3_1 = (lebar-5)*2/3+5;
                 lampiran.setVisibility(View.VISIBLE);
                 View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_3, null, false);
                 ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
                 ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
                 ImageView pertanyaanGambar3 = v.findViewById(R.id.lampiran_pertanyaan_3);
+                pertanyaanGambar1.getLayoutParams().height = lebar3_1;
                 if(fotoLampiran.size()==3){
-                    Utilities.setFotoDariUrl3(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3);
+                    Utilities.setFotoDariUrl(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3);
                 }else if(fotoLampiran.size()==2){
                     Utilities.setFotoDariUrl2(fotoLampiran,  pertanyaanGambar1, pertanyaanGambar2);
                 }else if(fotoLampiran.size()==1){
                     Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
                 }
                 lampiran.addView(v);
-            } else {
+            } else if(panjangLampiran ==4) {
                 lampiran.setVisibility(View.VISIBLE);
                 View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_4, null, false);
                 ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
                 ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
                 ImageView pertanyaanGambar3 = v.findViewById(R.id.lampiran_pertanyaan_3);
-                TextView countLeft = v.findViewById(R.id.lampiran_count_left);
-                if(fotoLampiran.size()>=3){
-                    Utilities.setFotoDariUrl3(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3);
+                ImageView pertanyaanGambar4 = v.findViewById(R.id.lampiran_pertanyaan_4);
+                //TextView countLeft = v.findViewById(R.id.lampiran_count_left);
+                int lebar4 = (lebar-6)/2;
+                pertanyaanGambar1.getLayoutParams().height = lebar4;
+                pertanyaanGambar2.getLayoutParams().height = lebar4;
+                pertanyaanGambar3.getLayoutParams().height = lebar4;
+                pertanyaanGambar4.getLayoutParams().height = lebar4;
+
+                if(fotoLampiran.size()>=4){
+                    Utilities.setFotoDariUrl(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3, pertanyaanGambar4);
                 }else if(fotoLampiran.size()==2){
                     Utilities.setFotoDariUrl2(fotoLampiran,  pertanyaanGambar1, pertanyaanGambar2);
                 }else if(fotoLampiran.size()==1){
@@ -552,7 +586,27 @@ public class Utilities {
                         //pindah untuk melihat list lampiran secara penuh
                     }
                 });
-                countLeft.setText(String.valueOf(panjangLampiran-3));
+                //countLeft.setText(String.valueOf(panjangLampiran-3));
+                lampiran.addView(v);
+            }else if(panjangLampiran>4){
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_5, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                //TextView countLeft = v.findViewById(R.id.lampiran_count_left);
+                RecyclerView rc_lampiran = v.findViewById(R.id.rc_lampiran_more);
+                int lebar5_2 = lebar/3 - 16;
+                int lebar5_1 = lebar - 15 -lebar5_2;
+                pertanyaanGambar1.getLayoutParams().height = lebar5_1;
+                if(fotoLampiran.size()>=4){
+                    Utilities.setFotoDariUrlSingle(fotoLampiran.get(0), pertanyaanGambar1, lebar5_1);
+                    rc_lampiran.setLayoutManager(new LinearLayoutManager(act, LinearLayoutManager.HORIZONTAL, false));
+                    rc_lampiran.setAdapter(new RcLampiran(fotoLampiran, lebar5_2));
+                }else if(fotoLampiran.size()==2){
+                   // Utilities.setFotoDariUrl2(fotoLampiran,  pertanyaanGambar1, pertanyaanGambar2);
+                }else if(fotoLampiran.size()==1){
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                }
+                //countLeft.setText(String.valueOf(panjangLampiran-3));
                 lampiran.addView(v);
             }
         }
@@ -747,20 +801,89 @@ public class Utilities {
         Volley.newRequestQueue(c).add(stringRequest);
     }
     public static  String ubahBahasa(String kata,String langID, Context c){
-        Language languageID=null;
-        switch (langID){
-            case "2" : languageID=Language.INDONESIAN; break;
-            case "3" : languageID=Language.ENGLISH; break;
-            case "4" : languageID=Language.ENGLISH; break;
-            case "5" : languageID=Language.JAPANESE; break;
-        }
-        com.rmtheis.yandtran.translate.Translate.setKey(c.getString(R.string.yandex_api_key));
-        try {
-            return com.rmtheis.yandtran.translate.Translate.execute(kata, Language.ENGLISH, languageID);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(c!=null){
+            Language languageID=null;
+            switch (langID){
+                case "2" : languageID=Language.INDONESIAN; break;
+                case "3" : languageID=Language.ENGLISH; break;
+                case "4" : languageID=Language.ENGLISH; break;
+                case "5" : languageID=Language.JAPANESE; break;
+            }
+            com.rmtheis.yandtran.translate.Translate.setKey(c.getString(R.string.yandex_api_key));
+            try {
+                return com.rmtheis.yandtran.translate.Translate.execute(kata, Language.ENGLISH, languageID);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return kata;
+    }
+
+    public static  String ubahBahasaDariId(String kata,String langID, Context c){
+        if(c!=null){
+            Language languageID=null;
+            switch (langID){
+                case "id" : languageID=Language.INDONESIAN; break;
+                case "en" : languageID=Language.ENGLISH; break;
+                case "ja" : languageID=Language.JAPANESE; break;
+            }
+            com.rmtheis.yandtran.translate.Translate.setKey(c.getString(R.string.yandex_api_key));
+            try {
+                return com.rmtheis.yandtran.translate.Translate.execute(kata, Language.ENGLISH, languageID);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return kata;
+    }
+
+    public static  String ubahBahasaSilang(String kata,String dari, String ke, Context c){
+        if(c!=null){
+            Language languageDari=null;
+            switch (dari){
+                case "id" : languageDari=Language.INDONESIAN; break;
+                case "en" : languageDari=Language.ENGLISH; break;
+                case "ja" : languageDari=Language.JAPANESE; break;
+            }
+            Language languageKe=null;
+            switch (ke){
+                case "id" : languageDari=Language.INDONESIAN; break;
+                case "en" : languageDari=Language.ENGLISH; break;
+                case "ja" : languageDari=Language.JAPANESE; break;
+            }
+            Log.d("Bahasa 1", dari + " " + ke);
+            if(languageDari != languageKe){
+                Log.d("bahasa", "ok");
+                com.rmtheis.yandtran.translate.Translate.setKey(c.getString(R.string.yandex_api_key));
+                try {
+                    return com.rmtheis.yandtran.translate.Translate.execute(kata, languageDari, languageKe);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return kata;
+    }
+
+    public static String ubahFormatBahasa(String id){
+        switch (id){
+            case "2" : return "id";
+            case "3" : return "en";
+            case "4" : return "en";
+            case "5" : return "ja";
+        }
+        return "ja";
+    }
+
+    public static String deteksiBahasa(String kata, Context c){
+        if(c!=null){
+            try {
+                return com.rmtheis.yandtran.translate.Translate.deteksiBahasa(kata, c.getString(R.string.yandex_api_key));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "en";
     }
 
     public static  String ubahBahasaChat(String kata,String langID, Context c){
@@ -779,6 +902,20 @@ public class Utilities {
         }
         return kata;
     }
+
+    public static String dapatkanResponse(final java.net.URL url) throws Exception {
+        StringBuilder hasil = new StringBuilder();
+        HttpURLConnection koneksi = (HttpURLConnection) url.openConnection();
+        koneksi.setRequestMethod("GET");
+        BufferedReader br = new BufferedReader(new InputStreamReader(koneksi.getInputStream()));
+        String line;
+        while ((line = br.readLine()) != null) {
+            hasil.append(line);
+        }
+        br.close();
+        return hasil.toString();
+    }
+
     public static String cekNull(String str){
         if(str==null)
             return "null";
@@ -847,6 +984,11 @@ public class Utilities {
         String nama = prefs.getString("nama", null);
         return  nama;
     }
+    public static void setUserNama(Context c, String nama){
+        SharedPreferences.Editor editor = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE).edit();
+        editor.putString("nama", nama);
+        editor.commit();
+    }
     //untuk mendapatkan status pengguna
     public static long getUserBidang(Context c){
         SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
@@ -859,11 +1001,49 @@ public class Utilities {
         String major = prefs.getString("major", null);
         return  major;
     }
+    public static void setUserMajor(Context c, String majorInd){
+        SharedPreferences.Editor editor = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE).edit();
+        editor.putString("major", majorInd);
+        editor.commit();
+    }
     //untuk mendapatkan status negara pengguna
     public static String getUserNegara(Context c){
+        if(c!=null){
+            SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
+            String lang = prefs.getString("lang", null);
+            return lang;
+        }
+        return null;
+    }
+
+    public static String getUserBahasa(Context c){
+        if(c!=null){
+            SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
+            String lang = prefs.getString("bahasa", null);
+            return lang;
+        }
+        return "en";
+    }
+    public static void setUserBahasa(Context c, String bahasa){
+        SharedPreferences.Editor editor = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE).edit();
+        editor.putString("bahasa", bahasa);
+        editor.commit();
+    }
+
+    public static String getUserBahasaDariNegara(String userNegara){
+        switch (userNegara){
+            case "2": return "id";
+            case "3": return "en";
+            case "4": return "en";
+            case "5": return "ja";
+        }
+        return "en";
+    }
+    //untuk mendapatkan url foto pengguna
+    public static String getUserFoto(Context c){
         SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
-        String lang = prefs.getString("lang", null);
-        return lang;
+        String foto = prefs.getString("foto", null);
+        return foto;
     }
     //untuk menghapus data login
     public static void removeDataLogin(Context c){

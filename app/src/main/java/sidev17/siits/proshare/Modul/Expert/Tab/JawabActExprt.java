@@ -3,6 +3,7 @@ package sidev17.siits.proshare.Modul.Expert.Tab;
 import android.app.Activity;
 import android.content.Intent;
 import android.media.Image;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -224,6 +225,27 @@ public class JawabActExprt extends Fragment {
                 }
                 judul.setText(masalah.get(posisi).getproblem_title());
                 isi.setText(masalah.get(posisi).getproblem_desc());
+                String[] judulIsi = {masalah.get(posisi).getproblem_title(), masalah.get(posisi).getproblem_desc()};
+                new AsyncTask<String[], Void, String[]>(){
+
+                    @Override
+                    protected String[] doInBackground(String[]... strings) {
+                        String[] output = strings[0];
+                        for(int i=0;i<output.length;i++){
+                            if(getActivity()!=null)
+                                output[i] = Utilities.ubahBahasa(output[i], Utilities.getUserNegara(getActivity()), getActivity());
+                        }
+                        return  output;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String[] strings) {
+                        if(judul!=null && isi!=null){
+                            judul.setText(strings[0]);
+                            isi.setText(strings[1]);
+                        }
+                    }
+                }.execute(judulIsi);
                // Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
                 Utilities.updateFoto(masalah.get(posisi).getpid(), foto, act);
                 view.setOnClickListener(new View.OnClickListener() {

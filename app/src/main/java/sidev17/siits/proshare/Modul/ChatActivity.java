@@ -156,12 +156,14 @@ public class ChatActivity extends AppCompatActivity{
     }
 
     private void kirimPesan(final String pengirim, final String penerima, final String pesan){
+        String id_pesan = Utilities.getUid();
         ChatPesanItem itempesan = new ChatPesanItem();
         itempesan.setPengirim(pengirim);
         itempesan.setPenerima(penerima);
         itempesan.setPesan(pesan);
         itempesan.setWaktu(Jam());
-        Utilities.getChatRef().push().setValue(itempesan)
+        itempesan.setId(id_pesan);
+        Utilities.getChatRef().child(id_pesan).setValue(itempesan)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
@@ -200,7 +202,7 @@ public class ChatActivity extends AppCompatActivity{
                             });
                             isiPesan.setText("");
                         }else{
-                            Toast.makeText(ChatActivity.this, "Message didn't send!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ChatActivity.this, "Failed to send message!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -217,8 +219,7 @@ public class ChatActivity extends AppCompatActivity{
                     ChatPesanItem chat = snapshot.getValue(ChatPesanItem.class);
                     if((chat.getPenerima().equals(penerima) && chat.getPengirim().equals(pengirim)) ||
                             (chat.getPenerima().equals(pengirim) && chat.getPengirim().equals(penerima))){
-                        Toast.makeText(ChatActivity.this, "ok "+ String.valueOf(++count), Toast.LENGTH_SHORT).show();
-                         listPesan.add(chat);
+                        listPesan.add(chat);
                     }
                 }
                 adapter = new ChatAdapter(ChatActivity.this, listPesan);

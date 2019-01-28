@@ -4,12 +4,14 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +37,7 @@ import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Modul.ChatActivity;
 import sidev17.siits.proshare.Modul.TemanDaftarAct;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.Utilities;
 
 public class FeedbackActExprt extends Fragment {
@@ -43,6 +46,10 @@ public class FeedbackActExprt extends Fragment {
     public static final int PENGGUNA_EXPERT= 201;
     public static final int PENGGUNA_BIASA= 200;
 */
+
+    public final int PENGGUNA_EXPERT_TERVERIFIKASI = 202;
+    public final int PENGGUNA_EXPERT = 201;
+    public final int PENGGUNA_BIASA = 200;
     private FirebaseRecyclerAdapter adapter;
     //FORMAT KONSTANTA INT:
     // xxx >> digit 1: 1,2
@@ -54,18 +61,19 @@ public class FeedbackActExprt extends Fragment {
     private int kategoriExpert[]= {Pengguna.Status.PENGGUNA_EXPERT_TERVERIFIKASI, Pengguna.Status.PENGGUNA_EXPERT,
         Pengguna.Status.PENGGUNA_BIASA, Pengguna.Status.PENGGUNA_EXPERT_TERVERIFIKASI};
 
-//    private String judulSolusi[]= {"What should I do whe this happen?", "How to gain inspiration?", "How to else?", "Stay cool"};
-    private String feedback[][]= {{"I do this everyday, but somehow..."}, {"When it happens, I don't know what to do. I need inspiration."}, {"bla bla bla..."}, {"Just bel cool bro!"}};
+    //    private String judulSolusi[]= {"What should I do whe this happen?", "How to gain inspiration?", "How to else?", "Stay cool"};
+    private String feedback[][] = {{"I do this everyday, but somehow..."}, {"When it happens, I don't know what to do. I need inspiration."}, {"bla bla bla..."}, {"Just bel cool bro!"}};
 
     private RecyclerView wadahFeedback;
     private ImageView mulaiChat;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_beranda_chat_exprt, container, false);
-        wadahFeedback= (RecyclerView)view.findViewById(R.id.feedback_wadah);
-        mulaiChat = (ImageView)view.findViewById(R.id.daftar_pertanyaan_tambah);
+        View view = inflater.inflate(R.layout.fragment_beranda_chat_exprt, container, false);
+        wadahFeedback = (RecyclerView) view.findViewById(R.id.feedback_wadah);
+        mulaiChat = (ImageView) view.findViewById(R.id.daftar_pertanyaan_tambah);
         initDaftarChat();
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setReverseLayout(true);
@@ -74,8 +82,8 @@ public class FeedbackActExprt extends Fragment {
         adapter.startListening();
         adapter.notifyDataSetChanged();
         wadahFeedback.setAdapter(adapter);
-       // AdapterFeedback adpFeedback= new AdapterFeedback();
-      //  wadahFeedback.setAdapter(adpFeedback);
+        // AdapterFeedback adpFeedback= new AdapterFeedback();
+        //  wadahFeedback.setAdapter(adpFeedback);
         mulaiChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,8 +94,8 @@ public class FeedbackActExprt extends Fragment {
                 final Dialog dialog = new Dialog(getActivity());
                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                 dialog.setContentView(R.layout.dialog_mulai_chatt);
-                RelativeLayout next = (RelativeLayout)dialog.findViewById(R.id.mulai_chat);
-                final EditText email = (EditText)dialog.findViewById(R.id.et_email_orang);
+                RelativeLayout next = (RelativeLayout) dialog.findViewById(R.id.mulai_chat);
+                final EditText email = (EditText) dialog.findViewById(R.id.et_email_orang);
                 next.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -123,7 +131,7 @@ NANTI DIPAKE DI TemanTambahAct
         return view;
     }
 
-    void initDaftarChat(){
+    void initDaftarChat() {
         FirebaseRecyclerOptions<ChatListItem> options =
                 new FirebaseRecyclerOptions.Builder<ChatListItem>()
                         .setQuery(Utilities.getChatListRef(getActivity()).child(Utilities.getUserID(getActivity()).replace(".", ",")).orderByChild("jam"), ChatListItem.class)
@@ -145,27 +153,35 @@ NANTI DIPAKE DI TemanTambahAct
             }
         };
     }
-    public class vhChatList extends RecyclerView.ViewHolder{
+
+    public class vhChatList extends RecyclerView.ViewHolder {
         private TextView prevChat, nama, waktu;
         private ImageView centang;
         private CircleImageView foto;
         private View view;
+
         public vhChatList(View itemView) {
             super(itemView);
             view = itemView;
-            prevChat = (TextView)itemView.findViewById(R.id.feedback_orang_chat);
-            nama = (TextView)itemView.findViewById(R.id.feedback_orang_nama);
-            waktu = (TextView)itemView.findViewById(R.id.feedback_waktu);
-            centang = (ImageView)itemView.findViewById(R.id.tl_orang_centang);
-            foto = (CircleImageView)itemView.findViewById(R.id.tl_orang_gambar);
+            prevChat = (TextView) itemView.findViewById(R.id.feedback_orang_chat);
+            nama = (TextView) itemView.findViewById(R.id.feedback_orang_nama);
+            waktu = (TextView) itemView.findViewById(R.id.feedback_waktu);
+            centang = (ImageView) itemView.findViewById(R.id.tl_orang_centang);
+            foto = (CircleImageView) itemView.findViewById(R.id.tl_orang_gambar);
         }
 
         public void initList(final ChatListItem listPesan) {
             //Data Untuk orang
+
 /*
             if(listPesan.getOrang().getStatus() == Pengguna.Status.PENGGUNA_EXPERT){
                 centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
             }else if(listPesan.getOrang().getStatus() == Pengguna.Status.PENGGUNA_EXPERT_TERVERIFIKASI){
+=======
+            if (listPesan.getOrang().getStatus() == 201) {
+                centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
+            } else if (listPesan.getOrang().getStatus() == 202) {
+>>>>>>> Stashed changes
                 centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
             }
 */
@@ -173,11 +189,12 @@ NANTI DIPAKE DI TemanTambahAct
             String delegate = "hh:mm aaa";
             prevChat.setText(listPesan.getPrewMessage());
             nama.setText(listPesan.getNama());
-            waktu.setText(String.valueOf(DateFormat.format(delegate,listPesan.getJam())));
-            if(listPesan.getOrang().getPhotoProfile()!=null){
-                foto.setPadding(0,0,0,0);
+            waktu.setText(String.valueOf(DateFormat.format(delegate, listPesan.getJam())));
+            if (listPesan.getOrang().getPhotoProfile() != null) {
+                foto.setPadding(0, 0, 0, 0);
                 Glide.with(getActivity()).load(listPesan.getOrang().getPhotoProfile()).into(foto);
             }
+
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -187,8 +204,69 @@ NANTI DIPAKE DI TemanTambahAct
                     startActivity(i);
                 }
             });
+            /*
+            final Terjemahan terjemahan = new Terjemahan(getActivity());
+            int responTerjemahan = terjemahan.terjemahkanDaftarChat(view, listPesan, Utilities.getUserBahasa(getActivity()), Utilities.getUserID(getActivity()));
+            if (responTerjemahan == Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_DITEMUKAN) {
+                new AsyncTask<String, Void, String>() {
+
+                    @Override
+                    protected String doInBackground(String... strings) {
+                        String output = strings[0];
+                        String bahasaDeteksi = Utilities.deteksiBahasa(output, getActivity());
+                        String bahasaKita = Utilities.getUserBahasa(getActivity());
+                        Log.d("Bahasa", bahasaDeteksi + " " + bahasaKita);
+                        if (!bahasaDeteksi.equalsIgnoreCase(bahasaKita))
+                            output = Terjemahan.terjemahkan(output, bahasaDeteksi, bahasaKita);
+                        else output = Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_PERLU;
+                        return output;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String s) {
+                        if (!s.equalsIgnoreCase(Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_PERLU) && !s.equalsIgnoreCase(listPesan.getPrewMessage())) {
+                            prevChat.setText(s);
+                            if (getActivity() != null)
+                                terjemahan.simpanTerjemahanDaftarChat(listPesan, s, Utilities.getUserBahasa(getActivity()), Utilities.getUserID(getActivity()));
+                        } else {
+                            if (getActivity() != null)
+                                terjemahan.simpanTerjemahanDaftarChat(listPesan, listPesan.getPrewMessage(), Utilities.getUserBahasa(getActivity()), Utilities.getUserID(getActivity()));
+                        }
+                    }
+                }.execute(listPesan.getPrewMessage());
+            } else if (responTerjemahan == Terjemahan.TerjemahanDbHelper.TERJEMAHAN_PERLU_DIPERBARUI) {
+                new AsyncTask<String, Void, String>() {
+
+                    @Override
+                    protected String doInBackground(String... strings) {
+                        String output = strings[0];
+                        String bahasaDeteksi = Utilities.deteksiBahasa(output, getActivity());
+                        String bahasaKita = Utilities.getUserBahasa(getActivity());
+                        Log.d("Bahasa", bahasaDeteksi + " " + bahasaKita);
+                        if (!bahasaDeteksi.equalsIgnoreCase(bahasaKita))
+                            output = Terjemahan.terjemahkan(output, bahasaDeteksi, bahasaKita);
+                        else output = Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_PERLU;
+                        return output;
+                    }
+
+                    @Override
+                    protected void onPostExecute(String s) {
+                        if (!s.equalsIgnoreCase(Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_PERLU) && !s.equalsIgnoreCase(listPesan.getPrewMessage())) {
+                            prevChat.setText(s);
+                            if (getActivity() != null)
+                                terjemahan.perbaruiTerjemahanDaftarChat(Utilities.getUserID(getActivity()), listPesan.getOrang().getEmail(), s, Utilities.getUserBahasa(getActivity()));
+                        } else {
+                            if (getActivity() != null)
+                                terjemahan.simpanTerjemahanDaftarChat(listPesan, listPesan.getPrewMessage(), Utilities.getUserBahasa(getActivity()), Utilities.getUserID(getActivity()));
+                        }
+                    }
+                }.execute(listPesan.getPrewMessage());
+            } else if (responTerjemahan == Terjemahan.TerjemahanDbHelper.TERJEMAHAN_DITEMUKAN) ;
+            */
         }
+
     }
+
     private String Jam() {
         String delegate = "hh:mm aaa";
         return (String) DateFormat.format(delegate, Calendar.getInstance().getTime());

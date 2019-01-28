@@ -1,25 +1,33 @@
 package sidev17.siits.proshare.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
 import sidev17.siits.proshare.Model.ChatPesanItem;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.Utilities;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.VhChatRoom> {
     private static final int CHAT_KITA = 2223;
     private static final int CHAT_ORANG = 3332;
-    private Context c;
+    private Activity c;
     private ArrayList<ChatPesanItem> chat;
-    public ChatAdapter(Context c, ArrayList<ChatPesanItem> chat){
+    public ChatAdapter(Activity c, ArrayList<ChatPesanItem> chat){
         this.c = c;
         this.chat = chat;
     }
@@ -36,8 +44,20 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.VhChatRoom> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull VhChatRoom holder, int position) {
+    public void onBindViewHolder(@NonNull final VhChatRoom holder, final int position) {
         holder.siapkanItem(chat.get(position));
+        final ViewTreeObserver observer = holder.latar.getViewTreeObserver();
+        observer.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if(!holder.loaded[position]){
+                    int lebarSekarang = holder.latar.getWidth();
+                    if(lebarSekarang>holder.maxLebar)
+                        holder.latar.getLayoutParams().width = holder.maxLebar;
+                    holder.loaded[position] = true;
+                }
+            }
+        });
     }
 
     @Override
@@ -71,16 +91,90 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.VhChatRoom> {
     }
 
     public class VhChatRoom extends RecyclerView.ViewHolder{
-        private TextView waktu, pesan;
+        private TextView waktu, pesan, pesanDiterjemahkan;
+        private RelativeLayout latar, latarTerjemahan;
+        private int maxLebar, lebar;
+        private boolean[] loaded;
+        private View view;
         public VhChatRoom(View itemView) {
             super(itemView);
+            view = itemView;
             waktu = itemView.findViewById(R.id.chat_waktu);
             pesan = itemView.findViewById(R.id.chat_teks);
+            pesanDiterjemahkan = itemView.findViewById(R.id.chat_teks_translated);
+            latarTerjemahan = itemView.findViewById(R.id.chat_latar_translated);
+            latar = itemView.findViewById(R.id.chat_latar);
+            loaded = new boolean[chat.size()];
+            for(int i = 0; i<loaded.length; i++)
+                loaded[i] = false;
         }
 
-        public void siapkanItem(ChatPesanItem pesanItem) {
+        public void siapkanItem(final ChatPesanItem pesanItem) {
+            DisplayMetrics dm = new DisplayMetrics();
+            c.getWindowManager().getDefaultDisplay().getMetrics(dm);
+            lebar = dm.widthPixels;
+            maxLebar = lebar - Utilities.dpToPx(100.0f, c);
             waktu.setText(pesanItem.getWaktu());
             pesan.setText(pesanItem.getPesan());
+            if(!pesanItem.getPengirim().equals(Utilities.getUserNow().getEmail())){
+                final Terjemahan terjemahan = new Terjemahan(c);
+                int responTerjemahan = terjemahan.terjemahkanChat(view, pesanItem, Utilities.getUserBahasa(c));
+                if(responTerjemahan==Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_DITEMUKAN){
+                    new AsyncTask<String, Void, String>(){
+
+                        @Override
+                        protected String doInBackground(String... strings) {
+                            String output = strings[0];
+                            String bahasaDeteksi = Utilities.deteksiBahasa(output, c);
+                            String bahasaKita = Utilities.getUserBahasa(c);
+                            Log.d("Bahasa", bahasaDeteksi + " " + bahasaKita);
+                            if(!bahasaDeteksi.equalsIgnoreCase(bahasaKita))
+                                output = Terjemahan.terjemahkan(output, bahasaDeteksi,  bahasaKita);
+                            else output = Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_PERLU;
+                            return output;
+                        }
+
+                        @Override
+                        protected void onPostExecute(String s) {
+                            if (!s.equalsIgnoreCase(Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_PERLU) && !s.equalsIgnoreCase(pesanItem.getPesan())) {
+                                latarTerjemahan.setVisibility(View.VISIBLE);
+                                pesanDiterjemahkan.setText(s);
+                                terjemahan.simpanTerjemahanChat(pesanItem, s, Utilities.getUserBahasa(c));
+                            } else {
+                                latarTerjemahan.setVisibility(View.GONE);
+                                terjemahan.simpanTerjemahanChat(pesanItem, pesanItem.getPesan(), Utilities.getUserBahasa(c));
+                            }
+                        }
+                    }.execute(pesanItem.getPesan());
+                }else if(responTerjemahan==Terjemahan.TerjemahanDbHelper.TERJEMAHAN_PERLU_DIPERBARUI){
+                    new AsyncTask<String, Void, String>(){
+
+                        @Override
+                        protected String doInBackground(String... strings) {
+                            String output = strings[0];
+                            String bahasaDeteksi = Utilities.deteksiBahasa(output, c);
+                            String bahasaKita = Utilities.getUserBahasa(c);
+                            Log.d("Bahasa", bahasaDeteksi + " " + bahasaKita);
+                            if(!bahasaDeteksi.equalsIgnoreCase(bahasaKita))
+                               output = Terjemahan.terjemahkan(output, bahasaDeteksi,bahasaKita);
+                            else output = Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_PERLU;
+                            return output;
+                        }
+
+                        @Override
+                        protected void onPostExecute(String s) {
+                            if(!s.equalsIgnoreCase(Terjemahan.TerjemahanDbHelper.TERJEMAHAN_TIDAK_PERLU) && !s.equalsIgnoreCase(pesanItem.getPesan())) {
+                                latarTerjemahan.setVisibility(View.VISIBLE);
+                                pesanDiterjemahkan.setText(s);
+                                terjemahan.perbaruiTerjemahanChat(pesanItem.getId(), s, Utilities.getUserBahasa(c));
+                            }else {
+                                latarTerjemahan.setVisibility(View.GONE);
+                                terjemahan.simpanTerjemahanChat(pesanItem, pesanItem.getPesan(), Utilities.getUserBahasa(c));
+                            }
+                        }
+                    }.execute(pesanItem.getPesan());
+                }else if(responTerjemahan==Terjemahan.TerjemahanDbHelper.TERJEMAHAN_DITEMUKAN);
+            }
         }
     }
 }
