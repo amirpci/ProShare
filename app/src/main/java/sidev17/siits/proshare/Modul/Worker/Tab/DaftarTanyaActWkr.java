@@ -186,7 +186,7 @@ public class DaftarTanyaActWkr extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        loadDaftarPertanyaan();
+        loadData();
     }
 
     public class RC_Masalah extends RecyclerView.Adapter<RC_Masalah.vH>{
@@ -281,4 +281,5 @@ public class DaftarTanyaActWkr extends Fragment {
             }
         }
     }
+
 }

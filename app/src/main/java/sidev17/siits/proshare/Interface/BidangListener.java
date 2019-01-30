@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Modul;
+package sidev17.siits.proshare.Interface;
 
 public interface BidangListener {
 

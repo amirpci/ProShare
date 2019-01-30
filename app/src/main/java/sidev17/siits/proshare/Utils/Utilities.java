@@ -13,9 +13,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.support.annotation.NonNull;
@@ -45,7 +43,6 @@ import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -70,19 +67,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.annotation.Target;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -95,8 +87,6 @@ import sidev17.siits.proshare.Model.Country;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
-import sidev17.siits.proshare.Modul.BidangListener;
-import sidev17.siits.proshare.Modul.TemanTambahAct;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.R;
 
@@ -160,7 +150,7 @@ public class Utilities {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public static String loadBidangTerjemahan(String bidangIndex, Context c){
+    public static String loadBidangKu(String bidangIndex, Context c){
         String respons = dapatkanResponsePost(Konstanta.BIDANGKU, new ParameterReq("majority_id", bidangIndex));
         try {
            // Log.d("respons", respons);
@@ -871,9 +861,9 @@ public class Utilities {
             }
             Language languageKe=null;
             switch (ke){
-                case "id" : languageDari=Language.INDONESIAN; break;
-                case "en" : languageDari=Language.ENGLISH; break;
-                case "ja" : languageDari=Language.JAPANESE; break;
+                case "id" : languageKe=Language.INDONESIAN; break;
+                case "en" : languageKe=Language.ENGLISH; break;
+                case "ja" : languageKe=Language.JAPANESE; break;
             }
             Log.d("Bahasa 1", dari + " " + ke);
             if(languageDari != languageKe){

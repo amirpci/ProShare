@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.AsyncTask;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -14,6 +16,7 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.util.ArrayList;
 
+import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
 import sidev17.siits.proshare.Model.ChatListItem;
 import sidev17.siits.proshare.Model.ChatPesanItem;
 import sidev17.siits.proshare.R;
@@ -74,6 +77,28 @@ public class Terjemahan {
         chatTerjemah.perbaruiTerjemahanDaftarChat(idKita, idOrang, terjemahan,
                 new KolomIsi<String>(TerjemahanChat.AtributDaftarChat.ISI_TERJEMAHAN, terjemahan),
                 new KolomIsi<String>(TerjemahanChat.AtributDaftarChat.ID_BAHASA, id_bahasa));
+    }
+
+    public static void terjemahkanAsync(String[] kata, final Context c, final PerubahanTerjemahListener listener){
+        new AsyncTask<String, Void, String[]>(){
+
+            @Override
+            protected String[] doInBackground(String... strings) {
+                String[] output = strings;
+                String dari = "en";
+                String ke = Utilities.getUserBahasa(c);
+                for (int i = 0; i < output.length; i++) {
+                    output[i] = Utilities.ubahBahasaSilang(output[i],dari, ke, c);
+                    Log.d("terjemahan"+String.valueOf(i), output[i]);
+                }
+                return output;
+            }
+
+            @Override
+            protected void onPostExecute(String[] s) {
+                listener.dataBerubah(s);
+            }
+        }.execute(kata);
     }
 
     public static String terjemahkan(String kata, String dari, String ke) {

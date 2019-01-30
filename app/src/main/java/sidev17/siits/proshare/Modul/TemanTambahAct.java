@@ -1,9 +1,7 @@
 package sidev17.siits.proshare.Modul;
 
 import android.os.AsyncTask;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -22,13 +20,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import sidev17.siits.proshare.Interface.BidangListener;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Teman;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.PackBahasa;
 import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.Utilities;
-import sidev17.siits.proshare.Utils.ViewTool.Kotak;
 
 public class TemanTambahAct extends AppCompatActivity implements BidangListener {
 
@@ -119,7 +117,7 @@ public class TemanTambahAct extends AppCompatActivity implements BidangListener 
 
                             @Override
                             protected String doInBackground(String... integers) {
-                                return Utilities.loadBidangTerjemahan(integers[0], TemanTambahAct.this);
+                                return Utilities.loadBidangKu(integers[0], TemanTambahAct.this);
                             }
 
                             @Override

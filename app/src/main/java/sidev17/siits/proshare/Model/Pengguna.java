@@ -30,6 +30,18 @@ public class Pengguna implements Serializable {
             }
             return false;
         }
+
+        public static int statusStr(long status){
+            switch ((int) status){
+                case PENGGUNA_BIASA :
+                    return 0;
+                case PENGGUNA_EXPERT :
+                    return 1;
+                case PENGGUNA_EXPERT_TERVERIFIKASI :
+                    return 2;
+            }
+            return 0;
+        }
     }
 
     private String nama;

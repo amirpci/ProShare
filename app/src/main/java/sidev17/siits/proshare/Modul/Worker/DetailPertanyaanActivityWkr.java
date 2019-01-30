@@ -10,7 +10,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,7 +34,6 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.rmtheis.yandtran.language.Language;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,13 +51,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
-import sidev17.siits.proshare.Modul.SettingAct;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
+import sidev17.siits.proshare.Utils.PackBahasa;
+import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.View.ImgViewTouch;
 import sidev17.siits.proshare.Utils.View.MenuBarView;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
@@ -495,9 +495,9 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     }
     private void isiViewPertanyaan(){
         viewPertanyaan= getLayoutInflater().inflate(R.layout.model_timeline_pertanyaan, null, false);
-        TextView teksJudul= viewPertanyaan.findViewById(R.id.tl_judul);
-        TextView teksMajority= viewPertanyaan.findViewById(R.id.tl_majority);
-        TextView teksDeskripsi= viewPertanyaan.findViewById(R.id.tl_deskripsi);
+        final TextView teksJudul= viewPertanyaan.findViewById(R.id.tl_judul);
+        final TextView teksMajority= viewPertanyaan.findViewById(R.id.tl_majority);
+        final TextView teksDeskripsi= viewPertanyaan.findViewById(R.id.tl_deskripsi);
         TextView teksNama = viewPertanyaan.findViewById(R.id.tl_nama_orang);
         TextView teksStatusOrang = viewPertanyaan.findViewById(R.id.tl_status_orang);
         TextView teksWaktu = viewPertanyaan.findViewById(R.id.tl_waktu);
@@ -581,9 +581,10 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         }
         System.out.println();
 
-        teksJudul.setText(Utilities.ubahBahasa(judulPertanyaan, Utilities.getUserNegara(this), this));
-        Utilities.loadBidang(majorityPertanyaan, Utilities.getUserNegara(this), teksMajority, this);
-        teksDeskripsi.setText(Utilities.ubahBahasa(deskripsiPertanyaan, Utilities.getUserNegara(this), this));
+        teksJudul.setText(judulPertanyaan);
+        teksMajority.setText("");
+        teksDeskripsi.setText(deskripsiPertanyaan);
+        loadPertanyaanLagi(teksJudul, teksMajority, teksDeskripsi);
         Utilities.loadFotoLampiran(fotoLampiran, videoLampiran, lampiran, this, id_masalah);
         switch (this.statusPertanyaan){
             case Konstanta.PROBLEM_STATUS_UNVERIFIED:
@@ -614,6 +615,38 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 break;
         }
      //   Toast.makeText(this, waktu, Toast.LENGTH_SHORT).show();
+    }
+
+    private void loadPertanyaanLagi(final TextView teksJudul, final TextView teksMajority, final TextView teksDeskripsi){
+        String akanDiterjemahkan[] = {judulPertanyaan, deskripsiPertanyaan};
+        Terjemahan.terjemahkanAsync(akanDiterjemahkan, DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
+            @Override
+            public void dataBerubah(String[] kata) {
+                teksJudul.setText(kata[0]);
+                teksDeskripsi.setText(kata[1]);
+            }
+        });
+
+        new AsyncTask<Void, Void, String>(){
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                String output = "";
+                output = Utilities.loadBidangKu(majorityPertanyaan, DetailPertanyaanActivityWkr.this);
+                return output;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                String[] akanDiterjemahkan = {s};
+                Terjemahan.terjemahkanAsync(akanDiterjemahkan, DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
+                    @Override
+                    public void dataBerubah(String[] kata) {
+                        teksMajority.setText(kata[0]);
+                    }
+                });
+            }
+        }.execute();
     }
 
     private void tampilanToastDiterjemahkan(String pesan){
@@ -1232,37 +1265,9 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 namaPemilik= user.getNama();
                 urlFotoOrang = Utilities.cekNull(user.getPhotoProfile()); urlFotoOrangLoaded = true;
                 nama.setText(namaPemilik);
-                Language languageID=null;
-                switch (Integer.parseInt(user.getNegara())){
-                    case 2 : languageID=Language.INDONESIAN; break;
-                    case 3 : languageID=Language.ENGLISH; break;
-                    case 4 : languageID=Language.ENGLISH; break;
-                    case 5 : languageID=Language.JAPANESE; break;
-                }
-                com.rmtheis.yandtran.translate.Translate.setKey(getString(R.string.yandex_api_key));
-                try {
-                    switch ((int)user.getStatus()){
-                        case 200 :
-                            majorPemilik = Utilities.ubahBahasa("Worker", Utilities.getUserNegara(getApplicationContext()), getApplicationContext());
-                            status.setText(majorPemilik);
-                            statusPemilik= PENGGUNA_BIASA;
-                            break;
-                        case 201 :
-                            majorPemilik = Utilities.ubahBahasa("Expert", Utilities.getUserNegara(getApplicationContext()), getApplicationContext());
-                            status.setText(majorPemilik);
-                            statusPemilik= PENGGUNA_EXPERT;
-                            break;
-                        case 202 :
-                            majorPemilik = Utilities.ubahBahasa("Verified Expert", Utilities.getUserNegara(getApplicationContext()), getApplicationContext());
-                            status.setText(majorPemilik);
-                            statusPemilik= PENGGUNA_EXPERT_TERVERIFIKASI;
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 if(user.getPhotoProfile()!=null)
                     Glide.with(DetailPertanyaanActivityWkr.this).load(user.getPhotoProfile()).into(fotoProfil);
+                status.setText(PackBahasa.statusOrang[Terjemahan.indexBahasa(DetailPertanyaanActivityWkr.this)][Pengguna.Status.statusStr(user.getStatus())]);
             }
 
             @Override
@@ -1271,6 +1276,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             }
         });
     }
+
     private String[] ambilDaftarVoter(String idPostingan){
         //ambil daftar voter tiap postingan (pertanyaan, solusi, atau komentar).
         return null;

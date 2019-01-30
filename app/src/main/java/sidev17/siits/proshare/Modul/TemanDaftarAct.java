@@ -130,7 +130,7 @@ public class TemanDaftarAct extends AppCompatActivity {
         }
 
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
+        public View getView(final int position, View convertView, ViewGroup parent) {
             View viewKolom= getLayoutInflater().inflate(R.layout.model_kolom_chat, null);
 
             TextView vNamaTeman= viewKolom.findViewById(R.id.feedback_orang_nama);
@@ -142,7 +142,33 @@ public class TemanDaftarAct extends AppCompatActivity {
             vBidangTeman.setText(daftarTeman.ambil(position).getBidang());
             Pengguna.Status.pasangIndikatorStatus(vStatus, (int)daftarTeman.ambil(position).getStatus());
 
+            viewKolom.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mulaiChat(daftarTeman.ambil(position));
+                }
+            });
+
             return viewKolom;
         }
+    }
+
+    private void mulaiChat(Teman teman){
+        Utilities.getUserRef().child(teman.getEmail().replace(".", ",")).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                Pengguna orang = dataSnapshot.getValue(Pengguna.class);
+                Intent i = new Intent(TemanDaftarAct.this, ChatActivity.class);
+                //i.putExtra("idPesan", listPesan.getIdPesan());
+                i.putExtra("pengguna", orang);
+                //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
+                startActivity(i);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

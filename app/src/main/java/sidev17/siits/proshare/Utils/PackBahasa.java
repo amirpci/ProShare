@@ -22,4 +22,10 @@ public class PackBahasa {
             { "Berhasil menambahkan teman!", "Gagal menambahkan teman!", "Sudah ditambahkan sebagai teman!"},
             { "友達を追加することができました！", "友達を追加できませんでした！", "すでに友達を追加しました！"}};
     public static String[] errorToast = {"Might error occured!", "Mungkin terjadi kesalahan!", };
+    public static String[][] statusOrang = {{"Worker", "Expert", "Verified Expert"},
+                                            {"Pekerja", "Ahli", "Ahli Terverifikasi"},
+                                            {"ワーカー", "エキスパート", "認証エキスパート"}};
+    public static String[][] tambahKnowledge = {{"Your Title Goes Here", "You insert description here about your problem"}
+    ,{"Judul Anda di Sini", "Anda memasukkan deskripsi di sini tentang masalah Anda"} ,
+            { "あなたのタイトルはここに来ます","あなたはあなたの問題についてここに説明を挿入します"}};
 }
