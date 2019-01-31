@@ -3,12 +3,14 @@ package sidev17.siits.proshare.Modul.Worker;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
@@ -48,8 +50,8 @@ public class MainActivityWkr extends Aktifitas {
         setContentView(R.layout.activity_main_wkr);
 
 
-        final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr, R.id.tab_tl_ikon_wkr, R.id.tab_feedback_ikon_Exprt},
-                {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, R.id.tab_tl_garis_wkr, R.id.tab_feedback_garis_Exprt}};
+        final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr/*, R.id.tab_tl_ikon_wkr*/, R.id.tab_feedback_ikon_Exprt},
+                {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, /*R.id.tab_tl_garis_wkr,*/ R.id.tab_feedback_garis_Exprt}};
 
         final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
                 {R.color.colorPrimary, R.color.colorPrimaryDark}};
@@ -58,13 +60,13 @@ public class MainActivityWkr extends Aktifitas {
         garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis_wkr);
         tmb_Profile = findViewById(R.id.tab_profile_wkr);
         tmb_Tanya = findViewById(R.id.tab_tanya_wkr);
-        tmb_Jawab = findViewById(R.id.tab_tl_wkr);
+//        tmb_Jawab = findViewById(R.id.tab_tl_wkr);
         tmb_Chat = findViewById(R.id.tab_feedback_wkr);
 
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
         adapter.AddFragment(new ProfileActWkr(), "");
-        adapter.AddFragment(new DaftarTanyaActWkr(), "");
+//        adapter.AddFragment(new DaftarTanyaActWkr(), "");
         adapter.AddFragment(new ShareActWkr(), "");
         adapter.AddFragment(new ChatExprt(), "");
         mvPager.setAdapter(adapter);
@@ -110,18 +112,18 @@ public class MainActivityWkr extends Aktifitas {
         });
 
 //        garis_Jawab= (ImageView) findViewById(R.id.tab_jawab_garis);
-        tmb_Jawab.setOnClickListener(new View.OnClickListener() {
+/*        tmb_Jawab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                tampilkan(new ShareActWkr(), 2);
                 gantiWarnaTab(2, tmbTab[0], tmbTab[1], warnaTab);
             }
-        });
+        });*/
         tmb_Chat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //                tampilkan(new ChatExprt(), 3);
-                gantiWarnaTab(3, tmbTab[0], tmbTab[1], warnaTab);
+                gantiWarnaTab(2, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
     }

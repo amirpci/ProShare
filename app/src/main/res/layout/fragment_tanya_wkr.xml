@@ -106,4 +106,16 @@
             app:LoadingDots_dots_size="18dp"
             app:LoadingDots_dots_space="1dp"/>
     </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/timeline_tambah"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="30dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/latar_lingkaran"
+        android:backgroundTint="@color/biruLaut"
+        android:src="@drawable/obj_pensil"
+        android:tint="#FFFFFF"
+        android:padding="15dp"/>
 </FrameLayout>

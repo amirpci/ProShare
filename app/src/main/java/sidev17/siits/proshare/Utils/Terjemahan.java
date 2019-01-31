@@ -79,14 +79,12 @@ public class Terjemahan {
                 new KolomIsi<String>(TerjemahanChat.AtributDaftarChat.ID_BAHASA, id_bahasa));
     }
 
-    public static void terjemahkanAsync(String[] kata, final Context c, final PerubahanTerjemahListener listener){
+    public static void terjemahkanAsync(String[] kata, final String dari, final String ke, final Context c, final PerubahanTerjemahListener listener){
         new AsyncTask<String, Void, String[]>(){
 
             @Override
             protected String[] doInBackground(String... strings) {
                 String[] output = strings;
-                String dari = "en";
-                String ke = Utilities.getUserBahasa(c);
                 for (int i = 0; i < output.length; i++) {
                     output[i] = Utilities.ubahBahasaSilang(output[i],dari, ke, c);
                     Log.d("terjemahan"+String.valueOf(i), output[i]);

@@ -28,4 +28,7 @@ public class PackBahasa {
     public static String[][] tambahKnowledge = {{"Your Title Goes Here", "You insert description here about your problem"}
     ,{"Judul Anda di Sini", "Anda memasukkan deskripsi di sini tentang masalah Anda"} ,
             { "あなたのタイトルはここに来ます","あなたはあなたの問題についてここに説明を挿入します"}};
+    public static String[][] tambahToast = {{"Please fill in the title or description!", "Please select a majority!"},
+            {"Silahkan isi judul atau deskripsi!", "Silahkan pilih bidang!"},
+            {"タイトルまたは説明を入力してください","フィールドを選択してください"}};
 }

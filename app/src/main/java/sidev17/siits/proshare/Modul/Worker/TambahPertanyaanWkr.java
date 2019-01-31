@@ -24,6 +24,7 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,11 +47,11 @@ import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
-import sidev17.siits.proshare.Utils.PackBahasa;
-import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.BitmapHandler;
+import sidev17.siits.proshare.Utils.ViewTool.EditTextMod;
 import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
+
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
 
@@ -83,11 +84,11 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private String kategoriItem= "foto"; // "foto" atau "video" tergantung tab yang dipilih
     private boolean transisiKategori= false;
 
-/*
-================================
-untuk foto atau video yang habis didownload / dari server
-================================
-*/
+    /*
+    ================================
+    untuk foto atau video yang habis didownload / dari server
+    ================================
+    */
     private int jmlItemAwal= 0;
 /*  private "FileGambar" gambarAwal[] //kalau bisa tipe Bitmap
 
@@ -102,11 +103,11 @@ untuk foto atau video yang habis didownload / dari server
 //    private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
 //    private ArrayList<String> pathFotoDipilih = new ArrayList<String>();
 
-/*
-    private int dipilih[];
-    private ArrayList<Bitmap> filePhotoDipilih = new ArrayList<Bitmap>();
-    private ArrayList<Integer> intDipilih= new ArrayList<Integer>();
-*/
+    /*
+        private int dipilih[];
+        private ArrayList<Bitmap> filePhotoDipilih = new ArrayList<Bitmap>();
+        private ArrayList<Integer> intDipilih= new ArrayList<Integer>();
+    */
     private ArrayList<View> viewDipilih = new ArrayList<View>();
 
     private final int JML_BUFFER_FOTO= 12;
@@ -118,8 +119,25 @@ untuk foto atau video yang habis didownload / dari server
 
     private int idHalaman;
 
-    private TextView tmbVerify;
+
+/*
+================================
+Bagian EXPERT / TambahJawaban
+================================
+*/
+
     private boolean verifiedQuestion= false;
+
+    private TextView vBidang;
+
+    private LinearLayout vTindakan;
+    private TextView vTolak;
+    private TextView vLempar;
+    private TextView vJawab;
+
+    private RelativeLayout vWadahPertanyaan;
+
+//================================
 
     protected void setIdHalaman(int idHalaman){
         this.idHalaman= idHalaman;
@@ -138,6 +156,35 @@ untuk foto atau video yang habis didownload / dari server
         setContentView(parentUtama);
 
         if(idHalaman== R.layout.activity_tambah_jawaban_exprt) {
+            vBidang= findViewById(R.id.tambah_bidang);
+
+            vTindakan= findViewById(R.id.tambah_tindakan);
+            vTolak= findViewById(R.id.tambah_tindakan_tolak);
+            vTolak.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    tandaiPertanyaanDitolak();
+                    finish();
+                }
+            });
+            vLempar= findViewById(R.id.tambah_tindakan_lempar);
+            vLempar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    lemparPertanyaan();
+                    finish();
+                }
+            });
+            vJawab= findViewById(R.id.tambah_tindakan_jawab);
+            vJawab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    vTindakan.setVisibility(View.GONE);
+                }
+            });
+
+            isiPertanyaan();
+/*
             tmbVerify = findViewById(R.id.tambah_verify);
             tmbVerify.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -156,6 +203,7 @@ untuk foto atau video yang habis didownload / dari server
                     }
                 }
             });
+*/
         }
         else{
             //==============================================
@@ -201,6 +249,30 @@ untuk foto atau video yang habis didownload / dari server
         inisiasiOk();
     }
 
+    /*
+    ================================
+    Bagian EXPERT / TambahJawaban
+    ================================
+    */
+    private void tandaiPertanyaanDitolak(){
+        //////
+    }
+    private void lemparPertanyaan(){
+        ///////
+    }
+
+    private String ambilBidang(int idBidang){return null;}
+
+    //hanya berisi deskripsi dan lampiran foto atau video pertanyaan
+    //judul dan bidang pertanyaan sudah di-init di header
+    private void isiPertanyaan(){
+        View viewPertanyaan= getLayoutInflater().inflate(R.layout.model_timeline_pertanyaan, null);
+        //Lakukan modifikasi data
+        vWadahPertanyaan.addView(viewPertanyaan);
+    }
+
+//====================================
+
     private void ambilData(){
         Intent intentSebelumnya= getIntent();
 
@@ -212,6 +284,8 @@ untuk foto atau video yang habis didownload / dari server
             teksJudul.setText(judul);
             teksDeskripsi.setText(deskripsi);
             idBidang= bidang;
+            if(idHalaman == R.layout.activity_tambah_jawaban_exprt)
+                vBidang.setText(ambilBidang(idBidang));
         }
 
         //file gambar yang udah diload dari server saat di activity DetailPertanyaan
@@ -286,8 +360,10 @@ untuk foto atau video yang habis didownload / dari server
         teksDeskripsi.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         teksDeskripsi.setMaxLines(1000);
         teksDeskripsi.setSingleLine(false);
-        teksJudul.setHint(PackBahasa.tambahKnowledge[Terjemahan.indexBahasa(this)][0]);
-        teksDeskripsi.setHint(PackBahasa.tambahKnowledge[Terjemahan.indexBahasa(this)][1]);
+        if(idBidang == R.layout.activity_tambah_jawaban_exprt){
+            EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
+            EditTextMod.enableEditText(teksJudul, InputType.TYPE_NULL, false);
+        }
     }
 
     private int ambilWarna(int id){
@@ -464,10 +540,10 @@ untuk foto atau video yang habis didownload / dari server
     ArrayList<String> DUMY_initArrayListMajority(){
         ArrayList<String> majority= new ArrayList<>();
         majority.add("Set majority");
-       // majority.add("Beton");
+        // majority.add("Beton");
         //majority.add("Teknik Lingkungan");
-       // majority.add("Psychiatrist");
-       // majority.add("Artist");
+        // majority.add("Psychiatrist");
+        // majority.add("Artist");
         return majority;
     }
     void initPilihanMajority(ArrayList<Bidang> majority){
@@ -788,16 +864,16 @@ untuk foto atau video yang habis didownload / dari server
         String pathFotoDipilih[] = new String[0];
         if(loader != null)
             pathFotoDipilih= loader.ambilPathDipilih();
-      //  int jmlUdahDiload= loader.ambilJmlUdahDiload();
-      //  int batas= loader.ambilJmlDipilih();
+        //  int jmlUdahDiload= loader.ambilJmlUdahDiload();
+        //  int batas= loader.ambilJmlDipilih();
         String daftarInd= "";
         for(int i=0;i<pathFotoDipilih.length;i++){
             Toast.makeText(this, pathFotoDipilih[i], Toast.LENGTH_SHORT).show();
         }
-       // int dipilih[]= loader.ambilUrutanDipilih();
-       // for(int i= 0; i< batas; i++)
-       ////     daftarInd+= Integer.toString(dipilih[i]) +", ";
-       // Toast.makeText(getBaseContext(), "dipilih \"" +Integer.toString(jmlUdahDiload) +"\": " +daftarInd, Toast.LENGTH_LONG).show();
+        // int dipilih[]= loader.ambilUrutanDipilih();
+        // for(int i= 0; i< batas; i++)
+        ////     daftarInd+= Integer.toString(dipilih[i]) +", ";
+        // Toast.makeText(getBaseContext(), "dipilih \"" +Integer.toString(jmlUdahDiload) +"\": " +daftarInd, Toast.LENGTH_LONG).show();
         String judul= teksJudul.getText().toString();
         String deskripsi= teksDeskripsi.getText().toString();
         boolean verified= verifiedQuestion;
@@ -819,7 +895,7 @@ untuk foto atau video yang habis didownload / dari server
             String urlFotoTerupload[] = new String[1];
             Utilities.uploadFoto(0, pathFotoDipilih, urlFotoTerupload, PId, problem, this, uploading);
         }else{
-            Utilities.tambahkanMasalah(this, PId, problem, uploading, 1);
+            Utilities.tambahkanMasalah(this, problem, uploading, 1);
         }
     }
 

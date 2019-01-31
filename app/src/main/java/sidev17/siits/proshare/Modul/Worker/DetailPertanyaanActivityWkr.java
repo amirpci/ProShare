@@ -192,6 +192,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                     keEdit.putExtra("deskripsi", deskripsiPertanyaan);
                     TextView majority= viewPertanyaan.findViewById(R.id.tl_majority);
                     keEdit.putExtra("bidang", majority.getText().toString());
+                    keEdit.putExtra("urlFoto", fotoLampiran);
 //                keEdit.putExtra("gambarAwal", gambarAwal);
 
                     startActivity(keEdit);
@@ -619,7 +620,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
 
     private void loadPertanyaanLagi(final TextView teksJudul, final TextView teksMajority, final TextView teksDeskripsi){
         String akanDiterjemahkan[] = {judulPertanyaan, deskripsiPertanyaan};
-        Terjemahan.terjemahkanAsync(akanDiterjemahkan, DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
+        Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this),DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
             @Override
             public void dataBerubah(String[] kata) {
                 teksJudul.setText(kata[0]);
@@ -639,7 +640,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             @Override
             protected void onPostExecute(String s) {
                 String[] akanDiterjemahkan = {s};
-                Terjemahan.terjemahkanAsync(akanDiterjemahkan, DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
+                Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this), DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
                     @Override
                     public void dataBerubah(String[] kata) {
                         teksMajority.setText(kata[0]);

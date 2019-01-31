@@ -81,6 +81,8 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import sidev17.siits.proshare.Adapter.RcLampiran;
+import sidev17.siits.proshare.Interface.BitmapServerListener;
+import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Country;
@@ -89,6 +91,7 @@ import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.ViewTool.BitmapHandler;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -177,7 +180,13 @@ public class Utilities {
                             String bidang = jsonArr.getJSONObject(0).getString("bidang");
                             try {
 //                                major.setText(com.rmtheis.yandtran.translate.Translate.execute(bidang, Language.ENGLISH, languageID));
-                                txt_bidang.setText(Utilities.ubahBahasa(bidang, languageID, act));
+                                txt_bidang.setText(bidang);
+                                Terjemahan.terjemahkanAsync(new String[]{bidang}, "en", Utilities.getUserBahasa(act), act, new PerubahanTerjemahListener() {
+                                    @Override
+                                    public void dataBerubah(String[] kata) {
+                                        txt_bidang.setText(kata[0]);
+                                    }
+                                });
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -397,6 +406,29 @@ public class Utilities {
     }
 
     //Untuk masang foto.
+    public static void loadBitmap(ArrayList<String> url, final BitmapServerListener ls){
+        for(int i = 0 ; i<url.size(); i++){
+            final int posisi = i;
+            Picasso.get().load(url.get(i)).resize(100,100).into(new com.squareup.picasso.Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                   ls.bitmapLoaded(bitmap);
+                }
+
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                }
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                }
+            });
+        }
+    }
+
+
     public static void setFotoDariUrlSingle(String url, ImageView gambar, int ukuran){
         Picasso.get().load(url).resize(ukuran,ukuran).centerCrop().into(gambar);
     }
@@ -712,7 +744,7 @@ public class Utilities {
                     @Override
                     public void onSuccess(Uri uri) {
                         String alamatUrl = uri.toString();
-                        Toast.makeText(c, "tes alamat : "+alamatUrl, Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(c, "tes alamat : "+alamatUrl, Toast.LENGTH_SHORT).show();
                         int urutanSekarang = urutanFile+1;
                         String[] url = new String[urutanSekarang];
                         url[urutanFile]=alamatUrl;
@@ -723,7 +755,7 @@ public class Utilities {
                             if(urutanFile!=alamatFile.length-1){
                                 uploadFoto(urutanSekarang, alamatFile, url, id, masalah, c, uploading);
                             }else{
-                                tambahkanMasalah(c, id, masalah, uploading, 0);
+                                tambahkanMasalah(c, masalah, uploading, 0);
                                 tambahkanFotoMasalah(c, id, url);
                             }
                         }else{
@@ -745,6 +777,53 @@ public class Utilities {
             }
         });
     }
+
+    public static void uploadVideo(final int urutanFile, final String[] alamatFile, final String[] urlFile, final String id, final Permasalahan masalah, final Activity c, final ProgressDialog uploading){
+        uploading.setMessage("uploading..."+" "+String.valueOf(urutanFile+1)+"/"+String.valueOf(alamatFile.length)+" 0%");
+        uploading.show();
+        Uri file = Uri.fromFile(new File(alamatFile[urutanFile]));
+        final StorageReference filepath = getProblemVideosRef(id, urutanFile);
+        filepath.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String alamatUrl = uri.toString();
+                        // Toast.makeText(c, "tes alamat : "+alamatUrl, Toast.LENGTH_SHORT).show();
+                        int urutanSekarang = urutanFile+1;
+                        String[] url = new String[urutanSekarang];
+                        url[urutanFile]=alamatUrl;
+                        if(urutanFile<alamatFile.length){
+                            for(int i=0; i<urutanFile; i++){
+                                url[i]=urlFile[i];
+                            }
+                            if(urutanFile!=alamatFile.length-1){
+                                uploadFoto(urutanSekarang, alamatFile, url, id, masalah, c, uploading);
+                            }else{
+                                tambahkanMasalah(c, masalah, uploading, 0);
+                                tambahkanFotoMasalah(c, id, url);
+                            }
+                        }else{
+                            Toast.makeText(c, "Photos succesfully uploaded!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(c, "foto ke "+String.valueOf(urutanFile+1)+" gagal diupload!", Toast.LENGTH_LONG).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                uploading.setMessage("uploading..."+" "+String.valueOf(urutanFile+1)+"/"+String.valueOf(alamatFile.length)+" "+(int)progress+"%");
+            }
+        });
+    }
+
     public static void tambahkanFotoMasalah(final Context c, final String id_masalah, final String[] url_foto){
         Cache cache = new DiskBasedCache(c.getCacheDir(), 1024*1024);
         Network network = new BasicNetwork(new HurlStack());
@@ -777,11 +856,27 @@ public class Utilities {
         }
     }
 
-    public static void tambahkanMasalah(final Activity c, final String id_masalah, final Permasalahan problem, final ProgressDialog uploading, final int status_foto){
+    public static void tambahkanMasalah(final Activity c, final Permasalahan problem, final ProgressDialog uploading, final int status_foto){
         if(status_foto==1) {
             uploading.setMessage("Adding problem to the server!");
             uploading.show();
         }
+        if(Utilities.getUserBahasa(c).equalsIgnoreCase("en")){
+            uploadMasalah(c, problem, uploading, status_foto);
+        } else {
+            String[] akanDiterjemahkan = {problem.getproblem_title(), problem.getproblem_desc()};
+            Terjemahan.terjemahkanAsync(akanDiterjemahkan, Utilities.getUserBahasa(c), "en", c, new PerubahanTerjemahListener() {
+                @Override
+                public void dataBerubah(String[] kata) {
+                    problem.setproblem_title(kata[0]);
+                    problem.setproblem_desc(kata[0]);
+                    uploadMasalah(c, problem, uploading, status_foto);
+                }
+            });
+        }
+    }
+
+    public static void uploadMasalah(final Activity c, final Permasalahan problem, final ProgressDialog uploading, final int status_foto){
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_PROBLEM_URL,
                 new Response.Listener<String>() {
                     @Override
@@ -1164,8 +1259,8 @@ public class Utilities {
         return FirebaseStorage.getInstance().getReference("Problem/"+problemID+"/Photo/photo_"+String.valueOf(urutan));
     }
     //untuk mendapatkan referensi video problem
-    public static StorageReference getProblemVideosRef(String problemID){
-        return FirebaseStorage.getInstance().getReference("Problem/"+problemID+"videos");
+    public static StorageReference getProblemVideosRef(String problemID, int urutan){
+        return FirebaseStorage.getInstance().getReference("Problem/"+problemID+"/Video/photo_"+String.valueOf(urutan));
     }
     //untuk referensi daftar pertanyaan yang pernah diajukan
     public static DatabaseReference getMyQuestionRef(Context c){

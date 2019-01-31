@@ -214,7 +214,6 @@ public class ChatActivity extends AppCompatActivity{
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 listPesan.clear();
-                int count = 0;
                 for(DataSnapshot snapshot : dataSnapshot.getChildren()){
                     ChatPesanItem chat = snapshot.getValue(ChatPesanItem.class);
                     if((chat.getPenerima().equals(penerima) && chat.getPengirim().equals(pengirim)) ||
