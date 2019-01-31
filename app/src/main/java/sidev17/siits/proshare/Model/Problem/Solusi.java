@@ -1,5 +1,7 @@
 package sidev17.siits.proshare.Model.Problem;
 
+import sidev17.siits.proshare.Model.Permasalahan;
+
 public class Solusi {
     String judul;
     String deskripsi;
@@ -10,10 +12,28 @@ public class Solusi {
     String fotoOrang;
     String namaOrang;
     String timestamp;
+    Permasalahan problem;
     int totalVote;
     int voteStatus;
+    int jumlahKomentar;
 
     public Solusi() {
+    }
+
+    public int getJumlahKomentar() {
+        return jumlahKomentar;
+    }
+
+    public void setJumlahKomentar(int jumlahKomentar) {
+        this.jumlahKomentar = jumlahKomentar;
+    }
+
+    public Permasalahan getProblem() {
+        return problem;
+    }
+
+    public void setProblem(Permasalahan problem) {
+        this.problem = problem;
     }
 
     public int getTotalVote() {

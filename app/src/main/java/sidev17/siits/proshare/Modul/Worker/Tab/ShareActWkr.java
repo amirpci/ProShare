@@ -59,19 +59,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import sidev17.siits.proshare.Adapter.SpinnerAdp;
+import sidev17.siits.proshare.Interface.PencarianListener;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Permasalahan;
+import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.AlgoritmaKesamaan;
+import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.Utilities;
 import java.sql.Timestamp;
 
@@ -98,7 +104,8 @@ public class ShareActWkr extends Fragment {
     private DatabaseReference dataRef;
     private StorageReference storageRef;
     private RC_Masalah adapter;
-    private ArrayList<Permasalahan> Masalah;
+    //private ArrayList<Permasalahan> Masalah;
+   //private ArrayList<Solusi> Solusi;
     private RelativeLayout layoutTidakDitemukan;
     private RelativeLayout jumlahDitemukan;
     private static final int UpPhotoID = 2;
@@ -138,14 +145,26 @@ public class ShareActWkr extends Fragment {
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadData();
+                loadData(new PencarianListener() {
+                    @Override
+                    public void ketemu(ArrayList<Solusi> solusi) {
+                        adapter = new RC_Masalah(solusi, getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
+                        rcTimeline.setAdapter(adapter);
+                    }
+                });
             }
         });
         search_input.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    cariMasalahan(search_input.getText().toString());
+                    cariMasalahan(search_input.getText().toString(), new PencarianListener() {
+                        @Override
+                        public void ketemu(ArrayList<Solusi> solusi) {
+                            adapter = new RC_Masalah(solusi, getActivity(), RC_Masalah.TIPE_TIMELINE_CARI);
+                            rcTimeline.setAdapter(adapter);
+                        }
+                    });
                     return true;
                 }
                 return false;
@@ -215,7 +234,6 @@ public class ShareActWkr extends Fragment {
     }
 
     private void bersihkanList(){
-        Masalah.clear();
         adapter.notifyDataSetChanged();
     }
 
@@ -235,23 +253,24 @@ public class ShareActWkr extends Fragment {
             }
         });
     }
-    private void cariMasalahan(final String cari) {
+    private void cariMasalahan(final String cari, final PencarianListener ls) {
         jumlahDitemukan.setVisibility(View.GONE);
-        bersihkanList();
+        //hkanList();
         layoutTidakDitemukan.setVisibility(View.GONE);
         loadingDitemukan.setVisibility(View.VISIBLE);
-
+        final ArrayList<Permasalahan> Masalah = new ArrayList<>();
         if(!useMajority){
             StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SEARCH_URL,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             try {
-                                ArrayList<Permasalahan> semuaPermasalahan = new ArrayList<>();
+                                ArrayList<Solusi> Solusi = new ArrayList<>();
                                 JSONArray jsonArr = new JSONArray(response);
                                 for(int i=0; i<jsonArr.length(); i++){
                                     try {
                                         JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                        Solusi sol = new Solusi();
                                         Permasalahan masalah = new Permasalahan();
                                         masalah.setproblem_desc(jsonObject.getString("problem_desc"));
                                         masalah.setproblem_title(jsonObject.getString("problem_title"));
@@ -260,16 +279,21 @@ public class ShareActWkr extends Fragment {
                                         masalah.setTimestamp(jsonObject.getString("timestamp"));
                                         masalah.setpid(jsonObject.getString("pid"));
                                         masalah.setmajority_id(jsonObject.getString("majority_id"));
-                                        semuaPermasalahan.add(masalah);
+                                        sol.setProblem(masalah);
+                                        sol.setId_solusi(jsonObject.getString("id_solusi"));
+                                        sol.setDeskripsi(jsonObject.getString("deskripsi"));
+                                        sol.setJumlahKomentar(jsonObject.getInt("more"));
+                                        Solusi.add(sol);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                         loadingDitemukan.setVisibility(View.GONE);
                                     }
                                 }
-                                AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(semuaPermasalahan, cari);
-                                Masalah.addAll(algoSama.listKetemu());
-                                adapter.notifyDataSetChanged();
-                                if(Masalah.size()==0){
+                                AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(Solusi, cari);
+                                ls.ketemu(algoSama.listKetemu());
+                               // Masalah.addAll(algoSama.listKetemu());
+                               // adapter.notifyDataSetChanged();
+                                if(Solusi.size()==0){
                                     initTambahPertanyaan();
                                 }else {
                                     tetapkanJumlahKetemu(Masalah.size());
@@ -294,13 +318,14 @@ public class ShareActWkr extends Fragment {
                         @Override
                         public void onResponse(String response) {
                             try {
-                                ArrayList<Permasalahan> semuaPermasalahan = new ArrayList<>();
+                                ArrayList<Solusi> Solusi = new ArrayList<>();
                                 JSONArray jsonArr = new JSONArray(response);
                                 Toast.makeText(getActivity(), "Berhasil loading! dengan panjang "+String.valueOf(jsonArr.length())+" bidang "+String.valueOf(idBidang), Toast.LENGTH_SHORT).show();
                                 for(int i=0; i<jsonArr.length(); i++){
                                     try {
                                         JSONObject jsonObject = jsonArr.getJSONObject(i);
                                         Permasalahan masalah = new Permasalahan();
+                                        Solusi sol = new Solusi();
                                         masalah.setproblem_desc(jsonObject.getString("problem_desc"));
                                         masalah.setproblem_title(jsonObject.getString("problem_title"));
                                         masalah.setproblem_owner(jsonObject.getString("problem_owner"));
@@ -308,16 +333,19 @@ public class ShareActWkr extends Fragment {
                                         masalah.setTimestamp(jsonObject.getString("timestamp"));
                                         masalah.setpid(jsonObject.getString("pid"));
                                         masalah.setmajority_id(jsonObject.getString("majority_id"));
-                                        semuaPermasalahan.add(masalah);
+                                        sol.setProblem(masalah);
+                                        sol.setId_solusi(jsonObject.getString("id_solusi"));
+                                        sol.setDeskripsi(jsonObject.getString("deskripsi"));
+                                        sol.setJumlahKomentar(jsonObject.getInt("more"));
+                                        Solusi.add(sol);
                                     } catch (JSONException e) {
                                         e.printStackTrace();
                                         loadingDitemukan.setVisibility(View.GONE);
                                     }
                                 }
-                                AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(semuaPermasalahan, cari);
-                                Masalah.addAll(algoSama.listKetemu());
-                                adapter.notifyDataSetChanged();
-                                if(Masalah.size()==0){
+                                AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(Solusi, cari);
+                                ls.ketemu(algoSama.listKetemu());
+                                if(Solusi.size()==0){
                                     initTambahPertanyaan();
                                 }else {
                                     tetapkanJumlahKetemu(Masalah.size());
@@ -345,18 +373,24 @@ public class ShareActWkr extends Fragment {
             Volley.newRequestQueue(getActivity()).add(stringRequestBidang);
         }
     }
+
     void loadDaftarPertanyaan(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rcTimeline.setLayoutManager(linearLayoutManager);
         rcTimeline.setLayoutManager(new LinearLayoutManager(getActivity()));
-        Masalah = new ArrayList<>();
-        adapter = new RC_Masalah(Masalah, getActivity());
-        rcTimeline.setAdapter(adapter);
-        loadData();
+       // Solusi = new ArrayList<>();
+        loadData(new PencarianListener() {
+            @Override
+            public void ketemu(ArrayList<sidev17.siits.proshare.Model.Problem.Solusi> solusi) {
+                adapter = new RC_Masalah(solusi, getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
+                rcTimeline.setAdapter(adapter);
+               // adapter.notifyDataSetChanged();
+            }
+        });
     }
-    private void loadData() {
+    private void loadData(final PencarianListener ls) {
         jumlahDitemukan.setVisibility(View.GONE);
-        bersihkanList();
+       // bersihkanList();
         layoutTidakDitemukan.setVisibility(View.GONE);
         refresh.setRefreshing(false);
         loadingDitemukan.setVisibility(View.VISIBLE);
@@ -365,13 +399,14 @@ public class ShareActWkr extends Fragment {
                     @Override
                     public void onResponse(String response) {
 
-                        Masalah.clear();
+                        ArrayList<Solusi> Solusi = new ArrayList<>();
                         try {
                             JSONArray jsonArr = new JSONArray(response);
-                            Log.d("loaddata", "ok"+String.valueOf(jsonArr.length()));
+                            //Log.d("loaddata", "ok"+String.valueOf(jsonArr.length()));
                             for(int i=0; i<jsonArr.length(); i++){
                                 try {
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    Solusi sol = new Solusi();
                                     Permasalahan masalah = new Permasalahan();
                                     Log.d("loadData ", jsonObject.getString("problem_title")+"\n");
                                     masalah.setproblem_desc(jsonObject.getString("problem_desc"));
@@ -381,13 +416,17 @@ public class ShareActWkr extends Fragment {
                                     masalah.setTimestamp(jsonObject.getString("timestamp"));
                                     masalah.setpid(jsonObject.getString("pid"));
                                     masalah.setmajority_id(jsonObject.getString("majority_id"));
-                                    Masalah.add(masalah);
+                                    sol.setProblem(masalah);
+                                    sol.setId_solusi(jsonObject.getString("id_solusi"));
+                                    sol.setDeskripsi(jsonObject.getString("deskripsi"));
+                                    sol.setJumlahKomentar(jsonObject.getInt("more"));
+                                    Solusi.add(sol);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     loadingDitemukan.setVisibility(View.GONE);
                                 }
                             }
-                            adapter.notifyDataSetChanged();
+                            ls.ketemu(Solusi);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -552,17 +591,24 @@ public class ShareActWkr extends Fragment {
         }
     }
     public class RC_Masalah extends RecyclerView.Adapter<RC_Masalah.vH>{
-        private List<Permasalahan> masalah;
+        private List<Solusi> solusi;
+        protected static final int TIPE_TIMELINE_DEFAULT = 2398;
+        protected static final int TIPE_TIMELINE_CARI = 8923;
+        private int tipeSekarang;
         Activity act;
-        public RC_Masalah(List<Permasalahan> masalah, Activity act) {
-            this.masalah = masalah;
+        public RC_Masalah(List<Solusi> solusi, Activity act, int tipe) {
+            this.solusi = solusi;
             this.act = act;
+            tipeSekarang = tipe;
         }
 
         @NonNull
         @Override
         public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
+            if(tipeSekarang == TIPE_TIMELINE_CARI)
+                return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
+            else
+                return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan_timeline, parent, false));
         }
 
         @Override
@@ -572,69 +618,71 @@ public class ShareActWkr extends Fragment {
 
         @Override
         public int getItemCount() {
-            return masalah.size();
+            return solusi.size();
         }
 
         public class vH extends RecyclerView.ViewHolder{
-            private TextView judul, isi;
+            private TextView judulProblem, tanggalProblem, deskripsiSolusi, jumlahKomentar, totalVote, isi;
             private ImageView centang, foto;
+            private LinearLayout lampiranSolusi;
             private View view;
             public vH(View itemView) {
                 super(itemView);
                 view = itemView;
-                centang = (ImageView) itemView.findViewById(R.id.daftar_pertanyaan_centang);
-                judul = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_judul);
-                isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);
-                foto = (ImageView)itemView.findViewById(R.id.daftar_pertanyaan_gambar);
+                judulProblem = itemView.findViewById(R.id.tl_problem_judul);
+                tanggalProblem = itemView.findViewById(R.id.tl_problem_tanggal);
+                totalVote = itemView.findViewById(R.id.tl_problem_total_vote);
+                deskripsiSolusi = itemView.findViewById(R.id.tl_solusi_deskripsi);
+                jumlahKomentar = itemView.findViewById(R.id.tl_komentar_jumlah);
+                lampiranSolusi = itemView.findViewById(R.id.lampiran_solusi);
             }
             public void bind(final int posisi){
+                /*
                 if(masalah.get(posisi).getStatus()==PENGGUNA_EXPERT){
                     centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
                 }else if(masalah.get(posisi).getStatus()==PENGGUNA_BIASA){
                     centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
+                } */
+
+                if(tipeSekarang == TIPE_TIMELINE_DEFAULT){
+                    judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
+                    SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
+                    String waktu = solusi.get(posisi).getProblem().getTimestamp();
+                    Date date = null;
+                    try {
+                        date = format1.parse(waktu);
+                        waktu = format2.format(date);
+                        tanggalProblem.setText(waktu);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                   // tanggalProblem.setText(solusi.get(posisi).getProblem().getTimestamp());
+                    deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
+                    jumlahKomentar.setText("dan "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" komentar lainnya...");
+                } else if(tipeSekarang == TIPE_TIMELINE_CARI){
+                    deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
+                    jumlahKomentar.setText("dan "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" komentar lainnya...");
                 }
-                judul.setText(masalah.get(posisi).getproblem_title());
-                isi.setText(masalah.get(posisi).getproblem_desc());
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Bundle paketDetailPetanyaan= new Bundle();
-                        paketDetailPetanyaan.putString("judul_pertanyaan", masalah.get(posisi).getproblem_title());
-                        paketDetailPetanyaan.putString("deskripsi_pertanyaan", masalah.get(posisi).getproblem_desc());
-                        paketDetailPetanyaan.putString("owner", masalah.get(posisi).getproblem_owner());
-                        paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
-                        paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
-                        paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
+                        paketDetailPetanyaan.putString("judul_pertanyaan", solusi.get(posisi).getProblem().getproblem_title());
+                        paketDetailPetanyaan.putString("deskripsi_pertanyaan", solusi.get(posisi).getProblem().getproblem_desc());
+                        paketDetailPetanyaan.putString("owner", solusi.get(posisi).getProblem().getproblem_owner());
+                        paketDetailPetanyaan.putString("waktu", solusi.get(posisi).getProblem().getTimestamp());
+                        paketDetailPetanyaan.putString("pid", solusi.get(posisi).getProblem().getpid());
+                        paketDetailPetanyaan.putString("majority", solusi.get(posisi).getProblem().getmajority_id());
                         Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                         startActivity(inten);
                     }
                 });
-                String[] judulIsi = {masalah.get(posisi).getproblem_title(), masalah.get(posisi).getproblem_desc()};
-                new AsyncTask<String[], Void, String[]>(){
-
-                    @Override
-                    protected String[] doInBackground(String[]... strings) {
-                        String[] output = strings[0];
-                        for(int i=0;i<output.length;i++){
-                            if(getActivity()!=null)
-                                output[i] = Utilities.ubahBahasaDariId(output[i], Utilities.getUserBahasa(getActivity()), getActivity());
-                        }
-                        return  output;
-                    }
-
-                    @Override
-                    protected void onPostExecute(String[] strings) {
-                        if(judul!=null && isi!=null){
-                            judul.setText(strings[0]);
-                            isi.setText(strings[1]);
-                        }
-                    }
-                }.execute(judulIsi);
                 //  Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
                 // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
-                Utilities.updateFoto(masalah.get(posisi).getpid(), foto, act);
             }
+
         }
     }
 }

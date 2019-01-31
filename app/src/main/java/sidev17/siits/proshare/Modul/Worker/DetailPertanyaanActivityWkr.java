@@ -1,9 +1,11 @@
 package sidev17.siits.proshare.Modul.Worker;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -25,19 +27,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.Cache;
+import com.android.volley.Network;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.w3c.dom.Text;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -54,6 +69,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
+import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.R;
@@ -66,6 +82,8 @@ import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
 import sidev17.siits.proshare.Utils.Warna;
+
+import static sidev17.siits.proshare.Utils.Utilities.getProblemImagesRef;
 
 public class DetailPertanyaanActivityWkr extends Aktifitas {
     public final int PENGGUNA_EXPERT_TERVERIFIKASI= 2;
@@ -116,6 +134,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     private int indViewKomentar[];
     private View viewPertanyaan;
     private View viewSolusi;
+    private TextView teksJudul, teksMajority;
     private ArrayList<View> viewKomentar;
 
     private View viewBarKomen;
@@ -133,6 +152,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_pertanyaan);
 
+        teksJudul = findViewById(R.id.tl_judul);
+        teksMajority = findViewById(R.id.tl_majority);
         isiDataPertanyaan();
 
         detailPertanyaan = (ListView) findViewById(R.id.detail_pertanyaan);
@@ -161,7 +182,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     }
 
     private void initMenuBar(){
-        menuBar= viewPertanyaan.findViewById(R.id.tl_opsi);
+        menuBar= findViewById(R.id.tl_opsi);
         int gmbOpsi[]= {R.drawable.icon_edit,
                 R.drawable.icon_hapus};
         int tersedia[]= {menuBar.ITEM_TERSEDIA, menuBar.ITEM_TERSEDIA};
@@ -496,8 +517,6 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     }
     private void isiViewPertanyaan(){
         viewPertanyaan= getLayoutInflater().inflate(R.layout.model_timeline_pertanyaan, null, false);
-        final TextView teksJudul= viewPertanyaan.findViewById(R.id.tl_judul);
-        final TextView teksMajority= viewPertanyaan.findViewById(R.id.tl_majority);
         final TextView teksDeskripsi= viewPertanyaan.findViewById(R.id.tl_deskripsi);
         TextView teksNama = viewPertanyaan.findViewById(R.id.tl_nama_orang);
         TextView teksStatusOrang = viewPertanyaan.findViewById(R.id.tl_status_orang);
@@ -910,8 +929,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 String komentar= teksKomentar.getText().toString();
                 String pathFoto[]= loader.ambilDaftarPathFoto();
                 String id= Utilities.getUserID(getApplicationContext());
-
-                kirimKomentar(id, komentar, pathFoto);
+                String id_solusi = Utilities.getUid();
+                kirimKomentar(id, id_solusi, komentar, pathFoto);
             }
         });
     }
@@ -926,15 +945,28 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         return false;
     }
 
-    private void kirimKomentar(final String idKomentator, final String komentar, String pathFoto[]){
+    private void kirimKomentar(final String idKomentator, final String id_solusi, final String komentar, String pathFoto[]){
         //lakukan sesuatu
         if(sudahKomen())
             Toast.makeText(this, "You already answered!", Toast.LENGTH_SHORT).show();
         else{
+
+        }
+    }
+
+    private interface FotoKomentarListener{
+        void tambahkanKomentar(String[] url);
+    }
+
+    private void uploadKomentar(final String idKomentator, final String id_solusi, final String komentar, final String[] pathFoto){
+        if(pathFoto.length>0){
+            ProgressDialog uploading = new ProgressDialog(this);
+            String urlFotoTerupload[] = new String[1];
+           // uploadFotoKomentar(0, pathFoto, urlFotoTerupload, id_solusi, sol, this, uploading);
+        }else{
             final ProgressDialog uploading = new ProgressDialog(this);
             uploading.setMessage("Sending solution...");
             uploading.show();
-            final String id_solusi = Utilities.getUid();
             Toast.makeText(this, id_solusi, Toast.LENGTH_SHORT).show();
             Utilities.getUserRef(idKomentator.replace(".", ",")).addValueEventListener(new ValueEventListener() {
                 @Override
@@ -1011,6 +1043,52 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             });
         }
     }
+
+    public static void uploadFotoKomentar(final int urutanFile, final String[] alamatFile, final String[] urlFile, final String id, final Activity c, final ProgressDialog uploading, final FotoKomentarListener ls){
+        uploading.setMessage("uploading..."+" "+String.valueOf(urutanFile+1)+"/"+String.valueOf(alamatFile.length)+" 0%");
+        uploading.show();
+        Uri file = Uri.fromFile(new File(alamatFile[urutanFile]));
+        final StorageReference filepath = getProblemImagesRef(id, urutanFile);
+        filepath.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String alamatUrl = uri.toString();
+                        // Toast.makeText(c, "tes alamat : "+alamatUrl, Toast.LENGTH_SHORT).show();
+                        int urutanSekarang = urutanFile+1;
+                        String[] url = new String[urutanSekarang];
+                        url[urutanFile]=alamatUrl;
+                        if(urutanFile<alamatFile.length){
+                            for(int i=0; i<urutanFile; i++){
+                                url[i]=urlFile[i];
+                            }
+                            if(urutanFile!=alamatFile.length-1){
+                                uploadFotoKomentar(urutanSekarang, alamatFile, url, id, c, uploading, ls);
+                            }else{
+                                ls.tambahkanKomentar(url);
+                            }
+                        }else{
+                            Toast.makeText(c, "Photos succesfully uploaded!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(c, "foto ke "+String.valueOf(urutanFile+1)+" gagal diupload!", Toast.LENGTH_LONG).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                uploading.setMessage("uploading..."+" "+String.valueOf(urutanFile+1)+"/"+String.valueOf(alamatFile.length)+" "+(int)progress+"%");
+            }
+        });
+    }
+
     private GaleriLoader initLoader(String pathFile[], int aksesoris[], RelativeLayout.LayoutParams lpAksesoris[]){
         final GaleriLoader loader= new GaleriLoader(this, pathFile, 18, GaleriLoader.JENIS_FOTO,
                 R.layout.model_tambah_properti_cell, R.id.tambah_cell_pratinjau);

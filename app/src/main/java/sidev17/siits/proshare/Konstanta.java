@@ -30,6 +30,7 @@ public class Konstanta {
     public static final String BIDANGKU =  ROOT_URL + "Bidangku.php";
     public static final String TIMELINE_URL = ROOT_URL+"Timeline.php";
     public static final String SEARCH_URL = ROOT_URL+"SearchProblem.php";
+    public static final String SEARCH_SOLUSI = ROOT_URL + "SearchSolusi.php";
     public static final String PROBLEM_VOTE = ROOT_URL+"VoteProblem.php";
     public static final String PROBLEM_VOTE_COUNT = ROOT_URL + "VoteCountProblem.php";
     public static final String SOLUTION_VOTE = ROOT_URL+"VoteSolution.php";

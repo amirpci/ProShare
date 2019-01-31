@@ -13,6 +13,7 @@ public class Permasalahan implements Serializable {
     private String video_id;
     private String tag;
     private int status;
+    private int totalVote;
     public Permasalahan(){
 
     }
@@ -27,6 +28,14 @@ public class Permasalahan implements Serializable {
         this.picture_id = picture_id;
         this.video_id = video_id;
         this.tag = tag;
+    }
+
+    public int getTotalVote() {
+        return totalVote;
+    }
+
+    public void setTotalVote(int totalVote) {
+        this.totalVote = totalVote;
     }
 
     public int getStatus() {

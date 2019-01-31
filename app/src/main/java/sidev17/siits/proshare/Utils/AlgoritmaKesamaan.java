@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import sidev17.siits.proshare.Model.Permasalahan;
+import sidev17.siits.proshare.Model.Problem.Solusi;
 
 public class AlgoritmaKesamaan {
     static Scanner in = new Scanner(System.in);
@@ -25,16 +26,16 @@ public class AlgoritmaKesamaan {
     static String[] bukanKalimatDasar = {"how", "should", "i", "you", "we", "they", "us", "them", "she", "he", "is", "which", "whom", "whose", "to", "use", "in", "of"
             , "a", "?", "!", "can", "that", "doesn't", "what's", "what", "the", "between", "", " ", "\n", "am", "doesnt", "and", "are", "if", "for", "not", "as", "about", "whats", "out",
             "start", "zero", "good", "enough","or"};
-    static ArrayList<Permasalahan> permasalahan;
+    static ArrayList<Solusi> permasalahan;
     static String searchKalimat;
 
-    public AlgoritmaKesamaan(ArrayList<Permasalahan> permasalahan, String searchKalimat) {
+    public AlgoritmaKesamaan(ArrayList<Solusi> permasalahan, String searchKalimat) {
         this.permasalahan = permasalahan;
         this.searchKalimat = searchKalimat;
     }
 
-    public ArrayList<Permasalahan> listKetemu() {
-        ArrayList<Permasalahan> listKetemu = new ArrayList<>();
+    public ArrayList<Solusi> listKetemu() {
+        ArrayList<Solusi> listKetemu = new ArrayList<>();
         ArrayList<Double> listKetemuIndex = new ArrayList<>();
         String cari = searchKalimat;
         ArrayList<Keyword> listSemuaKeyword = keywordKejadian();
@@ -69,7 +70,7 @@ public class AlgoritmaKesamaan {
             if(D>0.0){
                 listKetemuIndex.add(D);
                 listKetemu.add(permasalahan.get(i));
-                Log.d("judul ",listKetemu.get(listKetemuCounter++).getproblem_title());
+                Log.d("judul ",listKetemu.get(listKetemuCounter++).getProblem().getproblem_title());
             }
             // cuman buat testing
             if (D > bobotTertinggi) {
@@ -84,7 +85,7 @@ public class AlgoritmaKesamaan {
         Log.d("","\n");
         if (jawabanTercocok != -1) {
             System.out.println("Mungkin maksud ada pertanyaannya adalah : ");
-            System.out.println(permasalahan.get(jawabanTercocok).getproblem_title());
+            System.out.println(permasalahan.get(jawabanTercocok).getProblem().getproblem_title());
         } else {
             System.out.println("Mohon maaf pertanyaan anda tidak ditemukan :(");
         }
@@ -97,11 +98,11 @@ public class AlgoritmaKesamaan {
                     indexSekarang = j;
                     terbesar = listKetemuIndex.get(j);
                 }else if(terbesar==listKetemuIndex.get(j)){
-                    if(listKetemu.get(j).getproblem_title().length()<listKetemu.get(i).getproblem_title().length()){
+                    if(listKetemu.get(j).getProblem().getproblem_title().length()<listKetemu.get(i).getProblem().getproblem_title().length()){
                         double temp = listKetemuIndex.get(j);
                         listKetemuIndex.set(j, listKetemuIndex.get(i));
                         listKetemuIndex.set(i, temp);
-                        Permasalahan temp1 = listKetemu.get(j);
+                        Solusi temp1 = listKetemu.get(j);
                         listKetemu.set(j, listKetemu.get(i));
                         listKetemu.set(i, temp1);
                     }
@@ -112,7 +113,7 @@ public class AlgoritmaKesamaan {
                 listKetemuIndex.set(indexSekarang, listKetemuIndex.get(i));
                 listKetemuIndex.set(i, temp);
 
-                Permasalahan temp1 = listKetemu.get(indexSekarang);
+                Solusi temp1 = listKetemu.get(indexSekarang);
                 listKetemu.set(indexSekarang, listKetemu.get(i));
                 listKetemu.set(i, temp1);
             }
@@ -182,7 +183,7 @@ public class AlgoritmaKesamaan {
     static ArrayList<ArrayList<CVektor>> listFaqCV(ArrayList<Keyword> listSemuaKeyword) {
         ArrayList<ArrayList<CVektor>> semuaFaq = new ArrayList<ArrayList<CVektor>>();
         for (int i = 0; i < permasalahan.size(); i++) {
-            semuaFaq.add(dapatkanCV(permasalahan.get(i).getproblem_title(), listSemuaKeyword));
+            semuaFaq.add(dapatkanCV(permasalahan.get(i).getProblem().getproblem_title(), listSemuaKeyword));
         }
         return semuaFaq;
     }
@@ -192,7 +193,7 @@ public class AlgoritmaKesamaan {
         ArrayList<Keyword> keyword = new ArrayList<>();
         ArrayList<String> keywordStr = new ArrayList<>();
         for (int i = 0; i < permasalahan.size(); i++) {
-            String[] pecahanKeyword = permasalahan.get(i).getproblem_title().split(" ");
+            String[] pecahanKeyword = permasalahan.get(i).getProblem().getproblem_title().split(" ");
             for (int j = 0; j < pecahanKeyword.length; j++) {
                 String keywordNow = hilangkanSimbol(pecahanKeyword[j].toLowerCase());
                 Log.d("",keywordNow + ";");
@@ -211,7 +212,7 @@ public class AlgoritmaKesamaan {
         for (int i = 0; i < keywordStr.size(); i++) {
             int jumlahKeyword = 0;
             for (int j = 0; j < permasalahan.size(); j++) {
-                String[] keySplit = permasalahan.get(j).getproblem_title().split(" ");
+                String[] keySplit = permasalahan.get(j).getProblem().getproblem_title().split(" ");
                 for (int k = 0; k < keySplit.length; k++) {
                     if (keywordStr.get(i).equals(hilangkanSimbol(keySplit[k].toLowerCase())))
                         jumlahKeyword++;

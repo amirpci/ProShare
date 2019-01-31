@@ -1,97 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
-    android:background="@color/colorPrimary">
-
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="5dp"
+    android:background="@android:color/white">
     <RelativeLayout
-        android:id="@+id/daftar_pertanyaan_grafis"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_margin="10dp">
-        <ImageView
-            android:id="@+id/daftar_pertanyaan_gambar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="7dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/obj_gambar_kotak"/>
-        <ImageView
-            android:id="@+id/daftar_pertanyaan_centang"
-            android:layout_alignParentRight="true"
-            android:layout_width="25dp"
-            android:layout_height="25dp" />
-    </RelativeLayout>
-    <RelativeLayout
-        android:id="@+id/daftar_pertanyaan_teks"
-        android:layout_toRightOf="@id/daftar_pertanyaan_grafis"
+        android:layout_marginLeft="10dp"
         android:layout_width="match_parent"
         android:layout_height="80dp">
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginRight="20dp">
             <TextView
-                android:id="@+id/daftar_pertanyaan_judul"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="15dp"
-                android:textColor="#000000"
-                android:textSize="20sp"
-                android:text="Problem Text Goes Here"/>
-            <TextView
-                android:id="@+id/daftar_pertanyaan_deskripsi"
+                android:id="@+id/tl_problem_judul"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:textColor="#000000"
+                android:textSize="20sp"
+                android:text="How to gain inspiration?"/>
+            <TextView
+                android:id="@+id/tl_problem_tanggal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="6 Juni 2019"
+                android:textColor="@color/abuSangatTua"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="5dp"
                 android:textSize="12sp"
-                android:text="Problem description goes here"/>
+                />
         </LinearLayout>
-    </RelativeLayout>
-
-    <LinearLayout
-        android:id="@+id/komentar_vote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/daftar_pertanyaan_teks"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="30dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginBottom="2dp">
-        <ImageView
-            android:id="@+id/komentar_vote_down"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="5dp"
-            android:padding="10dp"
-            android:rotation="180"
-            android:src="@drawable/obj_segitiga"
-            android:tint="@color/biruLaut"/>
         <TextView
-            android:id="@+id/komentar_vote_posisi"
+            android:id="@+id/tl_problem_total_vote"
+            android:background="@drawable/latar_lingkaran"
+            android:backgroundTint="@color/biruLaut"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="5dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0"
-            android:textSize="12sp"
-            android:textColor="@color/biruLaut"
-            android:textStyle="bold"
-            android:layout_gravity="center_vertical"/>
-        <ImageView
-            android:id="@+id/komentar_vote_up"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginRight="5dp"
-            android:padding="10dp"
-            android:src="@drawable/obj_segitiga"
-            android:tint="@color/abuLebihTua"/>
-    </LinearLayout>
+            android:textColor="@color/primary_white"
+            android:text="5"/>
+    </RelativeLayout>
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:scaleType="fitXY"
-        android:layout_alignParentBottom="true"
-        android:src="@drawable/shadow_transparent"/>
+        android:layout_height="3dp"
+        android:background="@color/biruLaut"/>
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:id="@+id/lampiran_solusi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</RelativeLayout>
+    </LinearLayout>
+    <RelativeLayout
+        android:id="@+id/daftar_pertanyaan_teks"
+        android:layout_toRightOf="@id/daftar_pertanyaan_grafis"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tl_solusi_deskripsi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textColor="#000000"
+            android:text="Isi dari solusi expert"/>
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tl_komentar_jumlah"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="dan 15 solusi lainnya"
+        android:textColor="@color/abuSangatTua"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="5dp"
+        android:textSize="12sp"
+        />
+
+</LinearLayout>
