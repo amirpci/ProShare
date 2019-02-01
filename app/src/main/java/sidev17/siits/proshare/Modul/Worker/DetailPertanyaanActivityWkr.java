@@ -2,6 +2,7 @@ package sidev17.siits.proshare.Modul.Worker;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,6 +54,7 @@ import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.io.File;
@@ -66,6 +71,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import sidev17.siits.proshare.Adapter.RcLampiran;
 import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
@@ -84,6 +90,8 @@ import sidev17.siits.proshare.Utils.Utilities;
 import sidev17.siits.proshare.Utils.Warna;
 
 import static sidev17.siits.proshare.Utils.Utilities.getProblemImagesRef;
+import static sidev17.siits.proshare.Utils.Utilities.getSolusiImagesRef;
+import static sidev17.siits.proshare.Utils.Utilities.initViewSolusiLampiran;
 
 public class DetailPertanyaanActivityWkr extends Aktifitas {
     public final int PENGGUNA_EXPERT_TERVERIFIKASI= 2;
@@ -114,6 +122,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
 
     private LinearLayout lampiran;
     private ImageView pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3;
+    private ImageView tmbBatal;
+    private GridView gambarDipilih;
 
     private String orang[]= {"Mr. A", "Mr. B", "Mrs. C", "Will Smith"};
     private String job[]= {"Psychiatrist", "Motivator", "Engineer", "Actor"};
@@ -298,11 +308,15 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         View view= getLayoutInflater().inflate(R.layout.model_kolom_komentar, null, false);
 
         TextView teksOrang= view.findViewById(R.id.komentar_orang_nama);
-        TextView teksJob= view.findViewById(R.id.komentar_orang_job);
-        TextView teksSolusi= view.findViewById(R.id.komentar_deskripsi);
-        TextView teksTanggal = view.findViewById(R.id.komentar_waktu);
+        final TextView teksJob= view.findViewById(R.id.komentar_orang_job);
+        final TextView teksSolusi= view.findViewById(R.id.komentar_deskripsi);
+        final TextView teksTanggal = view.findViewById(R.id.komentar_waktu);
         ImageView centang= view.findViewById(R.id.komentar_orang_centang);
         CircleImageView fotoProfil= view.findViewById(R.id.komentar_orang_gambar);
+        LinearLayout lampiran = view.findViewById(R.id.lampiran_solusi);
+
+        loadSolusiLampiran(lampiran, solusi.get(ind).getId_solusi(), this);
+
 
         final TextView jmlSuka= view.findViewById(R.id.komentar_vote_posisi);
         //Belum selesai
@@ -370,38 +384,49 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 Utilities.voteSolusi("0", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(ind).getId_solusi());
             }
         });
-        teksOrang.setText(Utilities.ubahBahasa(solusi.get(ind).getOrang(), Utilities.getUserNegara(this), this));
+        teksOrang.setText(solusi.get(ind).getNamaOrang());
         //teksJob.setText("wkwkwk");
-        teksSolusi.setText(Utilities.ubahBahasa(solusi.get(ind).getDeskripsi(), Utilities.getUserNegara(this), this));
+        teksSolusi.setText(solusi.get(ind).getDeskripsi());
         if(!solusi.get(ind).getFotoOrang().equals("null"))
             Glide.with(this).load(solusi.get(ind).getFotoOrang()).into(fotoProfil);
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
         Date date = null;
-        String waktu;
+        String waktu = "";
         try {
             date = format1.parse(solusi.get(ind).getTimestamp());
             waktu = format2.format(date);
-            teksTanggal.setText(Utilities.ubahBahasa(waktu, Utilities.getUserNegara(this), this));
+            teksTanggal.setText(waktu);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        String status = "";
         switch (solusi.get(ind).getStatus()){
             case "200" :
-                solusi.get(ind).setStatus(Utilities.ubahBahasa("Worker", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()));
-                teksJob.setText(solusi.get(ind).getStatus());
+                status = "Worker";
+                teksJob.setText(status);
                 break;
             case "201" :
-                solusi.get(ind).setStatus(Utilities.ubahBahasa("Expert", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()));
-                teksJob.setText(solusi.get(ind).getStatus());
+                status = "Expert";
+                teksJob.setText(status);
                 centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
                 break;
             case "202" :
-                solusi.get(ind).setStatus(Utilities.ubahBahasa("Verified Expert", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()));
-                teksJob.setText(solusi.get(ind).getStatus());
+                status = "Verified Expert";
+                teksJob.setText(status);
                 centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
                 break;
         }
+
+        String diterjemahkanLagi[] = {solusi.get(ind).getDeskripsi(), status, waktu};
+        Terjemahan.terjemahkanAsync(diterjemahkanLagi, "en", Utilities.getUserBahasa(this), this, new PerubahanTerjemahListener() {
+            @Override
+            public void dataBerubah(String[] kata) {
+                teksSolusi.setText(kata[0]);
+                teksJob.setText(kata[1]);
+                teksTanggal.setText(kata[2]);
+            }
+        });
 
        viewKomentar.add(view);
        // indViewKomentar[indView]= ind;
@@ -411,11 +436,14 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         viewSolusi= getLayoutInflater().inflate(R.layout.model_solusi_expert, null, false);
 
         TextView teksOrang= viewSolusi.findViewById(R.id.komentar_orang_nama);
-        TextView teksJob= viewSolusi.findViewById(R.id.komentar_orang_job);
-        TextView teksSolusi= viewSolusi.findViewById(R.id.komentar_deskripsi);
+        final TextView teksJob= viewSolusi.findViewById(R.id.komentar_orang_job);
+        final TextView teksSolusi= viewSolusi.findViewById(R.id.komentar_deskripsi);
         ImageView centang= viewSolusi.findViewById(R.id.komentar_orang_centang);
         CircleImageView fotoProfil= viewSolusi.findViewById(R.id.komentar_orang_gambar);
-        TextView teksTanggal = viewSolusi.findViewById(R.id.komentar_waktu);
+        final TextView teksTanggal = viewSolusi.findViewById(R.id.komentar_waktu);
+        LinearLayout lampiran = viewSolusi.findViewById(R.id.lampiran_solusi);
+
+        loadSolusiLampiran(lampiran, solusi.get(0).getId_solusi(), this);
 
         final TextView jmlSuka= viewSolusi.findViewById(R.id.komentar_vote_posisi);
         View profil= viewSolusi.findViewById(R.id.komentar_orang_dp);
@@ -483,37 +511,49 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
 
         teksOrang.setText(solusi.get(0).getNamaOrang());
        // teksJob.setText("wkwkwkwkwkwk");
-        teksSolusi.setText(Utilities.ubahBahasa(solusi.get(0).getDeskripsi(), Utilities.getUserNegara(this), this));
-        if(!solusi.get(0).getFotoOrang().equals("null"))
+        teksSolusi.setText(solusi.get(0).getDeskripsi());
+        if(!solusi.get(0).getFotoOrang().equals("null")){
+            fotoProfil.setPadding(0, 0, 0, 0);
             Glide.with(this).load(solusi.get(0).getFotoOrang()).into(fotoProfil);
+        }
         SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
         Date date = null;
-        String waktu;
+        String waktu = "";
         try {
             date = format1.parse(solusi.get(0).getTimestamp());
             waktu = format2.format(date);
-            teksTanggal.setText(Utilities.ubahBahasa(waktu, Utilities.getUserNegara(this), this));
+            teksTanggal.setText(waktu);
         } catch (ParseException e) {
             e.printStackTrace();
         }
        // Log.d("solusi status", solusi.get(0).getStatus());
+        String status ="";
         switch (solusi.get(0).getStatus()){
             case "200" :
-                solusi.get(0).setStatus(Utilities.ubahBahasa("Worker", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()));
-                teksJob.setText(solusi.get(0).getStatus());
+                status = "Worker";
+                teksJob.setText(status);
                 break;
             case "201" :
-                solusi.get(0).setStatus(Utilities.ubahBahasa("Expert", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()));
-                teksJob.setText(solusi.get(0).getStatus());
+                status = "Expert";
+                teksJob.setText(status);
                 centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
                 break;
             case "202" :
-                solusi.get(0).setStatus(Utilities.ubahBahasa("Verified Expert", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()));
-                teksJob.setText(solusi.get(0).getStatus());
+                status = "Verfied Expert";
+                teksJob.setText(status);
                 centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
                 break;
         }
+        String diterjemahkanLagi[] = {solusi.get(0).getDeskripsi(), status, waktu};
+        Terjemahan.terjemahkanAsync(diterjemahkanLagi, "en", Utilities.getUserBahasa(this), this, new PerubahanTerjemahListener() {
+            @Override
+            public void dataBerubah(String[] kata) {
+                teksSolusi.setText(kata[0]);
+                teksJob.setText(kata[1]);
+                teksTanggal.setText(kata[2]);
+            }
+        });
     }
     private void isiViewPertanyaan(){
         viewPertanyaan= getLayoutInflater().inflate(R.layout.model_timeline_pertanyaan, null, false);
@@ -595,7 +635,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         try {
             date = format1.parse(waktu);
             waktu = format2.format(date);
-            teksWaktu.setText(Utilities.ubahBahasa(waktu, Utilities.getUserNegara(this), this));
+            teksWaktu.setText(waktu);
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -604,7 +644,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         teksJudul.setText(judulPertanyaan);
         teksMajority.setText("");
         teksDeskripsi.setText(deskripsiPertanyaan);
-        loadPertanyaanLagi(teksJudul, teksMajority, teksDeskripsi);
+        loadPertanyaanLagi(teksJudul, teksMajority, teksDeskripsi, teksWaktu, waktu);
         Utilities.loadFotoLampiran(fotoLampiran, videoLampiran, lampiran, this, id_masalah);
         switch (this.statusPertanyaan){
             case Konstanta.PROBLEM_STATUS_UNVERIFIED:
@@ -637,13 +677,56 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
      //   Toast.makeText(this, waktu, Toast.LENGTH_SHORT).show();
     }
 
-    private void loadPertanyaanLagi(final TextView teksJudul, final TextView teksMajority, final TextView teksDeskripsi){
-        String akanDiterjemahkan[] = {judulPertanyaan, deskripsiPertanyaan};
+    private void loadSolusiLampiran(final LinearLayout lampiran, final String id_solusi, final Activity c) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO_SOLUSI,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        ArrayList<String> fotoLampiran = new ArrayList<>();
+                        try {
+                            JSONArray jsonArr = new JSONArray(response);
+                            //  Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                            Solusi sol = new Solusi();
+                            if(jsonArr.length()!=0){
+                                for(int i = 0; i < jsonArr.length(); i++){
+                                    org.json.JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    fotoLampiran.add(jsonObject.getString("url_foto"));
+                                }
+                            }
+                            initViewSolusiLampiran(fotoLampiran, lampiran, c);
+                          //  loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                          //  loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                // Toast.makeText(act, Utilities.ubahBahasa("error cek solusi!", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()), Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("id_solusi", id_solusi);
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(c).add(stringRequest);
+    }
+
+
+    private void loadPertanyaanLagi(final TextView teksJudul, final TextView teksMajority, final TextView teksDeskripsi, final TextView teksTanggal, String tanggal){
+        String akanDiterjemahkan[] = {judulPertanyaan, deskripsiPertanyaan, tanggal};
         Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this),DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
             @Override
             public void dataBerubah(String[] kata) {
                 teksJudul.setText(kata[0]);
                 teksDeskripsi.setText(kata[1]);
+                teksTanggal.setText(kata[2]);
             }
         });
 
@@ -950,97 +1033,168 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         if(sudahKomen())
             Toast.makeText(this, "You already answered!", Toast.LENGTH_SHORT).show();
         else{
+            final Solusi sol = new Solusi();
+            sol.setId_solusi(id_solusi);
+            sol.setDeskripsi(komentar);
+            sol.setOrang(idKomentator);
+            if(pathFoto.length>0){
+                final ProgressDialog uploading = new ProgressDialog(this);
+                String urlFotoTerupload[] = new String[1];
+                uploadFotoKomentar(0, pathFoto, urlFotoTerupload, id_solusi,this, uploading, new FotoKomentarListener() {
+                    @Override
+                    public void tambahkanKomentar(String[] url) {
+                        tambahkanFotoKomentar(DetailPertanyaanActivityWkr.this, id_solusi, url);
+                        uploadKomentar(sol);
+                        initFotoBatal();
+                        uploading.dismiss();
+                        setProblemStatus();
+                    }
+                });
+            }else{
+                uploadKomentar(sol);
+                setProblemStatus();
+            }
 
         }
+    }
+    private void setProblemStatus() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SET_STATUS,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("id_problem", id_masalah);
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(this).add(stringRequest);
     }
 
     private interface FotoKomentarListener{
         void tambahkanKomentar(String[] url);
     }
 
-    private void uploadKomentar(final String idKomentator, final String id_solusi, final String komentar, final String[] pathFoto){
-        if(pathFoto.length>0){
-            ProgressDialog uploading = new ProgressDialog(this);
-            String urlFotoTerupload[] = new String[1];
-           // uploadFotoKomentar(0, pathFoto, urlFotoTerupload, id_solusi, sol, this, uploading);
-        }else{
-            final ProgressDialog uploading = new ProgressDialog(this);
-            uploading.setMessage("Sending solution...");
-            uploading.show();
-            Toast.makeText(this, id_solusi, Toast.LENGTH_SHORT).show();
-            Utilities.getUserRef(idKomentator.replace(".", ",")).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    final Pengguna user = dataSnapshot.getValue(Pengguna.class);
-                    StringRequest stringRequestSolusi = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_SOLUSI_URL,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    uploading.dismiss();
-                                    Log.d("kirim komentar :", response);
-                                    cekSolusi();
-                                }
+    private void uploadKomentar(final Solusi solusi){
+        final ProgressDialog uploading = new ProgressDialog(this);
+        uploading.setMessage("Sending solution...");
+        uploading.show();
+        Utilities.getUserRef(solusi.getOrang().replace(".", ",")).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                final Pengguna user = dataSnapshot.getValue(Pengguna.class);
+                StringRequest stringRequestSolusi = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_SOLUSI_URL,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                uploading.dismiss();
+                                Log.d("kirim komentar :", response);
+                                cekSolusi();
                             }
-                            , new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            uploading.dismiss();
-                            Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
                         }
-                    }) {
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String, String> masalah = new HashMap<>();
-                            masalah.put("id_problem", id_masalah);
-                            masalah.put("id_solusi", id_solusi);
-                            masalah.put("deskripsi", komentar);
-                            masalah.put("orang", idKomentator);
-                            masalah.put("nama_orang", user.getNama());
-                            masalah.put("status_orang", String.valueOf(user.getStatus()));
-                            masalah.put("foto_orang", Utilities.cekNull(user.getPhotoProfile()));
-                            return masalah;
-                        }
-                    };
-                    StringRequest stringRequestKomentar = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_COMMENT_URL,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    uploading.dismiss();
-                                    Log.i("kirim komentar :", response);
-                                    cekSolusi();
-                                }
+                        , new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        uploading.dismiss();
+                        Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> masalah = new HashMap<>();
+                        masalah.put("id_problem", id_masalah);
+                        masalah.put("id_solusi", solusi.getId_solusi());
+                        masalah.put("deskripsi", solusi.getDeskripsi());
+                        masalah.put("orang", solusi.getOrang());
+                        masalah.put("nama_orang", user.getNama());
+                        masalah.put("status_orang", String.valueOf(user.getStatus()));
+                        masalah.put("foto_orang", Utilities.cekNull(user.getPhotoProfile()));
+                        return masalah;
+                    }
+                };
+                StringRequest stringRequestKomentar = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_COMMENT_URL,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                uploading.dismiss();
+                                Log.i("kirim komentar :", response);
+                                cekSolusi();
                             }
-                            , new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            uploading.dismiss();
-                            Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
                         }
-                    }) {
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String, String> masalah = new HashMap<>();
-                            masalah.put("id_problem", id_masalah);
-                            masalah.put("id_solusi", id_solusi);
-                            masalah.put("deskripsi", komentar);
-                            masalah.put("orang", idKomentator);
-                            masalah.put("nama_orang", user.getNama());
-                            masalah.put("status_orang", String.valueOf(user.getStatus()));
-                            masalah.put("foto_orang", Utilities.cekNull(user.getPhotoProfile()));
-                            return masalah;
-                        }
-                    };
-                    if(!adaSolusi)
-                        Volley.newRequestQueue(getApplicationContext()).add(stringRequestSolusi);
-                    else
-                        Volley.newRequestQueue(getApplicationContext()).add(stringRequestKomentar);
-                }
+                        , new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        uploading.dismiss();
+                        Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> masalah = new HashMap<>();
+                        masalah.put("id_problem", id_masalah);
+                        masalah.put("id_solusi", solusi.getId_solusi());
+                        masalah.put("deskripsi", solusi.getDeskripsi());
+                        masalah.put("orang", solusi.getOrang());
+                        masalah.put("nama_orang", user.getNama());
+                        masalah.put("status_orang", String.valueOf(user.getStatus()));
+                        masalah.put("foto_orang", Utilities.cekNull(user.getPhotoProfile()));
+                        return masalah;
+                    }
+                };
+                if(!adaSolusi)
+                    Volley.newRequestQueue(getApplicationContext()).add(stringRequestSolusi);
+                else
+                    Volley.newRequestQueue(getApplicationContext()).add(stringRequestKomentar);
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public static void tambahkanFotoKomentar(final Context c, final String id_solusi, final String[] url_foto){
+        Cache cache = new DiskBasedCache(c.getCacheDir(), 1024*1024);
+        Network network = new BasicNetwork(new HurlStack());
+        RequestQueue antrianRequest = new RequestQueue(cache, network);
+        antrianRequest.start();
+        for(int i = 0 ; i< url_foto.length; i++){
+            Log.d("foto "+Integer.toString(i), url_foto[i]);
+          //  Toast.makeText(c, "wes dijajal!", Toast.LENGTH_SHORT).show();
+            final int posisi = i ;
+            StringRequest sRequest = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_SOLUSI_FOTO_URL, new Response.Listener<String>() {
                 @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+                public void onResponse(String response) {
+                    Log.d("Respons foto", response);
+                   // Toast.makeText(c, "Wes iso nambahno foto!\n"+response, Toast.LENGTH_SHORT).show();
                 }
-            });
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("Respons foto", error.toString());
+                    //Toast.makeText(c, "Jek gak iso nambahno foto!/n"+error.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> foto = new HashMap<>();
+                    foto.put("id_solusi", id_solusi);
+                    foto.put("url_foto", url_foto[posisi]);
+                    return foto;
+                }
+            };
+            Volley.newRequestQueue(c).add(sRequest);
         }
     }
 
@@ -1048,7 +1202,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         uploading.setMessage("uploading..."+" "+String.valueOf(urutanFile+1)+"/"+String.valueOf(alamatFile.length)+" 0%");
         uploading.show();
         Uri file = Uri.fromFile(new File(alamatFile[urutanFile]));
-        final StorageReference filepath = getProblemImagesRef(id, urutanFile);
+        final StorageReference filepath = getSolusiImagesRef(id, urutanFile);
         filepath.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -1065,7 +1219,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                                 url[i]=urlFile[i];
                             }
                             if(urutanFile!=alamatFile.length-1){
-                                uploadFotoKomentar(urutanSekarang, alamatFile, url, id, c, uploading, ls);
+                                uploadFotoKomentar(urutanSekarang, alamatFile, url, id,  c, uploading, ls);
                             }else{
                                 ls.tambahkanKomentar(url);
                             }
@@ -1286,7 +1440,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             urutanDipilih.dariArrayPrimitif(data.getIntArrayExtra("urutanDipilih"));
             posisiDipilih.dariArrayPrimitif(data.getIntArrayExtra("posisiDipilih"));
 
-            final GridView gambarDipilih= viewBarKomen.findViewById(R.id.wadah_gambar);
+           gambarDipilih= viewBarKomen.findViewById(R.id.wadah_gambar);
             float batasTinggi= lbrBarKomen +400;
             loader.aturPathItem(pathFoto);
 /*
@@ -1314,26 +1468,30 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             gambarDipilih.setAdapter(new AdapterPropertiCell(loader, gambarDipilih.getWidth() / loader.ambilJmlItemPerGaris(), pathFoto.length));
 
             ((EditText) viewBarKomen.findViewById(R.id.tab_text_hint)).setMaxLines(1);
-            final ImageView tmbBatal= viewBarKomen.findViewById(R.id.batal);
+            tmbBatal= viewBarKomen.findViewById(R.id.batal);
             tmbBatal.setVisibility(View.VISIBLE);
             tmbBatal.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, lbrBarKomen);
-                    RelativeLayout.LayoutParams lpDipilih= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//                    lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                    viewBarKomen.setLayoutParams(lp);
-                    gambarDipilih.setAdapter(null);
-                    gambarDipilih.setLayoutParams(lpDipilih);
-                    gambarDipilih.setPadding(0,0,0,0);
-                    ((EditText) viewBarKomen.findViewById(R.id.tab_text_hint)).setMaxLines(4);
-                    tmbBatal.setVisibility(View.GONE);
-
-                    urutanDipilih.hapusSemua();
-                    posisiDipilih.hapusSemua();
+                    initFotoBatal();
                 }
             });
         }
+    }
+
+    private  void initFotoBatal(){
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, lbrBarKomen);
+        RelativeLayout.LayoutParams lpDipilih= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//                    lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        viewBarKomen.setLayoutParams(lp);
+        gambarDipilih.setAdapter(null);
+        gambarDipilih.setLayoutParams(lpDipilih);
+        gambarDipilih.setPadding(0,0,0,0);
+        ((EditText) viewBarKomen.findViewById(R.id.tab_text_hint)).setMaxLines(4);
+        tmbBatal.setVisibility(View.GONE);
+
+        urutanDipilih.hapusSemua();
+        posisiDipilih.hapusSemua();
     }
 
     private void initOrang(final TextView nama, final TextView status, final CircleImageView fotoProfil){

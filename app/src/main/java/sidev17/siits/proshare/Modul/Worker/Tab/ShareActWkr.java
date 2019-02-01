@@ -82,6 +82,7 @@ import sidev17.siits.proshare.Utils.Utilities;
 import java.sql.Timestamp;
 
 import static android.app.Activity.RESULT_OK;
+import static sidev17.siits.proshare.Utils.Utilities.initViewSolusiLampiran;
 
 /**
  * Created by USER on 02/05/2018.
@@ -145,9 +146,12 @@ public class ShareActWkr extends Fragment {
         refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                adapter = new RC_Masalah(new ArrayList<Solusi>(), getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
+                rcTimeline.setAdapter(adapter);
                 loadData(new PencarianListener() {
                     @Override
                     public void ketemu(ArrayList<Solusi> solusi) {
+                        Log.d("k", "io");
                         adapter = new RC_Masalah(solusi, getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
                         rcTimeline.setAdapter(adapter);
                     }
@@ -664,6 +668,9 @@ public class ShareActWkr extends Fragment {
                     deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
                     jumlahKomentar.setText("dan "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" komentar lainnya...");
                 }
+
+                loadSolusiLampiran(lampiranSolusi, solusi.get(posisi).getId_solusi(), getActivity());
+
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -681,6 +688,47 @@ public class ShareActWkr extends Fragment {
                 });
                 //  Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
                 // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
+            }
+
+            private void loadSolusiLampiran(final LinearLayout lampiran, final String id_solusi, final Activity c) {
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO_SOLUSI,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                ArrayList<String> fotoLampiran = new ArrayList<>();
+                                try {
+                                    JSONArray jsonArr = new JSONArray(response);
+                                    //  Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                                    Solusi sol = new Solusi();
+                                    if(jsonArr.length()!=0){
+                                        for(int i = 0; i < jsonArr.length(); i++){
+                                            org.json.JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                            fotoLampiran.add(jsonObject.getString("url_foto"));
+                                        }
+                                    }
+                                    initViewSolusiLampiran(fotoLampiran, lampiran, c);
+                                    //  loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    //  loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                                }
+                            }
+                        }
+                        , new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                        // Toast.makeText(act, Utilities.ubahBahasa("error cek solusi!", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()), Toast.LENGTH_SHORT).show();
+                    }
+                }){
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> vote = new HashMap<>();
+                        vote.put("id_solusi", id_solusi);
+                        return vote;
+                    }
+                };
+                Volley.newRequestQueue(c).add(stringRequest);
             }
 
         }

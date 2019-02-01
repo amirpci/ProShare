@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -137,15 +138,19 @@ public class JawabActExprt extends Fragment {
                             for(int i=0; i<jsonArr.length(); i++){
                                 try {
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
-                                    Permasalahan masalah = new Permasalahan();
-                                    masalah.setproblem_desc(jsonObject.getString("problem_desc"));
-                                    masalah.setproblem_title(jsonObject.getString("problem_title"));
-                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
-                                    masalah.setStatus(jsonObject.getInt("status"));
-                                    masalah.setpid(jsonObject.getString("pid"));
-                                    masalah.setmajority_id(jsonObject.getString("majority_id"));
-                                    masalah.setTimestamp(jsonObject.getString("timestamp"));
-                                    Masalah.add(masalah);
+                                    if(jsonObject.getInt("answered_status")==1)
+                                        continue;
+                                    else{
+                                        Permasalahan masalah = new Permasalahan();
+                                        masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                        masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                        masalah.setproblem_owner(jsonObject.getString("problem_owner"));
+                                        masalah.setStatus(jsonObject.getInt("status"));
+                                        masalah.setpid(jsonObject.getString("pid"));
+                                        masalah.setmajority_id(jsonObject.getString("majority_id"));
+                                        masalah.setTimestamp(jsonObject.getString("timestamp"));
+                                        Masalah.add(masalah);
+                                    }
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -192,7 +197,7 @@ public class JawabActExprt extends Fragment {
         @NonNull
         @Override
         public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
+            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_ditanyakan, parent, false));
         }
 
         @Override

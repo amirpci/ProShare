@@ -658,6 +658,108 @@ public class Utilities {
         }
     }
 
+    public static void initViewSolusiLampiran(ArrayList<String> fotoLampiran,LinearLayout lampiran, Activity act) {
+        // fotoLampiran = directlink foto yang ada di server
+        // videoLampiran = direclink video yang ada di server
+        // viewGroup untuk tumbnail foto dan video di awal
+        int panjangLampiran = fotoLampiran.size();
+        DisplayMetrics dm = new DisplayMetrics();
+        act.getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int lebar = dm.widthPixels;
+        Toast.makeText(act.getApplicationContext(), String.valueOf(panjangLampiran), Toast.LENGTH_LONG).show();
+        if (panjangLampiran != 0) {
+            // GetXMLTask task = new GetXMLTask();
+            if (panjangLampiran == 1) {
+                int lebar1 = lebar;
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_1, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                pertanyaanGambar1.getLayoutParams().height = lebar1;
+                if(fotoLampiran.size()!=0)
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                lampiran.addView(v);
+            } else if (panjangLampiran == 2) {
+                int lebar2 = (lebar - 6)/2;
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_2, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
+                pertanyaanGambar1.getLayoutParams().height = lebar2;
+                pertanyaanGambar2.getLayoutParams().height = lebar2;
+                if(fotoLampiran.size()==2){
+                    Utilities.setFotoDariUrl2(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2);
+                }else if(fotoLampiran.size()==1)
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                lampiran.addView(v);
+            } else if (panjangLampiran == 3) {
+                int lebar3_1 = (lebar-5)*2/3+5;
+                lampiran.setVisibility(View.VISIBLE);
+                View v =act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_3, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
+                ImageView pertanyaanGambar3 = v.findViewById(R.id.lampiran_pertanyaan_3);
+                pertanyaanGambar1.getLayoutParams().height = lebar3_1;
+                if(fotoLampiran.size()==3){
+                    Utilities.setFotoDariUrl(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3);
+                }else if(fotoLampiran.size()==2){
+                    Utilities.setFotoDariUrl2(fotoLampiran,  pertanyaanGambar1, pertanyaanGambar2);
+                }else if(fotoLampiran.size()==1){
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                }
+                lampiran.addView(v);
+            } else if(panjangLampiran ==4) {
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_4, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                ImageView pertanyaanGambar2 = v.findViewById(R.id.lampiran_pertanyaan_2);
+                ImageView pertanyaanGambar3 = v.findViewById(R.id.lampiran_pertanyaan_3);
+                ImageView pertanyaanGambar4 = v.findViewById(R.id.lampiran_pertanyaan_4);
+                //TextView countLeft = v.findViewById(R.id.lampiran_count_left);
+                int lebar4 = (lebar-6)/2;
+                pertanyaanGambar1.getLayoutParams().height = lebar4;
+                pertanyaanGambar2.getLayoutParams().height = lebar4;
+                pertanyaanGambar3.getLayoutParams().height = lebar4;
+                pertanyaanGambar4.getLayoutParams().height = lebar4;
+
+                if(fotoLampiran.size()>=4){
+                    Utilities.setFotoDariUrl(fotoLampiran, pertanyaanGambar1, pertanyaanGambar2, pertanyaanGambar3, pertanyaanGambar4);
+                }else if(fotoLampiran.size()==2){
+                    Utilities.setFotoDariUrl2(fotoLampiran,  pertanyaanGambar1, pertanyaanGambar2);
+                }else if(fotoLampiran.size()==1){
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                }
+                pertanyaanGambar3.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //pindah untuk melihat list lampiran secara penuh
+                    }
+                });
+                //countLeft.setText(String.valueOf(panjangLampiran-3));
+                lampiran.addView(v);
+            }else if(panjangLampiran>4){
+                lampiran.setVisibility(View.VISIBLE);
+                View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_5, null, false);
+                ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
+                //TextView countLeft = v.findViewById(R.id.lampiran_count_left);
+                RecyclerView rc_lampiran = v.findViewById(R.id.rc_lampiran_more);
+                int lebar5_2 = lebar/3 - 16;
+                int lebar5_1 = lebar - 15 -lebar5_2;
+                pertanyaanGambar1.getLayoutParams().height = lebar5_1;
+                if(fotoLampiran.size()>=4){
+                    Utilities.setFotoDariUrlSingle(fotoLampiran.get(0), pertanyaanGambar1, lebar5_1);
+                    rc_lampiran.setLayoutManager(new LinearLayoutManager(act, LinearLayoutManager.HORIZONTAL, false));
+                    rc_lampiran.setAdapter(new RcLampiran(fotoLampiran, lebar5_2));
+                }else if(fotoLampiran.size()==2){
+                    // Utilities.setFotoDariUrl2(fotoLampiran,  pertanyaanGambar1, pertanyaanGambar2);
+                }else if(fotoLampiran.size()==1){
+                    Utilities.setFotoDariUrl1(fotoLampiran.get(0), pertanyaanGambar1);
+                }
+                //countLeft.setText(String.valueOf(panjangLampiran-3));
+                lampiran.addView(v);
+            }
+        }
+    }
+
     public static void updateFotoProfile(String url, final CircleImageView gambar){
         Picasso.get().load(url).resize(100,100).into(new com.squareup.picasso.Target() {
             @Override
@@ -1262,6 +1364,16 @@ public class Utilities {
     public static StorageReference getProblemVideosRef(String problemID, int urutan){
         return FirebaseStorage.getInstance().getReference("Problem/"+problemID+"/Video/photo_"+String.valueOf(urutan));
     }
+
+    //untuk mendapatkan referensi photo problem
+    public static StorageReference getSolusiImagesRef(String solusiID, int urutan){
+        return FirebaseStorage.getInstance().getReference("Solusi/"+solusiID+"/Photo/photo_"+String.valueOf(urutan));
+    }
+    //untuk mendapatkan referensi video problem
+    public static StorageReference getSolusiVideosRef(String solusiID, int urutan){
+        return FirebaseStorage.getInstance().getReference("Solusi/"+solusiID+"/Video/photo_"+String.valueOf(urutan));
+    }
+
     //untuk referensi daftar pertanyaan yang pernah diajukan
     public static DatabaseReference getMyQuestionRef(Context c){
         return FirebaseDatabase.getInstance().getReference(Konstanta.pertanyaanSayaKey)
