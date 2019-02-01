@@ -1,33 +1,21 @@
 package sidev17.siits.proshare.Modul.Expert.Tab;
 
-import android.app.Dialog;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
 
@@ -35,12 +23,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import sidev17.siits.proshare.Model.ChatListItem;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Modul.ChatActivity;
+import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
+import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.Modul.TemanDaftarAct;
 import sidev17.siits.proshare.R;
-import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.Utilities;
 
-public class FeedbackActExprt extends Fragment {
+public class FeedbackActExprt extends Fragment_Header {
 /*
     public static final int PENGGUNA_EXPERT_TERVERIFIKASI= 202;
     public static final int PENGGUNA_EXPERT= 201;
@@ -128,7 +117,17 @@ NANTI DIPAKE DI TemanTambahAct
 */
             }
         });
+//        initHeader();
         return view;
+    }
+
+    @Override
+    public void initHeader() {
+        MainAct_Header mainAct= (MainAct_Header) getActivity();
+        mainAct.aturJudulHeader("Chat");
+        mainAct.aturGambarOpsiHeader_Null(0);
+//        mainAct.aturTambahanHeader("(" +adapter.getItemCount() +")");
+//        int resId[]= {};
     }
 
     void initDaftarChat() {

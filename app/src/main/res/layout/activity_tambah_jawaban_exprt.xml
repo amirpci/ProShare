@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Modul.Worker.TambahPertanyaanWkr"
+    tools:context=".Modul.Expert.TambahJawabanExprt"
     android:background="@color/abu">
 
     <RelativeLayout
@@ -118,7 +118,7 @@
         <LinearLayout
             android:id="@+id/tambah_tindakan"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="match_parent"
             android:orientation="horizontal">
             <TextView
                 android:id="@+id/tambah_tindakan_tolak"

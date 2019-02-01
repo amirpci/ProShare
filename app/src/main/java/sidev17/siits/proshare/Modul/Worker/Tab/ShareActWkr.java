@@ -7,16 +7,13 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Layout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -73,13 +70,14 @@ import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
+import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
+import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
+import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.AlgoritmaKesamaan;
-import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.Utilities;
-import java.sql.Timestamp;
 
 import static android.app.Activity.RESULT_OK;
 import static sidev17.siits.proshare.Utils.Utilities.initViewSolusiLampiran;
@@ -88,7 +86,7 @@ import static sidev17.siits.proshare.Utils.Utilities.initViewSolusiLampiran;
  * Created by USER on 02/05/2018.
  */
 
-public class ShareActWkr extends Fragment {
+public class ShareActWkr extends Fragment_Header {
     public final int PENGGUNA_EXPERT_TERVERIFIKASI= 402;
     public final int PENGGUNA_EXPERT= 401;
     public final int PENGGUNA_BIASA= 400;
@@ -96,7 +94,7 @@ public class ShareActWkr extends Fragment {
     private EditText search_input,question_input;
     private TextView fileName;
     private ImageView search_btn, uploadPhoto, uploadedPhoto;
-    private Button add_question;
+    private ImageView vTambahTimeline;
     private RecyclerView rcTimeline;
     private ProgressBar uploadPhotoProgress;
     private ProgressDialog addQuestionLoading;
@@ -134,7 +132,15 @@ public class ShareActWkr extends Fragment {
         search_btn = (ImageView)v.findViewById(R.id.tanya_cari_icon);
         uploadPhoto = (ImageView)v.findViewById(R.id.tanya_add_photo);
         uploadedPhoto = (ImageView)v.findViewById(R.id.tanya_uploaded_photo);
-        add_question = (Button)v.findViewById(R.id.tanya_addQuestion_btn);
+//        add_question = (Button)v.findViewById(R.id.tanya_addQuestion_btn);
+        vTambahTimeline= v.findViewById(R.id.timeline_tambah);
+        vTambahTimeline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent keTambahTimeline= new Intent(getActivity(), TambahPertanyaanWkr.class);
+                startActivity(keTambahTimeline);
+            }
+        });
         uploadPhotoProgress = (ProgressBar) v.findViewById(R.id.tanya_upPhoto_loading);
         loading = (LinearLayout)v.findViewById(R.id.tanya_progress);
         rcTimeline = (RecyclerView)v.findViewById(R.id.list_timeline);
@@ -195,7 +201,34 @@ public class ShareActWkr extends Fragment {
         });
 
         loadDaftarPertanyaan();
+//        initHeader();
+        keHalamanAwal();
         return v;
+    }
+
+    @Override
+    public void initHeader() {
+        final MainAct_Header mainAct= (MainAct_Header) getActivity();
+        mainAct.aturJudulHeader("Pustaka");
+        mainAct.aturGambarOpsiHeader(0, R.drawable.icon_daftar);
+        mainAct.aturKlikOpsiHeader(0, new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent keDaftarPertanyaan= new Intent(mainAct, DaftarTanyaActWkr.class);
+                startActivity(keDaftarPertanyaan);
+            }
+        });
+    }
+    private void keHalamanAwal(){
+        MainActivityWkr mainAct= (MainActivityWkr) getActivity();
+        mainAct.keHalaman(1);
+    }
+
+    @Override
+    public void onStop() {
+        MainAct_Header mainAct= (MainAct_Header) getActivity();
+        mainAct.bolehInitHeader= false;
+        super.onStop();
     }
 
     void initPilihanMajority(ArrayList<Bidang> majority, View v){
@@ -252,8 +285,11 @@ public class ShareActWkr extends Fragment {
         layoutTidakDitemukan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Utilities.isStoragePermissionGranted(getActivity()))
-                   startActivity(new Intent(getActivity(), TambahPertanyaanWkr.class));
+                if(Utilities.isStoragePermissionGranted(getActivity())) {
+                    Intent keTambahPertanyaan= new Intent(getActivity(), TambahPertanyaanWkr.class);
+                    keTambahPertanyaan.putExtra("jenisPost", TambahPertanyaanWkr.JENIS_POST_TANYA);
+                    startActivity(keTambahPertanyaan);
+                }
             }
         });
     }

@@ -28,8 +28,14 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
         return super.getPageTitle(position);
     }
 
-    public void AddFragment(android.support.v4.app.Fragment fragment, String title){
+    public void addFragment(android.support.v4.app.Fragment fragment, String title){
         lstFragment.add(fragment);
         lstTitles.add(title);
+    }
+    public void addFragment(android.support.v4.app.Fragment fragment[], String title[]){
+        if(fragment.length != title.length)
+            throw new IllegalArgumentException("\"fragment.length\"  &  \"title.length\" HARUS SAMA!");
+        for(int i= 0; i< fragment.length; i++)
+            addFragment(fragment[i], title[i]);
     }
 }

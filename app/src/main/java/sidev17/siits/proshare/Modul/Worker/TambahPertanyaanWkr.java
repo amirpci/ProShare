@@ -1,5 +1,6 @@
 package sidev17.siits.proshare.Modul.Worker;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.app.ProgressDialog;
 import android.database.Cursor;
@@ -18,6 +19,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -54,6 +56,10 @@ import sidev17.siits.proshare.Utils.Utilities;
 
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
+    public static final int JENIS_POST_SHARE= 10;
+    public static final int JENIS_POST_TANYA= 11;
+
+    private int jenisPost= JENIS_POST_SHARE;
 
     private View parentUtama;
     private GridView wadahCell;
@@ -139,8 +145,12 @@ Bagian EXPERT / TambahJawaban
 
 //================================
 
-    protected void setIdHalaman(int idHalaman){
+    protected void aturIdHalaman(int idHalaman){
         this.idHalaman= idHalaman;
+    }
+
+    protected void aturIdHalaman_Default(){
+        aturIdHalaman(R.layout.activity_tambah_pertanyaan_wkr);
     }
 
     void verifyQuestion(boolean verify){
@@ -150,10 +160,26 @@ Bagian EXPERT / TambahJawaban
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setIdHalaman(getIntent().getIntExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr));
+//        aturIdHalaman(getIntent().getIntExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr));
+        aturIdHalaman_Default();
 
         parentUtama= getLayoutInflater().inflate(idHalaman, null);
         setContentView(parentUtama);
+
+        initTeks();
+        ambilData();
+        wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
+        tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
+                (View) findViewById(R.id.tambah_properti_icon));
+        tabBarIcon.aturTabIcon(tabIcon);
+        tabBarIcon.aturIdWarnaDitekan(WARNA_DITEKAN);
+        tabBarIcon.aturIdWarnaTakDitekan(WARNA_TAK_DITEKAN);
+        initAksiTekan();
+
+        pathFoto= ambilPathGambar();
+        pathVideo= ambilPathVideo();
+//        isiFileFoto(pathFoto, 0, 12);
+//        inisiasiFileFoto();
 
         if(idHalaman== R.layout.activity_tambah_jawaban_exprt) {
             vBidang= findViewById(R.id.tambah_bidang);
@@ -180,8 +206,14 @@ Bagian EXPERT / TambahJawaban
                 @Override
                 public void onClick(View v) {
                     vTindakan.setVisibility(View.GONE);
+                    tabBarIcon.aturTinggiTabDefault();
+                    tabBarIcon.tampilkanIconTab();
+                    inisiasiOk();
                 }
             });
+
+            tabBarIcon.aturTinggiTab(tabBarIcon.tinggiTabDitekan());
+            tabBarIcon.hilangkanIconTab();
 
             isiPertanyaan();
 /*
@@ -229,24 +261,8 @@ Bagian EXPERT / TambahJawaban
 
                 }
             });
+            inisiasiOk();
         }
-        initTeks();
-        ambilData();
-        wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
-        tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
-                (View) findViewById(R.id.tambah_properti_icon));
-        tabBarIcon.aturTabIcon(tabIcon);
-        tabBarIcon.aturIdWarnaDitekan(WARNA_DITEKAN);
-        tabBarIcon.aturIdWarnaTakDitekan(WARNA_TAK_DITEKAN);
-        initAksiTekan();
-
-        tmbCentang= findViewById(R.id.tambah_ok);
-
-        pathFoto= ambilPathGambar();
-        pathVideo= ambilPathVideo();
-//        isiFileFoto(pathFoto, 0, 12);
-//        inisiasiFileFoto();
-        inisiasiOk();
     }
 
     /*
@@ -268,6 +284,7 @@ Bagian EXPERT / TambahJawaban
     private void isiPertanyaan(){
         View viewPertanyaan= getLayoutInflater().inflate(R.layout.model_timeline_pertanyaan, null);
         //Lakukan modifikasi data
+        vWadahPertanyaan= findViewById(R.id.tambah_wadah_pertanyaan);
         vWadahPertanyaan.addView(viewPertanyaan);
     }
 
@@ -288,6 +305,8 @@ Bagian EXPERT / TambahJawaban
                 vBidang.setText(ambilBidang(idBidang));
         }
 
+        jenisPost= intentSebelumnya.getIntExtra("jenisPost", JENIS_POST_SHARE);
+
         //file gambar yang udah diload dari server saat di activity DetailPertanyaan
         //gak harus array String
 /*
@@ -300,6 +319,7 @@ Bagian EXPERT / TambahJawaban
     }
     private void initTeks(){
         teksJudul= findViewById(R.id.tambah_judul);
+/*
         teksJudul.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -326,10 +346,12 @@ Bagian EXPERT / TambahJawaban
                 return true;
             }
         });
+*/
         // initTeksJudul();
         teksJudul.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         teksJudul.clearFocus();
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
+/*
         teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -356,11 +378,12 @@ Bagian EXPERT / TambahJawaban
                 return true;
             }
         });
+*/
 //        teksDeskripsi.setTextIsSelectable(true);
         teksDeskripsi.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         teksDeskripsi.setMaxLines(1000);
         teksDeskripsi.setSingleLine(false);
-        if(idBidang == R.layout.activity_tambah_jawaban_exprt){
+        if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
             EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
             EditTextMod.enableEditText(teksJudul, InputType.TYPE_NULL, false);
         }
@@ -466,11 +489,7 @@ Bagian EXPERT / TambahJawaban
         void tekanItem(int ind){
             if(ind != trahirDitekan) {
                 if (!ditekanKah) {
-                    final float batasTinggi = view.getHeight() + 400;
-
-                    RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) batasTinggi);
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                    view.setLayoutParams(lp);
+                    aturTinggiTab(tinggiTabDitekan());
                 }
                 int jmlCell= 0;
                 if(ind== 0) {
@@ -499,11 +518,7 @@ Bagian EXPERT / TambahJawaban
                 AdapterPropertiCell adpCell = new AdapterPropertiCell(lebar, ind, jmlCell, view);
                 wadahCell.setAdapter(adpCell);
             } else if(ditekanKah && ind == trahirDitekan){
-                int tinggiAwal= viewIcon.getHeight();
-//                kategoriItem= "kosong";
-                RelativeLayout.LayoutParams lp= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tinggiAwal);
-                lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                view.setLayoutParams(lp);
+                aturTinggiTabDefault();
             }
             tekanGantiWarna(ind);
         }
@@ -534,6 +549,26 @@ Bagian EXPERT / TambahJawaban
         }
         void aturDitekan(boolean ditekan){
             ditekanKah= ditekan;
+        }
+
+        void aturTinggiTab(int tinggi){
+            RelativeLayout.LayoutParams lp= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, tinggi);
+            lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            view.setLayoutParams(lp);
+        }
+        void aturTinggiTabDefault(){
+            aturTinggiTab(viewIcon.getHeight());
+        }
+
+        int tinggiTabDitekan(){
+            return viewIcon.getHeight() +400;
+        }
+
+        void hilangkanIconTab(){
+            viewIcon.setVisibility(View.GONE);
+        }
+        void tampilkanIconTab(){
+            viewIcon.setVisibility(View.VISIBLE);
         }
     }
 
@@ -851,10 +886,86 @@ Bagian EXPERT / TambahJawaban
     }
 
     public void inisiasiOk(){
+        tmbCentang= findViewById(R.id.tambah_ok);
         tmbCentang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                kirimPertanyaan();
+                if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
+                    Dialog dialog= new Dialog(TambahPertanyaanWkr.this);
+                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                    dialog.setContentView(R.layout.dialog_kirim_jawaban);
+                    TextView vKirim= dialog.findViewById(R.id.tindakan_kirim);
+                    vKirim.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            kirimPertanyaan();
+                        }
+                    });
+                    TextView VLempar= dialog.findViewById(R.id.tindakan_lempar);
+                    vLempar.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            lemparPertanyaan();
+                        }
+                    });
+//                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    dialog.show();
+                }
+                else
+                    kirimPertanyaan();
+            }
+        });
+
+        teksJudul.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(tabBarIcon.trahirDitekan() > -1)
+                    tabBarIcon.tekanItem(tabBarIcon.trahirDitekan());
+                teksJudul.requestFocus();
+                final InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
+                imm.showSoftInput(teksJudul, InputMethodManager.SHOW_IMPLICIT);
+                tmbCentang.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        imm.hideSoftInputFromWindow(teksJudul.getWindowToken(), 0);
+                        teksJudul.clearFocus();
+                        tmbCentang.setImageResource(R.drawable.icon_kirim);
+                        tmbCentang.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                kirimPertanyaan();
+                            }
+                        });
+                    }
+                });
+                tmbCentang.setImageResource(R.drawable.obj_centang);
+                return true;
+            }
+        });
+        teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(tabBarIcon.trahirDitekan() > -1)
+                    tabBarIcon.tekanItem(tabBarIcon.trahirDitekan());
+                teksDeskripsi.requestFocus();
+                final InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
+                imm.showSoftInput(teksDeskripsi, InputMethodManager.SHOW_IMPLICIT);
+                tmbCentang.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        imm.hideSoftInputFromWindow(teksDeskripsi.getWindowToken(), 0);
+                        teksDeskripsi.clearFocus();
+                        tmbCentang.setImageResource(R.drawable.icon_kirim);
+                        tmbCentang.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                kirimPertanyaan();
+                            }
+                        });
+                    }
+                });
+                tmbCentang.setImageResource(R.drawable.obj_centang);
+                return true;
             }
         });
     }

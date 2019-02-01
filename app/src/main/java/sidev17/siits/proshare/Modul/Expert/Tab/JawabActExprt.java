@@ -14,12 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -28,7 +24,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.eyalbira.loadingdots.LoadingDots;
-import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,13 +36,15 @@ import java.util.Map;
 
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Permasalahan;
+import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
 import sidev17.siits.proshare.Modul.Expert.TambahJawabanExprt;
-import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
-import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
+import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
+import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
+import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Utilities;
 
-public class JawabActExprt extends Fragment {
+public class JawabActExprt extends Fragment_Header {
     public final int PENGGUNA_EXPERT_TERVERIFIKASI= 2;
     public final int PENGGUNA_EXPERT= 1;
     public final int PENGGUNA_BIASA= 0;
@@ -107,7 +104,29 @@ public class JawabActExprt extends Fragment {
         });
 
 */
+//        initHeader();
+        keHalamanAwal();
         return view;
+    }
+
+    @Override
+    public void initHeader() {
+        MainAct_Header mainAct= (MainAct_Header) getActivity();
+        mainAct.aturJudulHeader("Pertnyaan yang Harus Dijawab");
+        mainAct.aturTambahanHeader("(" +adapter.getItemCount() +")");
+        mainAct.aturGambarOpsiHeader_Null(0);
+//        int resId[]= {};
+    }
+    private void keHalamanAwal(){
+        MainActivityExprt mainAct= (MainActivityExprt) getActivity();
+        mainAct.keHalaman(1);
+    }
+
+    @Override
+    public void onStop() {
+        MainAct_Header mainAct= (MainAct_Header) getActivity();
+        mainAct.bolehInitHeader= false;
+        super.onStop();
     }
 
     void loadDaftarPertanyaan(){
@@ -263,7 +282,7 @@ public class JawabActExprt extends Fragment {
                         paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
                         paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
                         paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
-                        Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
+                        Intent inten= new Intent(getContext(), TambahJawabanExprt.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                         startActivity(inten);
                     }

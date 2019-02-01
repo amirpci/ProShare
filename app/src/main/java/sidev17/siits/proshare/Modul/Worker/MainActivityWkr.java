@@ -9,24 +9,22 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas_Slider;
+import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
+import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.Modul.Worker.Tab.ChatExprt;
-import sidev17.siits.proshare.Modul.Worker.Tab.DaftarTanyaActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ShareActWkr;
 import sidev17.siits.proshare.R;
-import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.ViewPagerAdapter;
 
-public class MainActivityWkr extends Aktifitas {
+public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider {
 
     private RelativeLayout tmb_Profile;
     private ImageView garis_Profile;
@@ -44,17 +42,23 @@ public class MainActivityWkr extends Aktifitas {
     private int halamanFragmen= 0;
     private PenungguGantiHalaman pngGantiHalaman;
 
+    private final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr/*, R.id.tab_tl_ikon_wkr*/, R.id.tab_feedback_ikon_Exprt},
+            {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, /*R.id.tab_tl_garis_wkr,*/ R.id.tab_feedback_garis_Exprt}};
+
+    private final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
+            {R.color.colorPrimary, R.color.colorPrimaryDark}};
+
+    private Fragment_Header fragmenHalaman[]= {new ProfileActWkr(), new ShareActWkr(), new ChatExprt()};
+    private String judulHalaman[]= {"", "", ""};
+//    private boolean bolehInitHeader= false; //false diperoleh hanya sekali saat pertama kali di-init
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_wkr);
 
+        bolehInitHeader= false;
 
-        final int tmbTab[][] = {{R.id.tab_profile_ikon_wkr, R.id.tab_tanya_ikon_wkr/*, R.id.tab_tl_ikon_wkr*/, R.id.tab_feedback_ikon_Exprt},
-                {R.id.tab_profile_garis_wkr, R.id.tab_tanya_garis_wkr, /*R.id.tab_tl_garis_wkr,*/ R.id.tab_feedback_garis_Exprt}};
-
-        final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
-                {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
         final ImageView icon_Profile = (ImageView) findViewById(R.id.tab_profile_ikon_wkr);
         garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis_wkr);
@@ -63,31 +67,15 @@ public class MainActivityWkr extends Aktifitas {
 //        tmb_Jawab = findViewById(R.id.tab_tl_wkr);
         tmb_Chat = findViewById(R.id.tab_feedback_wkr);
 
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
-        adapter.AddFragment(new ProfileActWkr(), "");
-//        adapter.AddFragment(new DaftarTanyaActWkr(), "");
-        adapter.AddFragment(new ShareActWkr(), "");
-        adapter.AddFragment(new ChatExprt(), "");
-        mvPager.setAdapter(adapter);
+        initAdapter();
+/*
+        adapter.addFragment(new ProfileActWkr(), "");
+//        adapter.addFragment(new DaftarTanyaActWkr(), "");
+        adapter.addFragment(new ShareActWkr(), "");
+        adapter.addFragment(new ChatExprt(), "");
+*/
 
-        mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-        mvPager.setOffscreenPageLimit(4);
 
         //Buat Warna Inisiasi
        saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_wkr), warnaTab[0],
@@ -126,6 +114,67 @@ public class MainActivityWkr extends Aktifitas {
                 gantiWarnaTab(2, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
+        initHeader();
+    }
+
+    @Override
+    public void keHalaman(int ke) {
+        bolehInitHeader= true;
+        mvPager.setCurrentItem(ke);
+    }
+/*
+    protected void bolehInitHeader(boolean boleh){
+        bolehInitHeader= boleh;
+    }
+
+    @Override
+    protected void onStop() {
+        bolehInitHeader= false;
+        super.onStop();
+    }
+/*
+    @Override
+    protected void onResumeFragments() {
+        bolehInitHeader= true;
+        super.onResumeFragments();
+    }
+*/
+
+    private void initFragment(){
+        fragmenHalaman= new Fragment_Header[]{new ProfileActWkr(), new ShareActWkr(), new ChatExprt()};
+        judulHalaman= new String[]{"", "", ""};
+    }
+    private void initAdapter(){
+        initFragment();
+        bolehInitHeader= false;
+        mvPager.setCurrentItem(0);
+        mvPager.setAdapter(null);
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(fragmenHalaman, judulHalaman);
+        mvPager.setAdapter(adapter);
+        mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
+                try {
+                    if(bolehInitHeader)
+                        fragmenHalaman[position].initHeader();
+                } catch (Exception e){
+                    initAdapter();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        mvPager.setOffscreenPageLimit(4);
     }
 
     public interface PenungguGantiHalaman{

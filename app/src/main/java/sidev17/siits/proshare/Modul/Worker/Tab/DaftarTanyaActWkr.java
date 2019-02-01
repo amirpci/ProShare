@@ -1,37 +1,27 @@
 package sidev17.siits.proshare.Modul.Worker.Tab;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.GetChars;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.eyalbira.loadingdots.LoadingDots;
@@ -49,13 +39,16 @@ import java.util.Map;
 
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Permasalahan;
+import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 
-import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
 import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
 
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Utilities;
+import sidev17.siits.proshare.Utils.View.ImgViewTouch;
+import sidev17.siits.proshare.Utils.View.MenuBarView;
+import sidev17.siits.proshare.Utils.Warna;
 
 import static com.android.volley.Request.*;
 
@@ -64,14 +57,14 @@ import static com.android.volley.Request.*;
  * Created by USER on 02/05/2018.
  */
 
-public class DaftarTanyaActWkr extends Fragment {
+public class DaftarTanyaActWkr extends MainAct_Header {
     public final int PENGGUNA_EXPERT_TERVERIFIKASI= 402;
     public final int PENGGUNA_EXPERT= 401;
     public final int PENGGUNA_BIASA= 400;
 
     List<Permasalahan> Masalah;
     private RecyclerView daftarTanya;
-    private ImageView tmbTambah;
+//    private ImageView tmbTambah;
     private SwipeRefreshLayout refreshLayout;
     RecyclerView.Adapter adapter;
     private LoadingDots loadingPertanyaan;
@@ -83,13 +76,18 @@ public class DaftarTanyaActWkr extends Fragment {
     private Image gambar[][];
     private int kategoriSoal[]= {1, 2, 1, 0};
 
+    private View halamanKosong;
+
+
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view= inflater.inflate(R.layout.fragment_daftar_tanya_wkr, container, false);
-        loadingPertanyaan = (LoadingDots)view.findViewById(R.id.loading_pertanyaan);
-        daftarTanya= view.findViewById(R.id.daftar_pertanyaan_wadah);
-        refreshLayout = view.findViewById(R.id.refresh_pertanyaan);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//        View view= inflater.inflate(R.layout.activity_daftar_tanya_wkr, container, false);
+        setContentView(R.layout.activity_daftar_tanya_wkr);
+        loadingPertanyaan = /*(LoadingDots)view.*/findViewById(R.id.loading_pertanyaan);
+        daftarTanya= /*view.*/findViewById(R.id.daftar_pertanyaan_wadah);
+        refreshLayout = /*view.*/findViewById(R.id.refresh_pertanyaan);
         user = FirebaseAuth.getInstance().getCurrentUser();
         loadDaftarPertanyaan();
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.abuTua), getResources().getColor(R.color.abuLebihTua),
@@ -100,29 +98,43 @@ public class DaftarTanyaActWkr extends Fragment {
                 loadData();
             }
         });
+/*
         tmbTambah= view.findViewById(R.id.daftar_pertanyaan_tambah);
         tmbTambah.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Utilities.isStoragePermissionGranted(getActivity())){
-                   // Toast.makeText(getActivity(), "sudah", Toast.LENGTH_SHORT).show();
-                    Intent inten= new Intent(getContext(), TambahPertanyaanWkr.class);
+                if(Utilities.isStoragePermissionGranted(DaftarTanyaActWkr.this)){
+                   // Toast.makeText(DaftarTanyaActWkr.this, "sudah", Toast.LENGTH_SHORT).show();
+                    Intent inten= new Intent(DaftarTanyaActWkr.this, TambahPertanyaanWkr.class);
                     inten.putExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr);
                     startActivity(inten);
                 }else {
-                    Toast.makeText(getActivity(), "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(DaftarTanyaActWkr.this, "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-
-        return view;
+*/
+        initHeaderDalam();
+        initHalamanKosong();
     }
+    private void initHeaderDalam(){
+//        final MainActivityWkr mainAct= (MainActivityWkr) getActivity();
+        initHeader();
+        aturJudulHeader("Daftar Pertanyaan");
+        aturTambahanHeader("(" +Integer.toString(adapter.getItemCount()) +")");
+    }
+    private void initHalamanKosong(){
+        halamanKosong= findViewById(R.id.daftar_pertanyaan_kosong);
+        int visibilitas= (adapter.getItemCount() == 0) ? View.VISIBLE : View.GONE;
+        halamanKosong.setVisibility(visibilitas);
+    }
+
     void loadDaftarPertanyaan(){
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(DaftarTanyaActWkr.this);
         daftarTanya.setLayoutManager(linearLayoutManager);
-        daftarTanya.setLayoutManager(new LinearLayoutManager(getActivity()));
+        daftarTanya.setLayoutManager(new LinearLayoutManager(this));
         Masalah = new ArrayList<>();
-        adapter = new RC_Masalah(Masalah, getActivity());
+        adapter = new RC_Masalah(Masalah, this);
         daftarTanya.setAdapter(adapter);
         loadData();
     }
@@ -141,7 +153,7 @@ public class DaftarTanyaActWkr extends Fragment {
                         try {
                             Masalah.clear();
                             JSONArray jsonArr = new JSONArray(response);
-                          //  Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                          //  Toast.makeText(DaftarTanyaActWkr.this, "Berhasil loading!", Toast.LENGTH_SHORT).show();
                             for(int i=0; i<jsonArr.length(); i++){
                                 try {
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
@@ -169,8 +181,8 @@ public class DaftarTanyaActWkr extends Fragment {
             @Override
             public void onErrorResponse(VolleyError error) {
                 loadingPertanyaan.setVisibility(View.GONE);
-                if(getActivity() != null)
-                    Toast.makeText(getActivity(), "Failed to load question!", Toast.LENGTH_SHORT).show();
+                if(this != null)
+                    Toast.makeText(DaftarTanyaActWkr.this, "Failed to load question!", Toast.LENGTH_SHORT).show();
             }
         }){
             @Override
@@ -180,13 +192,18 @@ public class DaftarTanyaActWkr extends Fragment {
                 return masalah;
             }
         };
-        Volley.newRequestQueue(getActivity()).add(stringRequest);
+        Volley.newRequestQueue(DaftarTanyaActWkr.this).add(stringRequest);
     }
 
     @Override
     public void onResume() {
         super.onResume();
         loadData();
+    }
+
+//=========================SAMPAI SINI MIR!=======================
+    protected void hapusPertanyaan(int idPertanyaan){
+        //sesuatu
     }
 
     public class RC_Masalah extends RecyclerView.Adapter<RC_Masalah.vH>{
@@ -217,6 +234,7 @@ public class DaftarTanyaActWkr extends Fragment {
             private TextView judul, isi;
             private ImageView centang, foto;
             private View view;
+            private MenuBarView menuBar;
             public vH(View itemView) {
                 super(itemView);
                 view = itemView;
@@ -224,7 +242,62 @@ public class DaftarTanyaActWkr extends Fragment {
                 judul = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_judul);
                 isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);
                 foto = (ImageView)itemView.findViewById(R.id.daftar_pertanyaan_gambar);
+                initMenuBar();
             }
+            private void initMenuBar(){
+                menuBar= itemView.findViewById(R.id.opsi_pertanyaan);
+                int gmbOpsi[]= {R.drawable.icon_edit,
+                        R.drawable.icon_hapus};
+                int tersedia[]= {menuBar.ITEM_TERSEDIA, menuBar.ITEM_TERSEDIA};
+                menuBar.aturGmbItem(gmbOpsi);
+                menuBar.aturItemTersedia(tersedia);
+//        menuBar.aturArahBar(menuBar.ARAH_VERTIKAL);
+                menuBar.aturLetakBarRelatif(menuBar.BAR_DI_BAWAH);
+                menuBar.aturWarnaTersedia("#FFFFFF");
+//        menuBar.aturWarnaTakTersedia();
+                menuBar.aturWarnaKuat(Warna.ambilStringWarna(getResources().getColor(R.color.biruLaut)));
+                menuBar.aturLatarInduk_Akhir(R.drawable.latar_kotak_tumpul_atas);
+                menuBar.aturPenungguKlikBar(new MenuBarView.PenungguKlik_BarView() {
+                    @Override
+                    public void klik(MenuBarView v, boolean menuDitampilkan) {
+                        if(!menuDitampilkan)
+                            v.aturWarnaInduk("#FFFFFF");
+                        else
+                            v.aturWarnaInduk(Warna.ambilStringWarna(getResources().getColor(R.color.biruLaut)));
+                    }
+                });
+                menuBar.aturAksiKlikItem(0, new ImgViewTouch.PenungguKlik() {
+                    @Override
+                    public void klik(View v) {
+                        if(Utilities.isStoragePermissionGranted(DaftarTanyaActWkr.this)){
+                            Intent keEdit= new Intent(DaftarTanyaActWkr.this, TambahPertanyaanWkr.class);
+
+                            keEdit.putExtra("judul", judul.getText().toString());
+                            keEdit.putExtra("deskripsi", isi.getText().toString());
+//                            TextView majority= viewPertanyaan.findViewById(R.id.tl_majority);
+                            String bidang= null; //ambil bidang dari server
+                            keEdit.putExtra("bidang", bidang);
+                            ArrayList<String> fotoLampiran= null; //ambil foto dari server
+                            keEdit.putExtra("urlFoto", fotoLampiran);
+//                keEdit.putExtra("gambarAwal", gambarAwal);
+
+                            startActivity(keEdit);
+                        }else {
+                            Toast.makeText(DaftarTanyaActWkr.this, "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+                menuBar.aturAksiKlikItem(1, new ImgViewTouch.PenungguKlik() {
+                    @Override
+                    public void klik(View v) {
+                        hapusPertanyaan(0);
+                    }
+                });
+
+                daftarkanBatas(menuBar.ambilBatas());
+            }
+
             public void bind(final int posisi){
                 switch (masalah.get(posisi).getStatus()){
                     case Konstanta.PROBLEM_STATUS_UNVERIFIED:
@@ -245,8 +318,8 @@ public class DaftarTanyaActWkr extends Fragment {
                     protected String[] doInBackground(String[]... strings) {
                         String[] output = strings[0];
                         for(int i=0;i<output.length;i++){
-                            if(getActivity()!=null)
-                                output[i] = Utilities.ubahBahasaDariId(output[i], Utilities.getUserBahasa(getActivity()), getActivity());
+                            if(DaftarTanyaActWkr.this!=null)
+                                output[i] = Utilities.ubahBahasaDariId(output[i], Utilities.getUserBahasa(DaftarTanyaActWkr.this), DaftarTanyaActWkr.this);
                         }
                         return  output;
                     }
@@ -273,7 +346,7 @@ public class DaftarTanyaActWkr extends Fragment {
                         paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
                         paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
                         paketDetailPetanyaan.putInt("status", masalah.get(posisi).getStatus());
-                        Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
+                        Intent inten= new Intent(DaftarTanyaActWkr.this, DetailPertanyaanActivityWkr.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                         startActivity(inten);
                     }

@@ -10,7 +10,7 @@
     <RelativeLayout
         android:id="@+id/teman_header"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:background="#FFFFFF">
         <TextView
             android:id="@+id/teman_judul"
@@ -41,6 +41,7 @@
             android:id="@+id/teman_tambah"
             android:layout_width="40dp"
             android:layout_height="60dp"
+            android:layout_marginRight="7dp"
             android:padding="8dp"
             android:layout_centerVertical="true"
             android:layout_alignParentRight="true"

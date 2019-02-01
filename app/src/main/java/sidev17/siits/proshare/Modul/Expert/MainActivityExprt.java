@@ -7,9 +7,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -19,12 +17,17 @@ import sidev17.siits.proshare.Modul.Expert.Tab.FeedbackActExprt;
 import sidev17.siits.proshare.Modul.Expert.Tab.JawabActExprt;
 import sidev17.siits.proshare.Modul.Expert.Tab.ProfileActExprt;
 import sidev17.siits.proshare.Modul.Expert.Tab.TimelineActExprt;
+import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
+import sidev17.siits.proshare.Modul.Worker.Tab.ChatExprt;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
+import sidev17.siits.proshare.Modul.Worker.Tab.ShareActWkr;
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas_Slider;
+import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
+import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.R;
-import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.ViewPagerAdapter;
 
-public class MainActivityExprt extends Aktifitas {
+public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slider {
 
     private LinearLayout tmb_Profile, tmb_Jawab, tmb_Timeline, tmb_Feedback;
     private ImageView garis_Profile, garis_Timeline, garis_Jawab, garis_Feedback;
@@ -34,46 +37,36 @@ public class MainActivityExprt extends Aktifitas {
     private boolean click_duaKali=false;
     private PenungguGantiHalaman pngGantiHalaman;
 
+    private final int tmbTab[][] = {{R.id.tab_profile_ikon_Exprt, R.id.tab_jawab_ikon_Exprt, R.id.tab_timeline_ikon_Exprt, R.id.tab_feedback_ikon_Exprt},
+            {R.id.tab_profile_garis_Exprt, R.id.tab_jawab_garis_Exprt, R.id.tab_timeline_garis_Exprt, R.id.tab_feedback_garis_Exprt}};
+    private final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
+            {R.color.colorPrimary, R.color.colorPrimaryDark}};
+
+    private Fragment_Header fragmenHalaman[]; //= {new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt()};
+    private String judulHalaman[]; //= {"", "", "", ""};
+//    private boolean bolehInitHeader= false; //false diperoleh hanya sekali saat pertama kali di-init
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_exprt);
-        final int tmbTab[][] = {{R.id.tab_profile_ikon_Exprt, R.id.tab_jawab_ikon_Exprt, R.id.tab_timeline_ikon_Exprt, R.id.tab_feedback_ikon_Exprt},
-                {R.id.tab_profile_garis_Exprt, R.id.tab_jawab_garis_Exprt, R.id.tab_timeline_garis_Exprt, R.id.tab_feedback_garis_Exprt}};
-        final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
-                {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
+        bolehInitHeader= false;
 
         tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile_Exprt);
         tmb_Timeline = (LinearLayout) findViewById(R.id.tab_timeline_Exprt);
         tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab_Exprt);
         tmb_Feedback = (LinearLayout) findViewById(R.id.tab_feedback_Exprt);
 
-        adapter = new ViewPagerAdapter(getSupportFragmentManager());
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
-        adapter.AddFragment(new ProfileActExprt(), "");
-        adapter.AddFragment(new JawabActExprt(), "");
-        adapter.AddFragment(new TimelineActExprt(), "");
-        adapter.AddFragment(new FeedbackActExprt(), "");
-        mvPager.setAdapter(adapter);
+        initAdapter();
+/*
+        adapter.addFragment(new ProfileActExprt(), "");
+        adapter.addFragment(new JawabActExprt(), "");
+        adapter.addFragment(new TimelineActExprt(), "");
+        adapter.addFragment(new FeedbackActExprt(), "");
+*/
 
-        mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
-        mvPager.setOffscreenPageLimit(4);
 
         //Buat Warna Inisiasi
         saringTerpilih(tmbTab[0], (ImageView) findViewById(R.id.tab_profile_ikon_Exprt), warnaTab[0],
@@ -116,6 +109,63 @@ public class MainActivityExprt extends Aktifitas {
                 gantiWarnaTab(3, tmbTab[0], tmbTab[1],warnaTab);
             }
         });
+        initHeader();
+    }
+
+    @Override
+    public void keHalaman(int ke) {
+        bolehInitHeader= true;
+        mvPager.setCurrentItem(ke);
+    }
+/*
+    @Override
+    protected void onStop() {
+        bolehInitHeader= false;
+        super.onStop();
+    }
+/*
+    @Override
+    protected void onResumeFragments() {
+        bolehInitHeader= true;
+        super.onResumeFragments();
+    }
+*/
+
+    private void initFragment(){
+        fragmenHalaman= new Fragment_Header[]{new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt()};
+        judulHalaman= new String[]{"", "", "", ""};
+    }
+    private void initAdapter(){
+        initFragment();
+        bolehInitHeader= false;
+        mvPager.setCurrentItem(0);
+        mvPager.setAdapter(null);
+        adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(fragmenHalaman, judulHalaman);
+        mvPager.setAdapter(adapter);
+        mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
+                try{
+                    if(bolehInitHeader)
+                        fragmenHalaman[position].initHeader();
+                } catch(Exception e){
+                    initAdapter();
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        mvPager.setOffscreenPageLimit(4);
     }
 
     public interface PenungguGantiHalaman{

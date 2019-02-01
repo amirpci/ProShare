@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/colorPrimary">
+
+    <RelativeLayout
+        android:id="@+id/daftar_pertanyaan_grafis"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_margin="10dp">
+        <ImageView
+            android:id="@+id/daftar_pertanyaan_gambar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="7dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/obj_gambar_kotak"/>
+        <ImageView
+            android:id="@+id/daftar_pertanyaan_centang"
+            android:layout_alignParentRight="true"
+            android:layout_width="25dp"
+            android:layout_height="25dp" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/daftar_pertanyaan_teks"
+        android:layout_toRightOf="@id/daftar_pertanyaan_grafis"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+        <sidev17.siits.proshare.Utils.View.MenuBarView
+            android:id="@+id/opsi_pertanyaan"
+            android:paddingBottom="10dp"
+            android:paddingTop="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginRight="5dp"
+            android:clickable="true"
+            android:layout_width="50dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/obj_titik_tiga_horizontal"
+            app:BAR_latarInduk="@drawable/latar_kotak_tumpul_bawah"
+            app:warna_latar="@color/abuTua"
+            app:warna_kuat="@color/biruLaut"
+            app:warna_induk="@color/abuSangatTua"
+            app:warna_tersedia="#FFFFFF"
+            android:tint="#FFFFFF"
+            android:backgroundTint="@color/abuTua"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/opsi_pertanyaan"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/daftar_pertanyaan_judul"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:text="Problem Text Goes Here"/>
+            <TextView
+                android:id="@+id/daftar_pertanyaan_deskripsi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:textColor="#000000"
+                android:textSize="12sp"
+                android:text="Problem description goes here"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

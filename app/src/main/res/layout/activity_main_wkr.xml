@@ -4,6 +4,64 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/main_header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#FFFFFF">
+        <TextView
+            android:id="@+id/header_judul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:padding="5dp"
+            android:text="Halaman"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+        <TextView
+            android:id="@+id/header_tambahan"
+            android:layout_toRightOf="@id/header_judul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp"
+            android:padding="5dp"
+            android:text="(tambahan)"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+
+        <ImageView
+            android:id="@+id/opsi_header_1"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:layout_marginRight="7dp"
+            android:padding="8dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/icon_tambah_teman"/>
+        <ImageView
+            android:id="@+id/opsi_header_2"
+            android:layout_toLeftOf="@id/opsi_header_1"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:padding="10dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/obj_search"/>
+        <ImageView
+            android:id="@+id/opsi_header_3"
+            android:layout_toLeftOf="@id/opsi_header_2"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:padding="10dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/obj_search"/>
+    </RelativeLayout>
+
     <LinearLayout
         android:layout_alignParentBottom="true"
         android:id="@+id/layout_tab_wkr"
@@ -28,7 +86,7 @@
             <ImageView
                 android:id="@+id/tab_profile_ikon_wkr"
                 android:layout_above="@id/tab_profile_garis_wkr"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="7dp"
                 android:layout_gravity="center_horizontal"
@@ -51,7 +109,7 @@
             <ImageView
                 android:id="@+id/tab_tanya_ikon_wkr"
                 android:layout_above="@id/tab_tanya_garis_wkr"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="7dp"
                 android:layout_gravity="center_horizontal"
@@ -74,7 +132,7 @@
             <ImageView
                 android:id="@+id/tab_feedback_ikon_Exprt"
                 android:layout_above="@id/tab_feedback_garis_Exprt"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="7dp"
                 android:layout_gravity="center_horizontal"
@@ -85,6 +143,7 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/layout_wadah_fragment_wkr"
         android:layout_above="@id/layout_tab_wkr"
+        android:layout_below="@id/main_header"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 <!--

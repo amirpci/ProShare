@@ -1,13 +1,10 @@
 package sidev17.siits.proshare.Modul.Worker.Tab;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,7 +16,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.method.KeyListener;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -38,7 +34,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
@@ -58,8 +53,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,16 +61,16 @@ import java.util.Map;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
+import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
+import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Konstanta;
-import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
 import sidev17.siits.proshare.Utils.View.ImgViewTouch;
 import sidev17.siits.proshare.Utils.View.MenuBarView;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Modul.SettingAct;
-import sidev17.siits.proshare.Utils.ArrayMod;
 import sidev17.siits.proshare.Utils.PackBahasa;
 import sidev17.siits.proshare.Utils.Utilities;
 import sidev17.siits.proshare.Utils.Warna;
@@ -95,7 +88,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
  * Created by USER on 02/05/2018.
  */
 
-public class ProfileActWkr extends Fragment {
+public class ProfileActWkr extends Fragment_Header {
     //private DatabaseReference dataRef;
     // private StorageReference storageRef;
     private EditText nama;
@@ -132,6 +125,8 @@ public class ProfileActWkr extends Fragment {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+
+
         textProfile = new TextView[4];
         textProfile[0] = v.findViewById(R.id.txt_profile_0);
         textProfile[1] = v.findViewById(R.id.txt_profile_1);
@@ -211,8 +206,16 @@ public class ProfileActWkr extends Fragment {
             }
         });
 */
-
+//        initHeader();
         return v;
+    }
+
+    @Override
+    public void initHeader(){
+        MainAct_Header mainAct= (MainAct_Header) getActivity();
+        mainAct.aturJudulHeader("Profil");
+        mainAct.aturGambarOpsiHeader_Null(0);
+//        int resId[]= {};
     }
 
     void loadPilihanMajorityServer(){
