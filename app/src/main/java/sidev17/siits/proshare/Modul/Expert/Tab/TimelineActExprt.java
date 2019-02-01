@@ -14,5 +14,8 @@ public class TimelineActExprt extends ShareActWkr {
         mainAct.aturJudulHeader("Pustaka");
         mainAct.aturGambarOpsiHeader_Null(0);
     }
+
+    @Override
+    protected void keHalamanAwal(){}
 }
 

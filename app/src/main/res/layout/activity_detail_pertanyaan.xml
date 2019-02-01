@@ -43,15 +43,18 @@
     <RelativeLayout
         android:id="@+id/timeline_header"
         android:layout_width="match_parent"
-        android:layout_height="80dp"
+        android:layout_height="100dp"
         android:orientation="vertical"
         android:background="@color/abu">
         <sidev17.siits.proshare.Utils.View.MenuBarView
             android:id="@+id/tl_opsi"
             android:layout_width="50dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:padding="10dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:layout_margin="10dp"
             android:tint="@color/biruLaut"
             app:BAR_latarInduk="@drawable/latar_kotak_tumpul_bawah"
@@ -60,9 +63,10 @@
             app:warna_tersedia="#FFFFFF"
             android:src="@drawable/obj_titik_tiga_vertical"/>
         <LinearLayout
+            android:id="@+id/tl_header"
             android:layout_toLeftOf="@id/tl_opsi"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/tl_judul"

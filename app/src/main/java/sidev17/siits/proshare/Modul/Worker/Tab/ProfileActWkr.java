@@ -115,6 +115,10 @@ public class ProfileActWkr extends Fragment_Header {
     private String bahasaSekarang = "en";
     private ArrayList<Bidang> bidangSekarang;
 
+    private boolean profileBerubah = false;
+    private String bidangAwal = "";
+    private String namaAwal = "";
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -173,6 +177,8 @@ public class ProfileActWkr extends Fragment_Header {
         addPhoto.setVisibility(View.GONE);
 
         initMenuBar();
+        bidangAwal = Utilities.getUserMajor(getActivity());
+        namaAwal = Utilities.getUserNama(getActivity());
         loadPilihanMajorityServer();
         // initBidang(new ArrayList<Bidang>());
 
@@ -261,6 +267,10 @@ public class ProfileActWkr extends Fragment_Header {
 
     void muatBidang(ArrayList<Bidang> bdg){
         String[] listBidang = Utilities.listBidangkeArray(bdg);
+        bidang.setAdapter(new AdapterBidang(listBidang));
+        bidang.setSelection(Integer.parseInt(bidangAwal) - 1);
+        bgAwalSpinner = bidang.getBackground();
+        enablePilihBidang(false);
         new ubahBahasMajor().execute(listBidang);
     }
 
@@ -289,9 +299,8 @@ public class ProfileActWkr extends Fragment_Header {
         @Override
         protected void onPostExecute(String[] result) {
             if(getActivity()!=null && bidang!=null) {
-                String bidangSekarang = Utilities.getUserMajor(getActivity());
                 bidang.setAdapter(new AdapterBidang(result));
-                bidang.setSelection(Integer.parseInt(bidangSekarang) - 1);
+                bidang.setSelection(Integer.parseInt(bidangAwal) - 1);
                 bgAwalSpinner = bidang.getBackground();
                 enablePilihBidang(false);
             }
@@ -410,7 +419,21 @@ public class ProfileActWkr extends Fragment_Header {
                     v.aturWarnaInduk("#ffffff");
                     v.aturWarnaLatar("#C9C9C9");
 //                    menuBar.setSelected(false);
-                    simpanProfil(nama.getText().toString(), String.valueOf(bidang.getSelectedItemPosition()+1));
+                    if(bidang.getSelectedItemPosition()+1!=Integer.parseInt(bidangAwal)){
+                        profileBerubah = true;
+                        if(bidang.getSelectedItemPosition()==0)
+                            profileBerubah = false;
+                    }
+                    if(nama.getText().toString().equalsIgnoreCase(namaAwal))
+                        profileBerubah = true;
+                    if (profileBerubah) {
+                        simpanProfil(nama.getText().toString(), String.valueOf(bidang.getSelectedItemPosition()+1));
+                        bidangAwal = String.valueOf(bidang.getSelectedItemPosition()+1);
+                        namaAwal = nama.getText().toString();
+                        profileBerubah = false;
+                    } else
+                        Toast.makeText(getActivity(), "No changes has been saved!", Toast.LENGTH_SHORT).show();
+
                 }
                 else if(menuDitampilkan){
 //                    v.latarIndukAwal();
@@ -679,6 +702,7 @@ public class ProfileActWkr extends Fragment_Header {
                         public void onSuccess(Uri uri) {
                             String alamatUrl = uri.toString();
                             Utilities.getProfileImageRef(getActivity()).setValue(alamatUrl);
+                            profileBerubah = true;
                             loadUploadedPP();
                         }
                     });

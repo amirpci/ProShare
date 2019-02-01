@@ -154,6 +154,11 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     private int lbrBarKomen= -3;
 
     private MenuBarView menuBar;
+    private LinearLayout header;
+
+    private String majorStr = null;
+    private String judulStr = null;
+    private String descStr = null;
 
     private final int BATAS_BUFFER_VIEW= 7;
 
@@ -193,6 +198,13 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
 
     private void initMenuBar(){
         menuBar= findViewById(R.id.tl_opsi);
+        header = findViewById(R.id.tl_header);
+        header.post(new Runnable() {
+            @Override
+            public void run() {
+                menuBar.getLayoutParams().height = header.getHeight();
+            }
+        });
         int gmbOpsi[]= {R.drawable.icon_edit,
                 R.drawable.icon_hapus};
         int tersedia[]= {menuBar.ITEM_TERSEDIA, menuBar.ITEM_TERSEDIA};
@@ -217,16 +229,19 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             @Override
             public void klik(View v) {
                 if(Utilities.isStoragePermissionGranted(DetailPertanyaanActivityWkr.this)){
-                    Intent keEdit= new Intent(DetailPertanyaanActivityWkr.this, TambahPertanyaanWkr.class);
+                    if(majorStr == null || judulStr==null || descStr==null)
+                        Toast.makeText(DetailPertanyaanActivityWkr.this, "Content has not fully loaded!", Toast.LENGTH_SHORT).show();
+                    else{
+                        Intent keEdit= new Intent(DetailPertanyaanActivityWkr.this, TambahPertanyaanWkr.class);
 
-                    keEdit.putExtra("judul", judulPertanyaan);
-                    keEdit.putExtra("deskripsi", deskripsiPertanyaan);
-                    TextView majority= viewPertanyaan.findViewById(R.id.tl_majority);
-                    keEdit.putExtra("bidang", majority.getText().toString());
-                    keEdit.putExtra("urlFoto", fotoLampiran);
+                        keEdit.putExtra("judul", judulPertanyaan);
+                        keEdit.putExtra("deskripsi", deskripsiPertanyaan);
+                        keEdit.putExtra("bidang", majorStr);
+                        keEdit.putExtra("urlFoto", fotoLampiran);
 //                keEdit.putExtra("gambarAwal", gambarAwal);
 
-                    startActivity(keEdit);
+                        startActivity(keEdit);
+                    }
                 }else {
                     Toast.makeText(DetailPertanyaanActivityWkr.this, "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
                 }
@@ -642,7 +657,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         System.out.println();
 
         teksJudul.setText(judulPertanyaan);
-        teksMajority.setText("");
+        teksMajority.setVisibility(View.GONE);
         teksDeskripsi.setText(deskripsiPertanyaan);
         loadPertanyaanLagi(teksJudul, teksMajority, teksDeskripsi, teksWaktu, waktu);
         Utilities.loadFotoLampiran(fotoLampiran, videoLampiran, lampiran, this, id_masalah);
@@ -727,6 +742,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 teksJudul.setText(kata[0]);
                 teksDeskripsi.setText(kata[1]);
                 teksTanggal.setText(kata[2]);
+                judulStr = kata[0];
+                descStr = kata[1];
             }
         });
 
@@ -745,7 +762,15 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this), DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
                     @Override
                     public void dataBerubah(String[] kata) {
+                        teksMajority.setVisibility(View.VISIBLE);
                         teksMajority.setText(kata[0]);
+                        majorStr = kata[0];
+                        header.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                menuBar.getLayoutParams().height = header.getHeight();
+                            }
+                        });
                     }
                 });
             }
