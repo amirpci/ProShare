@@ -1,7 +1,5 @@
 package sidev17.siits.proshare;
 
-import com.rmtheis.yandtran.language.Language;
-
 public class Konstanta {
     public static final String PENGGUNA_PREFS = "UserSekarang";
     public static final String permasalahanKey = "Problem";
@@ -41,13 +39,11 @@ public class Konstanta {
     public static final String COMMENT_VOTE_COUNT = ROOT_URL + "VoteCountComment.php";
     public static final String SOLUTION = ROOT_URL + "Solusi.php";
     public static final String COMMENT = ROOT_URL + "Komentar.php";
-    public static final String SET_STATUS = ROOT_URL + "SetProblemStatus.php";
+    public static final String SET_STATUS = ROOT_URL + "SetStatusProblem.php";
+    public static final String LEMPAR_PERTANYAAN = ROOT_URL + "LemparPertanyaan.php";
     public static final String LOGIN_INTENT = "login_intent";
     public static final int LOGIN_LOGOUT = 311;
     public static final int LOGIN_REGISTER = 312;
-    public static final Language BAHASA_INDONESIA = Language.INDONESIAN;
-    public static final Language BAHASA_INGGRIS = Language.ENGLISH;
-    public static final Language BAHASA_JEPANG = Language.JAPANESE;
     public static final int PROBLEM_STATUS_UNVERIFIED = 311;
     public static final int PROBLEM_STATUS_VERIFIED = 312;
     public static final int PROBLEM_STATUS_REJECTED = 313;

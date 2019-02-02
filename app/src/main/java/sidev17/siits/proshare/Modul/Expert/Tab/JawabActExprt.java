@@ -157,19 +157,15 @@ public class JawabActExprt extends Fragment_Header {
                             for(int i=0; i<jsonArr.length(); i++){
                                 try {
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
-                                    if(jsonObject.getInt("answered_status")==1)
-                                        continue;
-                                    else{
-                                        Permasalahan masalah = new Permasalahan();
-                                        masalah.setproblem_desc(jsonObject.getString("problem_desc"));
-                                        masalah.setproblem_title(jsonObject.getString("problem_title"));
-                                        masalah.setproblem_owner(jsonObject.getString("problem_owner"));
-                                        masalah.setStatus(jsonObject.getInt("status"));
-                                        masalah.setpid(jsonObject.getString("pid"));
-                                        masalah.setmajority_id(jsonObject.getString("majority_id"));
-                                        masalah.setTimestamp(jsonObject.getString("timestamp"));
-                                        Masalah.add(masalah);
-                                    }
+                                    Permasalahan masalah = new Permasalahan();
+                                    masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                    masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
+                                    masalah.setStatus(jsonObject.getInt("status"));
+                                    masalah.setpid(jsonObject.getString("pid"));
+                                    masalah.setmajority_id(jsonObject.getString("majority_id"));
+                                    masalah.setTimestamp(jsonObject.getString("timestamp"));
+                                    Masalah.add(masalah);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -193,6 +189,7 @@ public class JawabActExprt extends Fragment_Header {
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> masalah = new HashMap<>();
                 masalah.put("majority", Utilities.getUserMajor(getActivity()));
+                masalah.put("id_orang", Utilities.getUserID(getActivity()));
                 return masalah;
             }
         };
@@ -202,7 +199,7 @@ public class JawabActExprt extends Fragment_Header {
     @Override
     public void onResume() {
         super.onResume();
-        loadDaftarPertanyaan();
+        loadData();
     }
 
     public class RC_Masalah extends RecyclerView.Adapter<RC_Masalah.vH>{
@@ -284,6 +281,7 @@ public class JawabActExprt extends Fragment_Header {
                         paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
                         Intent inten= new Intent(getContext(), TambahJawabanExprt.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
+                        inten.putExtra("jenisPost", 12);
                         startActivity(inten);
                     }
                 });

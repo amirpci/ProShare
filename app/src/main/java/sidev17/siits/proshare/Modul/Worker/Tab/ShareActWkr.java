@@ -352,6 +352,7 @@ public class ShareActWkr extends Fragment_Header {
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
+                                Toast.makeText(getActivity(), "Might error occured!", Toast.LENGTH_SHORT).show();
                             }
                             loadingDitemukan.setVisibility(View.GONE);
                         }

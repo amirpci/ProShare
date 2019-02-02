@@ -654,7 +654,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        System.out.println();
+      //  System.out.println();
 
         teksJudul.setText(judulPertanyaan);
         teksMajority.setVisibility(View.GONE);
