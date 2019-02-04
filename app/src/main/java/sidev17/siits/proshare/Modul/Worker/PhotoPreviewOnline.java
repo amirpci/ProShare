@@ -29,7 +29,7 @@ public class PhotoPreviewOnline extends AppCompatActivity {
     private ArrayList<String> judul;
     private ViewPager wadahFoto;
     private int indDipilih;
-    private TextView judulHalaman;
+//    private TextView judulHalaman;
     private TextView judulFoto;
     private DisplayMetrics metrikUtama;
     private int panjangScreen;
@@ -51,7 +51,7 @@ public class PhotoPreviewOnline extends AppCompatActivity {
         panjangScreen= metrikUtama.widthPixels;
         lebarScreen= metrikUtama.heightPixels;
 
-        judulHalaman = findViewById(R.id.preview_judul);
+//        judulHalaman = findViewById(R.id.preview_judul);
         judulFoto= findViewById(R.id.preview_foto_judul);
 
         AdapterHalaman adpHal= new AdapterHalaman();

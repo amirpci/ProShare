@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
@@ -213,12 +212,14 @@ public class ProfileActWkr extends Fragment_Header {
         });
 */
 //        initHeader();
+        judulHeader= "Profil";
         return v;
     }
 
     @Override
     public void initHeader(){
-        MainAct_Header mainAct= (MainAct_Header) getActivity();
+//        Toast.makeText(actInduk, "INIT!!!", Toast.LENGTH_SHORT).show();
+        MainAct_Header mainAct= (MainAct_Header) actInduk;
         mainAct.aturJudulHeader("Profil");
         mainAct.aturGambarOpsiHeader_Null(0);
 //        int resId[]= {};
@@ -414,26 +415,8 @@ public class ProfileActWkr extends Fragment_Header {
 //                    v.sembunyikanLatar();
 //                    v.setBackgroundColor(getResources().getColor(R.color.abuTua));
                 } else if(!menuDitampilkan && !v.menuBisaDitampilkan()){
-                    v.menuBisaDitampilkan(true);
-                    v.aturGambarInduk(R.drawable.obj_titik_tiga_horizontal);
-                    v.aturWarnaInduk("#ffffff");
-                    v.aturWarnaLatar("#C9C9C9");
-//                    menuBar.setSelected(false);
-                    if(bidang.getSelectedItemPosition()+1!=Integer.parseInt(bidangAwal)){
-                        profileBerubah = true;
-                        if(bidang.getSelectedItemPosition()==0)
-                            profileBerubah = false;
-                    }
-                    if(nama.getText().toString().equalsIgnoreCase(namaAwal))
-                        profileBerubah = true;
-                    if (profileBerubah) {
-                        simpanProfil(nama.getText().toString(), String.valueOf(bidang.getSelectedItemPosition()+1));
-                        bidangAwal = String.valueOf(bidang.getSelectedItemPosition()+1);
-                        namaAwal = nama.getText().toString();
-                        profileBerubah = false;
-                    } else
-                        Toast.makeText(getActivity(), "No changes has been saved!", Toast.LENGTH_SHORT).show();
-
+                    menuBarAwal();
+                    cekPerubahanProfil();
                 }
                 else if(menuDitampilkan){
 //                    v.latarIndukAwal();
@@ -451,7 +434,6 @@ public class ProfileActWkr extends Fragment_Header {
 //                menuBar.setSelected(true);
                 menuBar.klik();
                 menuBar.menuBisaDitampilkan(false);
-
             }
         });
         menuBar.aturAksiKlikItem(1, new ImgViewTouch.PenungguKlik() {
@@ -470,13 +452,53 @@ public class ProfileActWkr extends Fragment_Header {
         });
 //        menuBar.latarIndukAwal();
 
-        ((Aktifitas)getActivity()).daftarkanBatas(menuBar.ambilBatas());
+        Aktifitas induk= (Aktifitas) actInduk;
+        induk.daftarkanBatas(menuBar.ambilBatas());
+        induk.daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
+            @Override
+            public boolean backPress() {
+                if(menuBar.itemDipilihKah(0)){
+                    menuBarAwal();
+                    return true;
+                } else if(menuBar.menuDitampilkan()){
+                    menuBar.klik();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
+    protected void menuBarAwal(){
+        editProfil(false);
+        menuBar.itemKe(0).setSelected(false);
+        menuBar.menuBisaDitampilkan(true);
+        menuBar.aturGambarInduk(R.drawable.obj_titik_tiga_horizontal);
+        menuBar.aturWarnaInduk("#ffffff");
+        menuBar.aturWarnaLatar("#C9C9C9");
+//                    menuBar.setSelected(false);
+    }
+
     void editProfil(boolean enable){
         int visibility= (enable) ? View.VISIBLE : View.GONE;
         editNama.setVisibility(visibility);
         addPhoto.setVisibility(visibility);
         enablePilihBidang(enable);
+    }
+    void cekPerubahanProfil(){
+        if(bidang.getSelectedItemPosition()+1!=Integer.parseInt(bidangAwal)){
+            profileBerubah = true;
+            if(bidang.getSelectedItemPosition()==0)
+                profileBerubah = false;
+        }
+        if(nama.getText().toString().equalsIgnoreCase(namaAwal))
+            profileBerubah = true;
+        if (profileBerubah) {
+            simpanProfil(nama.getText().toString(), String.valueOf(bidang.getSelectedItemPosition()+1));
+            bidangAwal = String.valueOf(bidang.getSelectedItemPosition()+1);
+            namaAwal = nama.getText().toString();
+            profileBerubah = false;
+        } else
+            Toast.makeText(getActivity(), "No changes has been saved!", Toast.LENGTH_SHORT).show();
     }
     void simpanProfil(final String nama, final String bidang){
         //lakukan sesuatu
@@ -504,7 +526,6 @@ public class ProfileActWkr extends Fragment_Header {
                 }
             }
         });
-        editProfil(false);
         if (editNama.isSelected())
             editNama.performClick();
     }

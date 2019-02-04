@@ -10,12 +10,12 @@ import sidev17.siits.proshare.Modul.Worker.Tab.ShareActWkr;
 public class TimelineActExprt extends ShareActWkr {
     @Override
     public void initHeader(){
-        final MainAct_Header mainAct= (MainAct_Header) getActivity();
+        final MainAct_Header mainAct= (MainAct_Header) actInduk;
         mainAct.aturJudulHeader("Pustaka");
         mainAct.aturGambarOpsiHeader_Null(0);
     }
 
     @Override
-    protected void keHalamanAwal(){}
+    protected void keHalamanAwal() {}
 }
 

@@ -517,7 +517,7 @@ Bagian EXPERT / TambahJawaban
         teksDeskripsi.setMaxLines(1000);
         teksDeskripsi.setSingleLine(false);
         if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
-           // EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
+//            EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
             EditTextMod.enableEditText(teksJudul, InputType.TYPE_NULL, false);
         }
     }

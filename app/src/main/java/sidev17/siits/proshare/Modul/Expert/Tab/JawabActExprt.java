@@ -106,12 +106,13 @@ public class JawabActExprt extends Fragment_Header {
 */
 //        initHeader();
         keHalamanAwal();
+        judulHeader= "Pertnyaan yang Harus Dijawab";
         return view;
     }
 
     @Override
     public void initHeader() {
-        MainAct_Header mainAct= (MainAct_Header) getActivity();
+        MainAct_Header mainAct= (MainAct_Header) actInduk;
         mainAct.aturJudulHeader("Pertnyaan yang Harus Dijawab");
         mainAct.aturTambahanHeader("(" +adapter.getItemCount() +")");
         mainAct.aturGambarOpsiHeader_Null(0);
@@ -121,14 +122,14 @@ public class JawabActExprt extends Fragment_Header {
         MainActivityExprt mainAct= (MainActivityExprt) getActivity();
         mainAct.keHalaman(1);
     }
-
+/*
     @Override
     public void onStop() {
         MainAct_Header mainAct= (MainAct_Header) getActivity();
         mainAct.bolehInitHeader= false;
         super.onStop();
     }
-
+*/
     void loadDaftarPertanyaan(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         daftarTanya.setLayoutManager(linearLayoutManager);
@@ -213,7 +214,7 @@ public class JawabActExprt extends Fragment_Header {
         @NonNull
         @Override
         public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_ditanyakan, parent, false));
+            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan_pribadi, parent, false));
         }
 
         @Override

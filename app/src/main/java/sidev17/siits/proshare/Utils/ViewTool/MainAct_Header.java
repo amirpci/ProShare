@@ -4,8 +4,10 @@ import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import sidev17.siits.proshare.R;
+import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 
 public class MainAct_Header extends Aktifitas {
@@ -35,6 +37,7 @@ Khusus untuk kustomasi header
         aturGambarOpsiHeader_Null(0);
     }
     public void aturJudulHeader(String judul){
+//        Toast.makeText(this, "judul= " +judul, Toast.LENGTH_SHORT).show();
         judulHeader.setText(judul);
     }
     public void aturTambahanHeader(String teks){
@@ -101,5 +104,4 @@ Khusus untuk kustomasi header
 -AKHIR-Khusus untuk kustomasi header
 ===============================
 */
-
 }

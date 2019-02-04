@@ -256,6 +256,16 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         });
 
         daftarkanBatas(menuBar.ambilBatas());
+        daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
+            @Override
+            public boolean backPress() {
+                if(menuBar.menuDitampilkan()){
+                    menuBar.klik();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void hapusPertanyaan() {

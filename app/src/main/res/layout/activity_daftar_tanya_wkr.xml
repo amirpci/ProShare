@@ -1,120 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v4.widget.SwipeRefreshLayout
-    android:id="@+id/refresh_pertanyaan"
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorAccent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <RelativeLayout
-            android:id="@+id/main_header"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="#FFFFFF">
-            <TextView
-                android:id="@+id/header_judul"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
-                android:padding="5dp"
-                android:text="Halaman"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#000000"/>
-            <TextView
-                android:id="@+id/header_tambahan"
-                android:layout_toRightOf="@id/header_judul"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_gravity="center_vertical"
-                android:layout_marginLeft="5dp"
-                android:padding="5dp"
-                android:text="(tambahan)"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                android:textColor="#000000"/>
 
-            <ImageView
-                android:id="@+id/opsi_header_1"
-                android:layout_width="40dp"
-                android:layout_height="60dp"
-                android:layout_marginRight="7dp"
-                android:padding="8dp"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:src="@drawable/icon_tambah_teman"/>
-            <ImageView
-                android:id="@+id/opsi_header_2"
-                android:layout_toLeftOf="@id/opsi_header_1"
-                android:layout_width="40dp"
-                android:layout_height="60dp"
-                android:padding="10dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/obj_search"/>
-            <ImageView
-                android:id="@+id/opsi_header_3"
-                android:layout_toLeftOf="@id/opsi_header_2"
-                android:layout_width="40dp"
-                android:layout_height="60dp"
-                android:padding="10dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/obj_search"/>
-        </RelativeLayout>
+    <RelativeLayout
+        android:id="@+id/main_header"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="#FFFFFF">
+        <TextView
+            android:id="@+id/header_judul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:padding="5dp"
+            android:text="Halaman"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+        <TextView
+            android:id="@+id/header_tambahan"
+            android:layout_toRightOf="@id/header_judul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="5dp"
+            android:padding="5dp"
+            android:text="(tambahan)"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+
+        <ImageView
+            android:id="@+id/opsi_header_1"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:layout_marginRight="7dp"
+            android:padding="8dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/icon_tambah_teman"/>
+        <ImageView
+            android:id="@+id/opsi_header_2"
+            android:layout_toLeftOf="@id/opsi_header_1"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:padding="10dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/obj_search"/>
+        <ImageView
+            android:id="@+id/opsi_header_3"
+            android:layout_toLeftOf="@id/opsi_header_2"
+            android:layout_width="40dp"
+            android:layout_height="60dp"
+            android:padding="10dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/obj_search"/>
+    </RelativeLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresh_pertanyaan"
+        android:layout_below="@id/main_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorAccent">
         <android.support.v7.widget.RecyclerView
             android:id="@+id/daftar_pertanyaan_wadah"
-            android:layout_below="@id/main_header"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="#00000000"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
+    <ImageView
+        android:id="@+id/daftar_pertanyaan_tambah"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="30dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/obj_tambah_lingkaran_full"/>
+    <com.eyalbira.loadingdots.LoadingDots
+        android:visibility="gone"
+        android:id="@+id/loading_pertanyaan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        app:LoadingDots_dots_color="@color/abu"
+        app:LoadingDots_dots_size="18dp"
+        app:LoadingDots_dots_space="1dp"/>
+
+    <LinearLayout
+        android:id="@+id/daftar_pertanyaan_kosong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true">
         <ImageView
-            android:id="@+id/daftar_pertanyaan_tambah"
-            android:visibility="gone"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="30dp"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/obj_tambah_lingkaran_full"/>
-        <com.eyalbira.loadingdots.LoadingDots
-            android:visibility="gone"
-            android:id="@+id/loading_pertanyaan"
+            android:id="@+id/tambah_pertanyaan"
+            android:layout_gravity="center_horizontal"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:tint="@color/abuSangatTua"
+            android:src="@drawable/obj_tidak_ada"/>
+        <TextView
+            android:layout_marginTop="30dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            app:LoadingDots_dots_color="@color/abu"
-            app:LoadingDots_dots_size="18dp"
-            app:LoadingDots_dots_space="1dp"/>
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:textSize="22sp"
+            android:textColor="@color/abuSangatTua"
+            android:text="Anda belum mengajukan pertanyaan"/>
+    </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/daftar_pertanyaan_kosong"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true">
-            <ImageView
-                android:id="@+id/tambah_pertanyaan"
-                android:layout_gravity="center_horizontal"
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:tint="@color/abuSangatTua"
-                android:src="@drawable/obj_tidak_ada"/>
-            <TextView
-                android:layout_marginTop="30dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:gravity="center"
-                android:textSize="22sp"
-                android:textColor="@color/abuSangatTua"
-                android:text="Anda belum mengajukan pertanyaan"/>
-        </LinearLayout>
-
-    </RelativeLayout>
-</android.support.v4.widget.SwipeRefreshLayout>
+</RelativeLayout>

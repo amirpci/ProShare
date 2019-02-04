@@ -110,6 +110,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
             }
         });
         initHeader();
+        initBackPress();
     }
 
     @Override
@@ -138,7 +139,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
     private void initAdapter(){
         initFragment();
         bolehInitHeader= false;
-        mvPager.setCurrentItem(0);
+//        mvPager.setCurrentItem(0);
         mvPager.setAdapter(null);
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(fragmenHalaman, judulHalaman);
@@ -157,6 +158,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
                         fragmenHalaman[position].initHeader();
                 } catch(Exception e){
                     initAdapter();
+                    Toast.makeText(MainActivityExprt.this, "posisi= " +mvPager.getCurrentItem(), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -238,23 +240,29 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
     void pesan(String pesan) {
         Toast.makeText(this, pesan, Toast.LENGTH_LONG).show();
     }
-    public void onBackPressed() {
-        if(click_duaKali){
-            Intent i = new Intent(Intent.ACTION_MAIN);
-            i.addCategory(Intent.CATEGORY_HOME);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(i);
-            finish();
-            System.exit(0);
-        }
-        Toast.makeText(MainActivityExprt.this, "Press BACK again to exit!", Toast.LENGTH_LONG).show();
-        new Handler().postDelayed(new Runnable() {
+
+    private void initBackPress() {
+        aturAksiBackPress_Int(new AksiBackPress_Internal() {
             @Override
-            public void run() {
-                click_duaKali=false;
+            public void backPress_Int() {
+                if(click_duaKali){
+                    Intent pergi = new Intent(Intent.ACTION_MAIN);
+                    pergi.addCategory(Intent.CATEGORY_HOME);
+                    pergi.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(pergi);
+//                    finish();
+//                    System.exit(0);
+                }
+                Toast.makeText(MainActivityExprt.this, "Press BACK again to exit!", Toast.LENGTH_LONG).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        click_duaKali=false;
+                    }
+                },3000);
+                click_duaKali=true;
             }
-        },3000);
-        click_duaKali=true;
+        });
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.ViewTool.Batas;
@@ -130,4 +131,64 @@ public class Aktifitas extends AppCompatActivity {
         intent.putExtra("requestCode", requestCode);
         super.startActivityForResult(intent, requestCode);
     }
+
+/*
+================================
+AksiBackPress
+================================
+*/
+    public interface AksiBackPress{
+        boolean backPress();
+    }
+    private Array<AksiBackPress> aksiBackPress;
+    private void initAksiBackPress(){
+        aksiBackPress= new Array<>();
+        aksiBackPress.aturPenungguTraverse(new Array.PenungguTraverse<Boolean, Boolean>(){
+            @Override
+            public Boolean traverse(int indek, Object isi) {
+                return ((AksiBackPress)isi).backPress();
+            }
+
+            @Override
+            public Boolean akhirTraverse(Boolean... hasilTraverse) {
+                boolean hasil= false;
+                for(int i= 0; i< hasilTraverse.length; i++)
+                    hasil |= hasilTraverse[i];
+                return hasil;
+            }
+        });
+    }
+    public void daftarkanAksiBackPress(AksiBackPress a){
+        if(aksiBackPress == null)
+            initAksiBackPress();
+        aksiBackPress.tambah(a);
+    }
+    public void hapusAksiBackPress(AksiBackPress a){
+        aksiBackPress.hapus(a);
+    }
+    public void bersihkanAksiBackPress(){
+        aksiBackPress.hapusSemua();
+    }
+
+
+    protected interface AksiBackPress_Internal{
+        void backPress_Int();
+    }
+    private AksiBackPress_Internal aksiBackPress_Int;
+    protected void aturAksiBackPress_Int(AksiBackPress_Internal a){
+        aksiBackPress_Int= a;
+    }
+
+    @Override
+    public void onBackPressed() {
+        boolean keAnak= false;
+        if(aksiBackPress != null)
+            keAnak |= (Boolean) aksiBackPress.traverse();
+        if(!keAnak)
+            if(aksiBackPress_Int != null)
+                aksiBackPress_Int.backPress_Int();
+            else
+                super.onBackPressed();
+    }
+
 }

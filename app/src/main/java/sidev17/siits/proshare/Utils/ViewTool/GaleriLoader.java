@@ -345,23 +345,32 @@ public class GaleriLoader {
         v.setOnTouchListener(gesture);
     }
 
-    public static final Array<String> ekstensiFoto= new Array<>("jpg", "jpeg", "png", "bmp", "gif");
-    public static final Array<String> ekstensiVideo= new Array<>("mp4", "mkv", "3gp");
-
     private int jenisFoto(int posisi){
-        String array[]= pathFoto[posisi].split("\\.");
-        String strTrahir= array[array.length -1];
+        int jenis= Galeri.jenisFoto(pathFoto[posisi]);
+        if(jenis == JENIS_VIDEO)
+            jenis= (jenisFoto == JENIS_VIDEO) ? JENIS_VIDEO : JENIS_VIDEO_THUMBNAIL;
+        return jenis;
+    }
+    public static class Galeri{
+        public static final Array<String> ekstensiFoto= new Array<>("jpg", "jpeg", "png", "bmp", "gif");
+        public static final Array<String> ekstensiVideo= new Array<>("mp4", "mkv", "3gp");
+
+
+        public static int jenisFoto(String path){
+            String array[]= path.split("\\.");
+            String strTrahir= array[array.length -1];
 //        array= strTrahir.split(".");
 //        strTrahir= array[array.length-1];
 
-        int indekFoto= ekstensiFoto.indekAwal(strTrahir);
-        int indekVideo= ekstensiVideo.indekAwal(strTrahir);
+            int indekFoto= ekstensiFoto.indekAwal(strTrahir);
+            int indekVideo= ekstensiVideo.indekAwal(strTrahir);
 
-        if(indekFoto > -1)
-            return JENIS_FOTO;
-        else if(indekVideo > -1)
-            return jenisFoto == JENIS_VIDEO ? JENIS_VIDEO : JENIS_VIDEO_THUMBNAIL;
-        return -1;
+            if(indekFoto > -1)
+                return JENIS_FOTO;
+            else if(indekVideo > -1)
+                return JENIS_VIDEO;
+            return -1;
+        }
     }
 
     private void isiFileFoto(int mulai, int sebanyak, int ukuranPokok){

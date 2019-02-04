@@ -1,13 +1,16 @@
 package sidev17.siits.proshare.Modul.Worker;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Path;
+import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -16,6 +19,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -24,6 +28,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import java.util.ArrayList;
 
@@ -41,11 +46,21 @@ public class GaleriPreview extends AppCompatActivity {
     public static final int PATH_DEFAULT= 21;
     public static final int PATH_TERTENTU= 22;
 
-    public static final int JENIS_AMBIL_BANYAK= 31;
-    public static final int JENIS_AMBIL_SATU= 30;
+    public static final int AMBIL_BANYAK = 31;
+    public static final int AMBIL_SATU = 30;
+
+//    public static final int SUMBER_FOTO_PENYIMPANAN= 40;
+//    public static final int SUMBER_FOTO_SERVER= 41;
+
+    public static final String TANDA_DARI_SERVER= "\"server\":";
+    public static final int PANJANG_TANDA_DARI_SERVER= TANDA_DARI_SERVER.length();
+
 
     private String pathFoto[];
     private ArrayList<String> judul;
+//    private Bitmap bitmapFoto[];
+//    private int jenisFoto[];
+
     private int batasHalaman= 10;
     private int posisiLoader[];
     private boolean adapterDiAwal= true;
@@ -53,10 +68,11 @@ public class GaleriPreview extends AppCompatActivity {
     private boolean bisaDiPerluas= false; //menandakan bahwa halaman cuma 1 / pathFoto tidak lebih panjang dari batasHalaman
     private boolean indikatorDitampilkan= true;
     private int kelompokHalamanSkrg= 0;
-    private int posisiFoto;
+    private int posisiFotoSebelumnya= -1;
+    private int posisiFoto= -1;
     private int jenisPath;
 
-    private int jenisPengambilan= JENIS_AMBIL_BANYAK;
+    private int jenisPengambilan= AMBIL_BANYAK;
     private int posisiTrahir= -1;
 
     private Array<Integer> posisiAwal= new Array<>();
@@ -65,17 +81,24 @@ public class GaleriPreview extends AppCompatActivity {
 
 //    private ArrayList<Bitmap> foto;
     private ViewPager wadahFoto;
-    private TextView judulHalaman;
+//    private TextView judulHalaman;
     private TextView judulFoto;
     private ImageView tmbOk;
 
-    private boolean judulDitampilkan= true;
     private Path pathHeader= new Path();
     private Path pathFooter= new Path();
     private ObjectAnimator animatorHeader;
     private ObjectAnimator animatorFooter;
     private View header;
     private View footer;
+    private boolean judulDitampilkan= true;
+    private boolean videoControlDipasang= false;
+    private int indekViewControl= -1;
+//    private View videoControl;
+
+    private int batasBuffer;
+    private Object bufferView[]; //tipe Object karena bisa berupa RelativeLayout atau VideoPreview
+    private int indekKeliatan[]; //= new int[batasBuffer];
 
     private TextView noUrutDipilih;
     private ImageView centangDipilih;
@@ -83,7 +106,7 @@ public class GaleriPreview extends AppCompatActivity {
 
     private GaleriLoader loader;
     private boolean zoomIn= false;
-    private int jenisFoto;
+//    private int jenisFoto;
 
     private DisplayMetrics metrikUtama;
     private int panjangScreen;
@@ -97,7 +120,7 @@ public class GaleriPreview extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview_foto);
 
-        judulHalaman = findViewById(R.id.preview_judul);
+//        judulHalaman = findViewById(R.id.preview_judul);
         judulFoto= findViewById(R.id.preview_foto_judul);
         noUrutDipilih = findViewById(R.id.tambah_cell_centang_no);
         centangDipilih= findViewById(R.id.tambah_cell_centang_gambar);
@@ -107,7 +130,7 @@ public class GaleriPreview extends AppCompatActivity {
         initTmbOk();
         initHeaderFooter();
         pengaturanAwal();
-        initLoader(pathFoto, jenisFoto);
+        initLoader(pathFoto);
 
         metrikUtama= new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrikUtama);
@@ -128,19 +151,32 @@ public class GaleriPreview extends AppCompatActivity {
             }
         });
 
+        AdapterHalaman adpHal= new AdapterHalaman();
+        wadahFoto.setAdapter(adpHal);
+
+        wadahFoto.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return zoomIn;
+            }
+        });
         wadahFoto.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                if(videoControlDipasang && posisiFotoSebelumnya != -1)
+                    ((VideoPreview)bufferView[posisiFotoSebelumnya %batasBuffer]).hentikan();
             }
 
             @Override
             public void onPageSelected(int position) {
                 judulFoto.setText(judul.get(position));
-                posisiFoto = position;
 
                 pasangIndikatorDipilih(loader.fotoDipilih(posisiFoto));
 
+                posisiFoto = position;
+
+                if(bufferView[posisiFoto %batasBuffer] != null)
+                    pasangVideoControl_Induk();
 //                Toast.makeText(GaleriPreview.this, "posisi= " + posisiFoto, Toast.LENGTH_SHORT).show();
             }
 
@@ -149,23 +185,38 @@ public class GaleriPreview extends AppCompatActivity {
 
             }
         });
-//        pilihHalaman(posisiFoto);
-        AdapterHalaman adpHal= new AdapterHalaman();
-        wadahFoto.setAdapter(adpHal);
         wadahFoto.setCurrentItem(posisiFoto);
+//        pilihHalaman(posisiFoto);
+    }
 
-        wadahFoto.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return zoomIn;
-            }
-        });
+    private void pasangVideoControl_Induk(){
+        if(!(GaleriLoader.Galeri.jenisFoto(pathFoto[posisiFoto]) == -1)){
+            if(!(GaleriLoader.Galeri.jenisFoto(pathFoto[posisiFoto]) == GaleriLoader.JENIS_FOTO)){
+                if(videoControlDipasang && posisiFotoSebelumnya != -1)
+                    ((VideoPreview)bufferView[posisiFotoSebelumnya %batasBuffer]).lepasVideoControl();
+                ((VideoPreview)bufferView[posisiFoto %batasBuffer]).pasangVideoControl();
+                posisiFotoSebelumnya= posisiFoto;
+            } else if(videoControlDipasang)
+                ((VideoPreview)bufferView[posisiFotoSebelumnya %batasBuffer]).lepasVideoControl();
+        }
     }
 
     @Override
     public void onBackPressed() {
-        setResult(RESULT_CANCELED);
-        super.onBackPressed();
+        if(videoControlDipasang)
+            ((VideoPreview)bufferView[wadahFoto.getCurrentItem() %batasBuffer]).hentikan();
+        else{
+            setResult(RESULT_CANCELED);
+            super.onBackPressed();
+        }
+    }
+
+    private void initBuffer(int batasBuffer){
+        bufferView= new Object[batasBuffer];
+        indekKeliatan= new int[batasBuffer];
+        this.batasBuffer= batasBuffer;
+        for(int i= 0; i< batasBuffer; i++)
+            indekKeliatan[i]= -1;
     }
 
     private void ambilIntent(){
@@ -173,14 +224,17 @@ public class GaleriPreview extends AppCompatActivity {
 
 //        ParcelHolder<Bitmap> holder= intentSebelumnya.getParcelableExtra("foto");
 //        foto= intentSebelumnya.getParcelableArrayListExtra("foto");
+
         pathFoto= intentSebelumnya.getStringArrayExtra("path");
+//        bitmapFoto= intentSebelumnya.getStringArrayExtra("bitmap");
+
         jenisPath= (pathFoto== null) ? PATH_DEFAULT
                     : intentSebelumnya.getIntExtra("jenisPath", PATH_TERTENTU);
 
-        jenisPengambilan= intentSebelumnya.getIntExtra("jenisPengambilan", JENIS_AMBIL_BANYAK);
-        Toast.makeText(this, "jenisPengambilan= " +jenisPengambilan, Toast.LENGTH_SHORT).show();
+        jenisPengambilan= intentSebelumnya.getIntExtra("jenisPengambilan", AMBIL_BANYAK);
+//        Toast.makeText(this, "jenisPengambilan= " +jenisPengambilan, Toast.LENGTH_SHORT).show();
 
-        jenisFoto= intentSebelumnya.getIntExtra("jenisFoto", GaleriLoader.JENIS_FOTO);
+//        jenisFoto= intentSebelumnya.getIntExtra("jenisFoto", GaleriLoader.JENIS_FOTO);
 
         if(jenisPath == PATH_DEFAULT) {
             pathFoto= ambilPathGambar();
@@ -197,6 +251,7 @@ public class GaleriPreview extends AppCompatActivity {
 
     private void pengaturanAwal(){
         ambilIntent();
+        initBuffer(4);
         if(pathFoto.length > batasHalaman) {
             adapterDiAwal= true;
             adapterDiAkhir= false;
@@ -212,6 +267,7 @@ public class GaleriPreview extends AppCompatActivity {
     private void initHeaderFooter(){
         header= findViewById(R.id.preview_header);
         footer= findViewById(R.id.preview_footer);
+//        videoControl= findViewById(R.id.video_control);
     }
 
     private void initTmbOk(){
@@ -305,9 +361,9 @@ public class GaleriPreview extends AppCompatActivity {
         return true;
     }
 
-    void initLoader(String pathFile[], int jenisFoto){
+    void initLoader(String pathFile[]){
 //        inisiasiArrayDipilih(pathFoto.length);
-        loader= new GaleriLoader(this, pathFile, 18, jenisFoto,
+        loader= new GaleriLoader(this, pathFile, 18, GaleriLoader.JENIS_FOTO,
                 GaleriLoader.ELEMEN_KOSONG, GaleriLoader.ELEMEN_KOSONG);
 //        loader.bisaDiScale(true);
         loader.aturUkuranPratinjau(1000);
@@ -343,7 +399,7 @@ public class GaleriPreview extends AppCompatActivity {
         loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
             @Override
             public void pilihFoto(View v, final int posisi) {
-                if(jenisPengambilan == JENIS_AMBIL_SATU){
+                if(jenisPengambilan == AMBIL_SATU){
                     if(posisiTrahir != -1)
                         loader.batalPilihFoto(posisiTrahir);
                     if(posisiAwal.ukuran() == 0
@@ -352,7 +408,7 @@ public class GaleriPreview extends AppCompatActivity {
                     } else if(posisiAwal.ukuran() > 0 && posisi == posisiAwal.ambil(0))
                         tmbOk(false);
                     posisiTrahir= posisi;
-                } else if(jenisPengambilan == JENIS_AMBIL_BANYAK){
+                } else if(jenisPengambilan == AMBIL_BANYAK){
                     if(samaDenganAwal){
                         tmbOk(true);
                     }
@@ -367,14 +423,14 @@ public class GaleriPreview extends AppCompatActivity {
             }
             @Override
             public void batalPilihFoto(View v, int posisi) {
-                if(jenisPengambilan == JENIS_AMBIL_SATU){
+                if(jenisPengambilan == AMBIL_SATU){
                     if(posisi == wadahFoto.getCurrentItem()){
                         if(posisiAwal.ukuran() > 0 && posisiAwal.ambil(0) == posisi){
                             posisiTrahir = -1;
                             tmbOk(true);
                         }
                     }
-                } else if(jenisPengambilan == JENIS_AMBIL_BANYAK){
+                } else if(jenisPengambilan == AMBIL_BANYAK){
                     if(posisiAwal.indekAwal(posisi) != -1) {
                         perbedaanDipilih++;
                         tmbOk(true);
@@ -389,18 +445,18 @@ public class GaleriPreview extends AppCompatActivity {
     }
     private void pasangIndikatorDipilih(boolean dipilih){
         if(dipilih){
-            if(jenisPengambilan == JENIS_AMBIL_BANYAK){
+            if(jenisPengambilan == AMBIL_BANYAK){
                 noUrutDipilih.setText(Integer.toString(loader.ambilUrutanDipilih(posisiFoto)));
 //                Toast.makeText(this, "BANYAK!!!", Toast.LENGTH_SHORT).show();
             }
-            else if(jenisPengambilan == JENIS_AMBIL_SATU)
+            else if(jenisPengambilan == AMBIL_SATU)
                 centangDipilih.setImageResource(R.drawable.obj_centang);
             noUrutDipilih.getBackground().setTint(getResources().getColor(R.color.biruLaut));
             noUrutDipilih.getBackground().setAlpha(255);
         } else{
-            if(jenisPengambilan == JENIS_AMBIL_BANYAK)
+            if(jenisPengambilan == AMBIL_BANYAK)
                 noUrutDipilih.setText("");
-            else if(jenisPengambilan == JENIS_AMBIL_SATU)
+            else if(jenisPengambilan == AMBIL_SATU)
                 centangDipilih.setImageDrawable(null);
             noUrutDipilih.getBackground().setAlpha(0);
         }
@@ -484,7 +540,7 @@ public class GaleriPreview extends AppCompatActivity {
         return listOfAllImages;
     }
 
-    public ArrayList<String> ambilDaftarJudul(){
+    private ArrayList<String> ambilDaftarJudul(){
         ArrayList<String> judul= new ArrayList<String>();
 //        String pathDipilih[]= ambilPathDipilih();
         for(int i= 0; i<pathFoto.length; i++){
@@ -547,77 +603,463 @@ public class GaleriPreview extends AppCompatActivity {
             RelativeLayout induk= new RelativeLayout(getBaseContext());
             induk.setLayoutParams(lpInduk);
 */
-            RelativeLayout.LayoutParams lpPanel= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            ImageView panel= new ImageView(getBaseContext());
-            panel.setLayoutParams(lpPanel);
-//            panel.setImageBitmap(foto.get(position));
-            panel.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-            panel= (ImageView) loader.buatFoto(panel, position/*posisiLoader[position]*/);
+            RelativeLayout indukPanel= new RelativeLayout(GaleriPreview.this);
+            RelativeLayout.LayoutParams lpIndukPanel= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            lpIndukPanel.addRule(RelativeLayout.CENTER_IN_PARENT);
 
-            ScaleGesture gestur= new ScaleGesture(panel, getBaseContext());
-            gestur.aturAksiZoom(new ScaleGesture.AksiZoom() {
-                @Override
-                public void zoomIn(View v, float scale) {
-                    zoomIn= true;
-                }
+            int indekGrup= position /indekKeliatan.length;
+            int indekBuffer= position %batasBuffer;
 
-                @Override
-                public void zoomOut(View v, float scale) {
-                    zoomIn= false;
-                }
-            });
-            panel.setOnTouchListener(gestur);
+            if(indekKeliatan[indekBuffer] != indekGrup){
+                indekKeliatan[indekBuffer] = indekGrup;
 
-            panel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if(!judulDitampilkan){
-                        pathHeader.moveTo(header.getX(), header.getY());
-                        pathHeader.lineTo(header.getX(), header.getY()-(header.getHeight()));
-                        animatorHeader= ObjectAnimator.ofFloat(header, View.X, View.Y, pathHeader);
-                        animatorHeader.setDuration(500);
+                indukPanel.setLayoutParams(lpIndukPanel);
+                indukPanel.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if(!judulDitampilkan){
+                            pathHeader.moveTo(header.getX(), header.getY());
+                            pathHeader.lineTo(header.getX(), header.getY()-(header.getHeight()));
+                            animatorHeader= ObjectAnimator.ofFloat(header, View.X, View.Y, pathHeader);
+                            animatorHeader.setDuration(500);
 
-                        pathFooter.moveTo(footer.getX(), footer.getY());
-                        pathFooter.lineTo(footer.getX(), footer.getHeight());
-                        animatorFooter= ObjectAnimator.ofFloat(footer, View.X, View.Y, pathFooter);
-                        animatorFooter.setDuration(500);
+                            pathFooter.moveTo(footer.getX(), footer.getY());
+                            pathFooter.lineTo(footer.getX(), footer.getHeight());
+                            animatorFooter= ObjectAnimator.ofFloat(footer, View.X, View.Y, pathFooter);
+                            animatorFooter.setDuration(500);
 
-                        animatorHeader.start();
-                        animatorFooter.start();
-                        judulDitampilkan= true;
-                    } else{
-                        if(animatorHeader.isRunning())
-                            animatorHeader.cancel();
-                        if(animatorFooter.isRunning())
-                            animatorFooter.cancel();
+                            animatorHeader.start();
+                            animatorFooter.start();
+                            judulDitampilkan= true;
+                        } else if(animatorFooter != null){
+                            if(animatorHeader.isRunning())
+                                animatorHeader.cancel();
+                            if(animatorFooter.isRunning())
+                                animatorFooter.cancel();
 
-                        header.setY(header.getY()+header.getHeight());
-                        footer.setY(footer.getY()-footer.getHeight());
-                        judulDitampilkan= false;
+                            header.setY(header.getY()+header.getHeight());
+                            footer.setY(footer.getY()-footer.getHeight());
+                            judulDitampilkan= false;
+                        }
+                        return true;
                     }
-                }
-            });
+                });
+
+                View panel;
+                if(!pathFoto[position].startsWith(TANDA_DARI_SERVER)){
+                    if(GaleriLoader.Galeri.jenisFoto(pathFoto[position]) == GaleriLoader.JENIS_FOTO){
+//                    videoControl.setVisibility(View.GONE);
+                        ImageView imgPanel= new ImageView(getBaseContext());
+//                imgPanel.setLayoutParams(lpPanel);
+//            panel.setImageBitmap(foto.get(position));
+                        imgPanel.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+                        imgPanel= (ImageView) loader.buatFoto(imgPanel, position/*posisiLoader[position]*/);
+
+                        ScaleGesture gestur= new ScaleGesture(imgPanel, getBaseContext());
+                        gestur.aturAksiZoom(new ScaleGesture.AksiZoom() {
+                            @Override
+                            public void zoomIn(View v, float scale) {
+                                zoomIn= true;
+                            }
+
+                            @Override
+                            public void zoomOut(View v, float scale) {
+                                zoomIn= false;
+                            }
+                        });
+//                    imgPanel.setOnTouchListener(gestur);
 /*
-            RelativeLayout.LayoutParams lpJudul= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            lpJudul.setMargins(20, 20, 20, 0);
-            TextView judulFoto= new TextView(getBaseContext());
-            judulFoto.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            judulFoto.setTextColor(Color.parseColor("#FFFFFF"));
-            judulFoto.setLayoutParams(lpJudul);
-            judulFoto.setText(judul.get(position) +" " +position);
+                    imgPanel.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                        }
+                    });
 */
+                        panel= imgPanel;
+                        indukPanel.addView(panel);
+                        bufferView[indekBuffer]= indukPanel;
+                    } else{
+//                    videoControl.setVisibility(View.VISIBLE);
+                        VideoPreview vidPrev= new VideoPreview(pathFoto[position]);
+                        panel= vidPrev.pasangVideoViewKe(indukPanel);
+                        bufferView[indekBuffer]= vidPrev;
+//                        Toast.makeText(GaleriPreview.this, "VIDEO!= " +position, Toast.LENGTH_SHORT).show();
+                    }
+                } else{
+//===========CARI!!!=============
+                    // jika dari server
 
-//            induk.addView(panel);
+                    final TextView vPath= new TextView(GaleriPreview.this);
+                    vPath.setText("*DARI SERVER*");
+                    vPath.setTextSize(15);
+                    vPath.setTextColor(Color.parseColor("#000000"));
+                    vPath.setGravity(Gravity.CENTER);
 
-            container.addView(panel, container.getChildCount()-2);
+                    panel= vPath;
+                    indukPanel.addView(panel);
+                    bufferView[indekBuffer]= indukPanel;
+                }
+                RelativeLayout.LayoutParams lpPanel= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                lpPanel.addRule(RelativeLayout.CENTER_IN_PARENT);
+                panel.setLayoutParams(lpPanel);
 
-            return panel;
+            } else{
+                if(bufferView[indekBuffer] instanceof VideoPreview)
+                    indukPanel= ((VideoPreview)bufferView[indekBuffer]).viewWraper();
+                else
+                    indukPanel= (RelativeLayout) bufferView[indekBuffer];
+            }
+            container.addView(indukPanel, container.getChildCount()-2);
+            return indukPanel;
         }
 
         @Override
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-            container.removeView((ImageView) object);
+            container.removeView((View) object);
+        }
+    }
+
+    class VideoPreview{
+        public final int JALAN= 10;
+        public final int JEDA= 11;
+        public final int BERHENTI= 12;
+
+        private int status= BERHENTI;
+
+        private RelativeLayout indukPanel; //sebagai wrapper untuk AdapterHalaman
+//        private int indekViewControl= -1; //pada wraper
+        private View viewInduk; //yg utama
+        private View viewControl; //bar yg ngontrol video (play n pause)
+
+        private VideoView vVideo;
+        private ImageView vKontrol;
+        private ImageView vPlay;
+
+//        private RelativeLayout vBar;
+        private ImageView vBarLatar;
+        private ImageView vBarProgres;
+        private ImageView vPenunjuk;
+
+        private TextView vDurasi;
+//        private TextView vDurasiBesar;
+
+        private int durasiVid;
+        private int pjgBarFull;
+        private AsyncTask<Void, Integer, Void> videoProgres;
+
+//        private ListView listPathVideo;
+        private String pathVideo;
+
+//        private int indekDipilih= 1;
+
+        private ScaleGesture sg;
+
+        public VideoPreview(String pathVideo) {
+            this.pathVideo= pathVideo;
+            viewInduk= getLayoutInflater().inflate(R.layout.model_video_view, null);
+            viewControl= getLayoutInflater().inflate(R.layout.model_video_view_control, null);
+
+//            vBar= viewControl.findViewById(R.id.video_control_bar);
+            vBarProgres= viewControl.findViewById(R.id.video_control_bar_progres);
+            vBarLatar= viewControl.findViewById(R.id.video_control_bar_latar);
+
+            vPenunjuk= viewControl.findViewById(R.id.video_control_bar_penunjuk);
+            sg= new ScaleGesture(vPenunjuk, GaleriPreview.this);
+            sg.aturAksiGeser(new ScaleGesture.AksiGeser() {
+
+                float xAwal, yAwal, pjgBarAwal;
+                @Override
+                public void awalGeser(View v, float xAwal, float yAwal) {
+                    this.xAwal= xAwal;
+                    this.yAwal= yAwal;
+                    pjgBarAwal= vBarProgres.getLayoutParams().width;
+                }
+
+                @Override
+                public void geser(View v, float xGeser, float yGeser) {
+                    if(videoProgres != null && videoProgres.getStatus() == AsyncTask.Status.RUNNING){
+//                    videoProgres.cancel(true);
+//                    Toast.makeText(VideoPrevAct.this, "DIGESER!!!", Toast.LENGTH_SHORT).show();
+                    }
+
+                    ViewGroup.LayoutParams lp =vBarProgres.getLayoutParams();
+                    lp.width= (int) (pjgBarAwal +xGeser); //((int) v.getX() +(v.getWidth()/2));
+                    vBarProgres.setLayoutParams(lp);
+//                    Toast.makeText(VideoPrevAct.this, "pjg= " +vBarProgres.getLayoutParams().width, Toast.LENGTH_SHORT).show();
+//                mainkan((double) vBarProgres.getWidth() /pjgBarFull);
+                }
+
+                @Override
+                public void akhirGeser(View v, float xAkhir, float yAkhir) {
+                    mainkan((double) vBarProgres.getWidth() /pjgBarFull);
+                }
+            });
+            sg.bisaZoom(false);
+            sg.aturModeGeser(ScaleGesture.MODE_GESER_HORIZONTAL);
+
+            vDurasi= viewControl.findViewById(R.id.video_control_durasi);
+//            vDurasiBesar= viewInduk.findViewById(R.id.durasi);
+
+//            pathVideo= ambilPathVideo();
+//            listPathVideo= viewInduk.findViewById(R.id.video_path);
+//            listPathVideo.setAdapter(new AdapterPath());
+
+
+            vVideo= viewInduk.findViewById(R.id.video_preview);
+//        vVideo.setVideoPath(pathDipilih);
+            vVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    durasiVid= mp.getDuration();
+                    pjgBarFull= vBarLatar.getWidth();
+                    vBarProgres.getLayoutParams().width= 0;
+                    vPenunjuk.setX(vBarProgres.getX());
+                    vVideo.start();
+                    videoProgres.execute();
+                    Toast.makeText(GaleriPreview.this, "panjang: " +(durasiVid), Toast.LENGTH_LONG).show();
+                }
+            });
+
+            vPlay= viewInduk.findViewById(R.id.video_play);
+            vPlay.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!vKontrol.isSelected()){
+                        if(status == BERHENTI)
+                            mainkan((double) vVideo.getCurrentPosition() /durasiVid);
+                        else if(status == JEDA)
+                            lanjutkan();
+                    } else{
+                        jeda();
+                    }
+                }
+            });
+
+            vKontrol= viewControl.findViewById(R.id.video_control_play);
+            vKontrol.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(!v.isSelected()){
+                        if(status == BERHENTI)
+                            mainkan((double) vVideo.getCurrentPosition() /durasiVid);
+                        else if(status == JEDA)
+                            lanjutkan();
+                    } else{
+                        jeda();
+                    }
+                }
+            });
+//            pasangVideoControl_Induk(this);
+        }
+
+        public void pasangVideoControl(){
+            indekViewControl= ((ViewGroup)footer).getChildCount();
+            ((ViewGroup)footer).addView(viewControl);
+            videoControlDipasang= true;
+        }
+        public void lepasVideoControl(){
+            ((ViewGroup)footer).removeViewAt(indekViewControl);
+            videoControlDipasang= false;
+        }
+
+        AsyncTask<Void, Integer, Void> initVideoProgres(){
+            return new AsyncTask<Void, Integer, Void>() {
+                @SuppressLint("WrongThread")
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    float persenProgres, pjgProgres;
+                    do{
+                        persenProgres= (float) vVideo.getCurrentPosition() /durasiVid *100;
+                        pjgProgres= (float) pjgBarFull *persenProgres /100;
+                        if(pjgProgres > pjgBarFull || status == JEDA || status == BERHENTI) {
+//                        Toast.makeText(VideoPrevAct.this, "KELUAR!!!", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
+                        if(!sg.sedangDigeser())
+                            publishProgress((int)pjgProgres, vVideo.getCurrentPosition());
+//                    Toast.makeText(VideoPrevAct.this, "MASUK!!! ", Toast.LENGTH_SHORT).show();
+                    }while(pjgProgres <= pjgBarFull);
+                    return null;
+                }
+
+                @Override
+                protected void onProgressUpdate(Integer... values) {
+                    super.onProgressUpdate(values);
+                    int pjg= values[0];
+                    int milidetik= values[1];
+                    vBarProgres.getLayoutParams().width= pjg;
+                    int posisiPenunjuk= vBarProgres.getRight();
+                    vPenunjuk.setX(posisiPenunjuk);
+                    tampilkanDurasi(vDurasi, milidetik);
+//                Toast.makeText(VideoPrevAct.this, "MASUK!!! " +milidetik, Toast.LENGTH_SHORT).show();
+                }
+            };
+        }
+/*
+        public String[] ambilPathVideo(){
+            ArrayList<String> arrayList= getVideoPath();
+            String array[]= new String[arrayList.size()];
+            int indJalan= 0;
+            for(int i= array.length-1; i >= 0; i--)
+                array[indJalan++]= arrayList.get(i);
+            return array;
+        } public ArrayList<String> getVideoPath() {
+            Uri uri;
+            ArrayList<String> listOfAllVideo = new ArrayList<String>();
+            Cursor cursor;
+            int column_index_data, column_index_folder_name;
+            String PathOfVideo = null;
+            uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+
+            Bitmap bm= ThumbnailUtils.createVideoThumbnail("asas", MediaStore.Video.Thumbnails.MICRO_KIND);
+
+            String[] projection = { MediaStore.MediaColumns.DATA,
+                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME };
+
+            cursor = getContentResolver().query(uri, projection, null,
+                    null, null);
+
+            column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+            column_index_folder_name = cursor
+                    .getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME);
+            while (cursor.moveToNext()) {
+                PathOfVideo = cursor.getString(column_index_data);
+
+                listOfAllVideo.add(PathOfVideo);
+            }
+            return listOfAllVideo;
+        }
+/*
+        class AdapterPath extends BaseAdapter {
+            @Override
+            public int getCount() {
+                return pathVideo.length;
+            }
+
+            @Override
+            public Object getItem(int position) {
+                return pathVideo[position];
+            }
+
+            @Override
+            public long getItemId(int position) {
+                return position;
+            }
+
+            @Override
+            public View getView(final int position, View convertView, ViewGroup parent) {
+                ViewGroup.LayoutParams lp= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+                String arrayJudulVideo[]= pathVideo[position].split("/");
+                String judulVideo= arrayJudulVideo[arrayJudulVideo.length-1];
+
+                final TextView vPath= new TextView(GaleriPreview.this);
+                vPath.setText(judulVideo);
+                vPath.setTextSize(15);
+                vPath.setTextColor(Color.parseColor("#000000"));
+
+                vPath.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(!v.isSelected()){
+                            v.setBackgroundColor(getResources().getColor(R.color.ijoUtama));
+                            v.setSelected(true);
+                            vPath.setTextColor(Color.parseColor("#FFFFFF"));
+                            if(indekDipilih != position){
+//                            jeda();
+                                vVideo.setVideoPath(pathVideo[indekDipilih = position]);
+                                mainkan(0);
+                            }
+                        } else{
+                            v.setBackground(null);
+                            v.setSelected(false);
+                            vPath.setTextColor(Color.parseColor("#000000"));
+                        }
+                    }
+                });
+                return vPath;
+            }
+        }
+*/
+        //0 <= persen <= 1
+        public void mainkan(double persen){
+//            if(status == JALAN) {
+//                Toast.makeText(this, "Batal sebelum", Toast.LENGTH_SHORT).show();
+//            jeda();
+//            }
+            vKontrol.setSelected(true);
+            vKontrol.setImageResource(R.drawable.icon_pause);
+            videoProgres= initVideoProgres();
+            vVideo.setVideoPath(pathVideo);
+            vVideo.seekTo((int)(durasiVid *persen));
+            vPlay.setVisibility(View.GONE);
+            status= JALAN;
+        }
+        public void lanjutkan(){
+            vKontrol.setSelected(true);
+            vKontrol.setImageResource(R.drawable.icon_pause);
+            vVideo.start();
+//        vVideo.seekTo(vVideo.getCurrentPosition());
+            videoProgres= initVideoProgres();
+            vPlay.setVisibility(View.GONE);
+            status= JALAN;
+        }
+        public void jeda(){
+            vKontrol.setSelected(false);
+            vKontrol.setImageResource(R.drawable.icon_play);
+            vVideo.pause();
+            if(videoProgres != null) {
+                videoProgres.cancel(false);
+//            Toast.makeText(this, "batal= " +batal, Toast.LENGTH_SHORT).show();
+            }
+//        vPlay.setVisibility(View.VISIBLE);
+            status= JEDA;
+        }
+        public void hentikan(){
+            if(status == JALAN)
+                jeda();
+            vVideo.stopPlayback();
+            status= BERHENTI;
+        }
+
+        public int status(){
+            return status;
+        }
+/*
+        @Override
+        public void onBackPressed() {
+            if(status != BERHENTI)
+                hentikan();
+            super.onBackPressed();
+        }
+*/
+        private void tampilkanDurasi(TextView tv, int milidetik){
+            int detik= milidetik /1000;
+            int menit= detik /60;
+            detik%= 60;
+
+            tv.setText(formatDwi(menit)+" : " +formatDwi(detik));
+        }
+        private String formatDwi(int angka){
+            String hasil= Integer.toString(angka);
+            if(hasil.length() == 1 )
+                hasil= "0" +hasil;
+            return hasil;
+        }
+
+        public View viewInduk(){
+            return viewInduk;
+        }
+
+        public View pasangVideoViewKe(RelativeLayout induk){
+            indukPanel= induk;
+            induk.addView(viewInduk);
+            return viewInduk;
+        }
+        public RelativeLayout viewWraper(){
+            return indukPanel;
         }
     }
 }

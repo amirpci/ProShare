@@ -13,6 +13,7 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import sidev17.siits.proshare.R;
@@ -69,6 +70,7 @@ public class MenuBarView extends ImgViewTouch {
     private boolean menuDitampilkan = false;
     private boolean aksiSentuhItemDefault= false;
     private boolean menuBisaDitampilkan= true;
+    private boolean aksiKlik= true;
     private int padding;
     private int elevasiBar;
 
@@ -300,7 +302,7 @@ Overrides - Bawahan
             @Override
             public void klik_Int(View v) {
                 boolean menuBisaDitampilkanAwal= menuBisaDitampilkan;
-                if(pngKlikBar != null)
+                if(pngKlikBar != null && aksiKlik)
                     pngKlikBar.klik(superView, menuDitampilkan);
                 klikInduk(menuBisaDitampilkanAwal);
             }
@@ -308,7 +310,11 @@ Overrides - Bawahan
     }
     public final boolean klik(){
         return super.performClick();
-    } public final boolean klik(boolean tampilkan){
+    } public final boolean klik(boolean aksiKlik){
+        this.aksiKlik= aksiKlik;
+        return klik();
+    }
+    public final boolean klikTampilkan(boolean tampilkan){
         menuDitampilkan= !tampilkan;
         return klik();
     }
@@ -398,7 +404,7 @@ Batas View
             @Override
             public boolean sentuh_Int(Array<View> view, MotionEvent event, boolean diDalam) {
                 if(!diDalam && event.getAction() == MotionEvent.ACTION_UP && menuBisaDitampilkan) {
-                    ((MenuBarView) view.ambil(0)).klik(false);
+                    ((MenuBarView) view.ambil(0)).klikTampilkan(false);
 //                    if(diDalam);
 //                        Cek.toast(konteks, "luar!!!");
                 }
@@ -1152,5 +1158,8 @@ Item
 
     public boolean itemDipilihKah(int indek){
         return daftarItem.ambil(indek).isSelected();
+    }
+    public ImageView itemKe(int indek){
+        return daftarItem.ambil(indek);
     }
 }

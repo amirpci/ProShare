@@ -9,10 +9,15 @@ import android.view.View;
 import android.widget.Toast;
 
 public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.OnScaleGestureListener {
+    public static final int MODE_GESER_HORIZONTAL= 10;
+    public static final int MODE_GESER_VERTIKAL= 11;
+    public static final int MODE_GESER_DEFAULT= 12; //geser ke segala arah
+
     private View view;
     private ScaleGestureDetector gestureScale;
     private float skalaPerubah = 1;
-    private boolean sedangDiskala;
+    private boolean sedangDiskala= false;
+    private boolean sedangDigeser= false;
 
     private Context konteks;
 
@@ -23,6 +28,8 @@ public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.
     private boolean bisaGeser= true;
     private boolean bisaDiskala= false; //hanya untuk internal. Tidak bisa dimodifikasi dari luar
 
+    private boolean bisaGeserX= true;
+    private boolean bisaGeserY= true;
     private float xSentuhAwal;
     private float ySentuhAwal;
     private float xViewAwal;
@@ -45,6 +52,8 @@ public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.
         view= v;
         konteks= c;
         gestureScale = new ScaleGestureDetector(c, this);
+
+        view.setOnTouchListener(this);
 //        handlerZoomIn= new Handler();
 //        handlerZoomOut= new Handler();
     }
@@ -58,13 +67,18 @@ public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.
 
         if(xAsli == -1)
             initTitikAwal();
-
+/*
+        if(pngAksiSentuh != null)
+            pngAksiSentuh.sentuh(view, event);
+*/
         if(event.getAction() == MotionEvent.ACTION_DOWN) {
             xSentuhAwal= event.getRawX();
             ySentuhAwal = event.getRawY();
             xViewAwal= view.getX();
             yViewAwal= view.getY();
 
+            if(pngAksiGeser != null)
+                pngAksiGeser.awalGeser(view, xSentuhAwal, ySentuhAwal);
         } else if((!ukuranAsli || !bisaZoom) && bisaGeser && event.getAction() == MotionEvent.ACTION_MOVE){
             xGeser= event.getRawX() - xSentuhAwal;
             yGeser= event.getRawY() - ySentuhAwal;
@@ -75,8 +89,12 @@ public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.
             float xBaru= xViewAwal + xGeser;
             float yBaru= yViewAwal + yGeser;
 
-            view.setX(xBaru);
-            view.setY(yBaru);
+            if(bisaGeserX)
+                view.setX(xBaru);
+            if(bisaGeserY)
+                view.setY(yBaru);
+
+            sedangDigeser= true;
 
             if(pngAksiGeser != null)
                 pngAksiGeser.geser(view, xGeser, yGeser);
@@ -116,6 +134,9 @@ public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.
                     }
                 }
             }
+            sedangDigeser= false;
+            if(pngAksiGeser != null)
+                pngAksiGeser.akhirGeser(view, (xViewAwal + xGeser), (yViewAwal + yGeser));
         }
 /*
             else if(event.getAction() == MotionEvent.ACTION_UP) {
@@ -124,10 +145,21 @@ public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.
 */
         return true;
     }
-
+/*
+    private AksiSentuh pngAksiSentuh;
+    public interface AksiSentuh{
+        void sentuh(View v, MotionEvent event);
+    }
+    public void aturAksiSentuh(AksiSentuh png){
+        pngAksiSentuh= png;
+    }
+*/
     private AksiGeser pngAksiGeser;
-    public interface AksiGeser{
-        void geser(View v, float xGeser, float yGeser);
+    public static abstract class AksiGeser{
+        public void awalGeser(View v, float xAwal, float yAwal){}
+        public abstract void geser(View v, float xGeser, float yGeser);
+        //saat MotionEvent.ACTION_UP
+        public void akhirGeser(View v, float xAkhir, float yAkhir){}
     }
     public void aturAksiGeser(AksiGeser png){
         pngAksiGeser= png;
@@ -195,6 +227,14 @@ public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.
         return bisaGeser;
     }
 
+    public void aturModeGeser(int mode){
+        bisaGeserX = bisaGeserY = true;
+        if(mode == MODE_GESER_HORIZONTAL)
+            bisaGeserY= false;
+        else if(mode == MODE_GESER_VERTIKAL)
+            bisaGeserX= false;
+    }
+
 
     @Override
     public boolean onScale(ScaleGestureDetector detector) {
@@ -231,6 +271,13 @@ public class ScaleGesture implements View.OnTouchListener, ScaleGestureDetector.
     public void onScaleEnd(ScaleGestureDetector detector) {
 //        sedangDiskala = false;
 //        bisaGeser= true;
+    }
+
+    public boolean sedangDiskala(){
+        return sedangDiskala;
+    }
+    public boolean sedangDigeser(){
+        return sedangDigeser;
     }
 }
 

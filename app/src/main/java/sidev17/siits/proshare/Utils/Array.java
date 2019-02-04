@@ -1,7 +1,6 @@
 package sidev17.siits.proshare.Utils;//package cob.cob3_1_2.Tools;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -17,7 +16,7 @@ public class Array<Tipe> {
 
     public final ArrayPrimitif PRIMITIF= new ArrayPrimitif();
 
-    private PenungguTraverse<Tipe> pngTraverse;
+    private PenungguTraverse pngTraverse;
 
 
     public Array(Tipe ... array){
@@ -51,6 +50,7 @@ public class Array<Tipe> {
 //        bolehRumpang= false;
         elemen= new Object[UKURAN_DEFAULT];
     }
+
 
     public void tambah(Tipe masuk){
         if(masuk == null)
@@ -407,7 +407,7 @@ public class Array<Tipe> {
              throw new IllegalArgumentException("koleksi.size == 0. \n\tJika ingin menghapus semua isi Array, gunakan \"hapusSemua()\"");
      }
 
-    private Object arrayPrimitif(Class<?> tipeData, int ukuran) throws NegativeArraySizeException {
+    protected static Object arrayPrimitif(Class<?> tipeData, int ukuran) throws NegativeArraySizeException {
         if (tipeData == char.class || tipeData == Character.class) {
             return new char[ukuran];
         } else if (tipeData == int.class || tipeData == Integer.class) {
@@ -427,7 +427,8 @@ public class Array<Tipe> {
         } else if (tipeData == void.class || tipeData == Void.class) {
             throw new IllegalArgumentException("Gak bisa buat array tipe void");
         }
-        throw new AssertionError();
+        return null;
+//        throw new AssertionError();
     }
 
     public void ganti(int indek, Tipe masuk){
@@ -735,22 +736,42 @@ public class Array<Tipe> {
         return batas;
     }
 
-    public boolean traverse(){
+    public Object traverse(){
         if(pngTraverse != null){
 //            int batas= (!bolehRumpang) ? ukuran : (this.batas+1);
             int batas= this.batas+1;
+            Object hasil[]= new Object[batas];
             for(int i= 0; i< batas; i++)
-                pngTraverse.traverse(i, (Tipe) elemen[i]);
-            return true;
+                hasil[i]= pngTraverse.traverse(i, (Tipe) elemen[i]);
+//            pngTraverse.getClass().getTypeParameters()[1].getGenericDeclaration().cast(hasil);
+            return pngTraverse.transisi(hasil);
         }
-        return false;
+        return null;
     }
 
     public void aturPenungguTraverse(PenungguTraverse p){
         pngTraverse= p;
     }
-    public interface PenungguTraverse<Tipe>{
-        void traverse(int indek, Tipe isi);
+    //Progres adalah keluaran dari tiap iterasi pada proses traverse
+    //Akhir adalah kelauran akhir setelah pengolahan Progres
+    //Akhir juga merupakan keluaran dari Array<Tipe>.traverse()
+    public static abstract class PenungguTraverse<Progres, Akhir>{
+        public abstract Progres traverse(int indek, Object isiArray);
+        public abstract Akhir akhirTraverse(Progres ... hasilTraverse);
+        private final Akhir transisi(Object ... hasil){
+            int indek= 0;
+            while(indek < hasil.length && hasil[indek] == null) indek++;
+            if(indek == hasil.length)
+                return akhirTraverse(null);
+            if(hasil.length > 0 && !hasil[indek].getClass().isAssignableFrom(Void.class)){
+                Progres array[]= (Progres[]) java.lang.reflect.Array.newInstance(hasil[indek].getClass(), hasil.length);
+                for(int i= 0; i< array.length; i++)
+                    array[i]= (Progres) hasil[i];
+                return akhirTraverse(array);
+            }
+//            throw new RuntimeException(hasil[indek].getClass().getName() +"  !!!  " +hasil[indek].getClass().isAssignableFrom(Void.class));
+            return akhirTraverse(null);
+        }
     }
 
 /*

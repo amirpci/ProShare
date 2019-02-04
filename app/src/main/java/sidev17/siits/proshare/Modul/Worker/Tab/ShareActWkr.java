@@ -215,13 +215,15 @@ public class ShareActWkr extends Fragment_Header {
 
         loadDaftarPertanyaan();
 //        initHeader();
+        judulHeader= "Pustaka";
         keHalamanAwal();
         return v;
     }
 
     @Override
     public void initHeader() {
-        final MainAct_Header mainAct= (MainAct_Header) getActivity();
+//        Toast.makeText(actInduk, "INIT!!!", Toast.LENGTH_SHORT).show();
+        final MainAct_Header mainAct= (MainAct_Header) actInduk;
         mainAct.aturJudulHeader("Pustaka");
         mainAct.aturGambarOpsiHeader(0, R.drawable.icon_daftar);
         mainAct.aturKlikOpsiHeader(0, new View.OnClickListener() {
@@ -235,15 +237,19 @@ public class ShareActWkr extends Fragment_Header {
     protected void keHalamanAwal(){
         MainActivityWkr mainAct= (MainActivityWkr) getActivity();
         mainAct.keHalaman(1);
+        String ada= "ada";
+        if(mainAct == null)
+            ada= "null";
+//        Toast.makeText(getContext(), "masukCOY!!! " +ada, Toast.LENGTH_SHORT).show();
     }
-
+/*
     @Override
     public void onStop() {
         MainAct_Header mainAct= (MainAct_Header) getActivity();
         mainAct.bolehInitHeader= false;
         super.onStop();
     }
-
+*/
     void initPilihanMajority(ArrayList<Bidang> majority, View v){
 
         pilihanMajority= v.findViewById(R.id.timeline_pilihan_majority);

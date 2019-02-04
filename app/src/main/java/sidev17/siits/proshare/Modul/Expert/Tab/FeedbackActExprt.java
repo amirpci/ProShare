@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -118,12 +119,14 @@ NANTI DIPAKE DI TemanTambahAct
             }
         });
 //        initHeader();
+        judulHeader= "Chat";
         return view;
     }
 
     @Override
     public void initHeader() {
-        MainAct_Header mainAct= (MainAct_Header) getActivity();
+//        Toast.makeText(actInduk, "INIT!!!", Toast.LENGTH_SHORT).show();
+        MainAct_Header mainAct= (MainAct_Header) actInduk;
         mainAct.aturJudulHeader("Chat");
         mainAct.aturGambarOpsiHeader_Null(0);
 //        mainAct.aturTambahanHeader("(" +adapter.getItemCount() +")");
