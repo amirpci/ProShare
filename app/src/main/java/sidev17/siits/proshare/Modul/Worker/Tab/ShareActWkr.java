@@ -14,6 +14,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -73,7 +75,10 @@ import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
+import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
 import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
+import sidev17.siits.proshare.Utils.ViewTool.Aktifitas_Slider;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
@@ -118,6 +123,8 @@ public class ShareActWkr extends Fragment_Header {
     private Uri uriPhoto;
     private String Photo_url;
 
+    private boolean mulaiMencari= false;
+
     private Spinner pilihanMajority;
     private int idBidang = 0;
     private SpinnerAdp adpMajority;
@@ -131,19 +138,38 @@ public class ShareActWkr extends Fragment_Header {
         refresh = (SwipeRefreshLayout)v.findViewById(R.id.refresh_timeline);
         relatedQuestion = (LinearLayout)v.findViewById(R.id.tanya_related_q);
         addQuestion = (LinearLayout)v.findViewById(R.id.tanya_add_question);
-        search_input = (EditText)v.findViewById(R.id.et_search_question);
         question_input = (EditText)v.findViewById(R.id.tanya_desc);
         fileName = (TextView)v.findViewById(R.id.tanya_file_name);
         search_btn = (ImageView)v.findViewById(R.id.tanya_cari_icon);
         uploadPhoto = (ImageView)v.findViewById(R.id.tanya_add_photo);
         uploadedPhoto = (ImageView)v.findViewById(R.id.tanya_uploaded_photo);
-//        add_question = (Button)v.findViewById(R.id.tanya_addQuestion_btn);
         vTambahTimeline= v.findViewById(R.id.timeline_tambah);
         vTambahTimeline.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent keTambahTimeline= new Intent(getActivity(), TambahPertanyaanWkr.class);
+                keTambahTimeline.putExtra("jenisPost", TambahPertanyaanWkr.JENIS_POST_SHARE);
                 startActivity(keTambahTimeline);
+            }
+        });
+        search_input = (EditText)v.findViewById(R.id.et_search_question);
+        search_input.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() > 0)
+                    vTambahTimeline.setVisibility(View.GONE);
+                else
+                    vTambahTimeline.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
             }
         });
         uploadPhotoProgress = (ProgressBar) v.findViewById(R.id.tanya_upPhoto_loading);
@@ -173,6 +199,7 @@ public class ShareActWkr extends Fragment_Header {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    mulaiMencari = true;
                     adapter = new RC_Masalah(new ArrayList<Solusi>(), getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
                     rcTimeline.setAdapter(adapter);
                     loadingDitemukan.setVisibility(View.VISIBLE);
@@ -217,25 +244,48 @@ public class ShareActWkr extends Fragment_Header {
 //        initHeader();
         judulHeader= "Pustaka";
         keHalamanAwal();
+        actInduk.daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
+            @Override
+            public boolean backPress() {
+                if(mulaiMencari){
+                    mulaiMencari= false;
+                    adapter = new RC_Masalah(new ArrayList<Solusi>(), getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
+                    rcTimeline.setAdapter(adapter);
+                    loadData(new PencarianListener() {
+                        @Override
+                        public void ketemu(ArrayList<Solusi> solusi) {
+                            Log.d("k", "io");
+                            adapter = new RC_Masalah(solusi, getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
+                            rcTimeline.setAdapter(adapter);
+                        }
+                    });
+                }
+                if(search_input.getText().length() > 0){
+                    search_input.setText("");
+                    return true;
+                }
+                return false;
+            }
+        });
         return v;
     }
 
     @Override
     public void initHeader() {
 //        Toast.makeText(actInduk, "INIT!!!", Toast.LENGTH_SHORT).show();
-        final MainAct_Header mainAct= (MainAct_Header) actInduk;
-        mainAct.aturJudulHeader("Pustaka");
-        mainAct.aturGambarOpsiHeader(0, R.drawable.icon_daftar);
-        mainAct.aturKlikOpsiHeader(0, new View.OnClickListener() {
+//        final MainAct_Header mainAct= (MainAct_Header) actInduk;
+//        actInduk.aturJudulHeader("Pustaka");
+        actInduk.aturGambarOpsiHeader(0, R.drawable.icon_daftar);
+        actInduk.aturKlikOpsiHeader(0, new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent keDaftarPertanyaan= new Intent(mainAct, DaftarTanyaActWkr.class);
+                Intent keDaftarPertanyaan= new Intent(actInduk, DaftarTanyaActWkr.class);
                 startActivity(keDaftarPertanyaan);
             }
         });
     }
     protected void keHalamanAwal(){
-        MainActivityWkr mainAct= (MainActivityWkr) getActivity();
+        Aktifitas_Slider mainAct= (Aktifitas_Slider) getActivity();
         mainAct.keHalaman(1);
         String ada= "ada";
         if(mainAct == null)
@@ -348,10 +398,10 @@ public class ShareActWkr extends Fragment_Header {
                                     }
                                 }
                                 AlgoritmaKesamaan algoSama = new AlgoritmaKesamaan(Solusi, cari);
-                                ls.ketemu(algoSama.listKetemu());
-                               // Masalah.addAll(algoSama.listKetemu());
-                               // adapter.notifyDataSetChanged();
-                                if(Solusi.size()==0){
+                                ArrayList<Solusi> ketemu = algoSama.listKetemu();
+                                ls.ketemu(ketemu);
+
+                                if(ketemu.size()==0){
                                     initTambahPertanyaan();
                                 }else {
                                     tetapkanJumlahKetemu(Masalah.size());

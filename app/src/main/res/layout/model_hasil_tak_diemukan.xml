@@ -21,12 +21,25 @@
             android:tint="@color/colorPrimaryDark"
             android:src="@drawable/obj_tanda_tanya_lingkaran_garis"/>
         <TextView
-            android:layout_margin="20dp"
+            android:id="@+id/tambah_teks_1"
+            android:layout_marginTop="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22sp"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:textSize="20sp"
             android:textColor="#000000"
-            android:text="Add new question here"/>
+            android:text="Sorry, no one has the same problem"/>
+        <TextView
+            android:id="@+id/tambah_teks_2"
+            android:layout_marginTop="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:textColor="#000000"
+            android:text="Ask now!"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"/>

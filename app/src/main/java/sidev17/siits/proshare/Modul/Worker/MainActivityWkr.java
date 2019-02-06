@@ -37,8 +37,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
     private RelativeLayout tmb_Jawab, tmb_Chat;
     private ImageView garis_Jawab;
 
-    private ViewPagerAdapter adapter;
-    private ViewPager mvPager;
+    protected ViewPagerAdapter adapter;
     private boolean click_duaKali=false;
 
     private int halamanFragmen= 0;
@@ -189,6 +188,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
             @Override
             public void onPageSelected(int position) {
                 gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
+
 /*
                 if(fragmenHalaman.ambil(position).ambilAktifitas() != null)
                     Toast.makeText(MainActivityWkr.this, "kelasnya= " +fragmenHalaman.ambil(position).ambilAktifitas().getClass().getName(), Toast.LENGTH_SHORT).show();
@@ -198,6 +198,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
 */
                 if(bolehInitHeader)
                     fragmenHalaman.ambil(position).initHeader();
+                aturJudulHeader(judulHalaman.ambil(position));
             }
 
             @Override

@@ -1,5 +1,6 @@
 package sidev17.siits.proshare.Adapter;
 
+import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Layout;
@@ -14,13 +15,18 @@ import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Utilities;
 
 public class RcLampiran extends RecyclerView.Adapter<RcLampiran.vHolder> {
-    private ArrayList<String> url;
-    private int ukuran;
+    private ArrayList<String> urlFoto, urlVideo;
+    private int ukuran, batasVideo, padding;
     private final int UTAMA = 323;
     private final int SEPARATOR = 232;
-    public RcLampiran(ArrayList<String> url, int ukuran){
-        this.url = url;
+    private Activity act;
+    public RcLampiran(ArrayList<String> urlFoto, ArrayList<String> urlVideo , int ukuran, int batasVideo, Activity act){
+        this.urlFoto = urlFoto;
+        this.urlVideo = urlVideo;
         this.ukuran = ukuran;
+        this.batasVideo = batasVideo;
+        this.act = act;
+        padding = ukuran/3;
     }
     @NonNull
     @Override
@@ -38,7 +44,7 @@ public class RcLampiran extends RecyclerView.Adapter<RcLampiran.vHolder> {
 
     @Override
     public int getItemCount() {
-        return url.size()*2-3;
+        return urlFoto.size()*2-3;
     }
 
     @Override
@@ -58,7 +64,12 @@ public class RcLampiran extends RecyclerView.Adapter<RcLampiran.vHolder> {
         public void aturView(int posisi){
             gambar.getLayoutParams().height = ukuran;
             gambar.getLayoutParams().width = ukuran;
-            Utilities.setFotoDariUrlSingle(url.get(posisi), gambar, ukuran);
+            if(posisi>=batasVideo - 1 || batasVideo == -1){
+                gambar.setBackgroundColor(act.getResources().getColor(R.color.abuLebihTua));
+                gambar.setPadding(padding, padding, padding, padding);
+                gambar.setImageDrawable(act.getResources().getDrawable(R.drawable.obj_indek_video_lingkaran));
+            }else
+                Utilities.setFotoDariUrlSingle(urlFoto.get(posisi), gambar, ukuran);
         }
     }
 }

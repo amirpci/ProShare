@@ -1,6 +1,8 @@
 package sidev17.siits.proshare.Modul.Worker;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.app.ProgressDialog;
 import android.database.Cursor;
@@ -36,21 +38,33 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.Cache;
+import com.android.volley.Network;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.BasicNetwork;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -70,10 +84,13 @@ import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.PackBahasa;
 import sidev17.siits.proshare.Utils.Terjemahan;
+import sidev17.siits.proshare.Utils.Ukuran;
 import sidev17.siits.proshare.Utils.ViewTool.BitmapHandler;
 import sidev17.siits.proshare.Utils.ViewTool.EditTextMod;
 import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
+
+import static sidev17.siits.proshare.Utils.Utilities.getSolusiImagesRef;
 
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
@@ -95,7 +112,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 
     private ImageView tmbCentang;
 
-    private int tabIcon[]= {R.id.tambah_gambar, R.id.tambah_video, R.id.tambah_link};
+    private int tabIcon[];
     private final String WARNA_DITEKAN= "#4972AD"; //biruLaut
     private final String WARNA_TAK_DITEKAN= "#ADADAD"; //ambilWarna(R.color.abuLebihTua)
 
@@ -110,7 +127,8 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private GaleriLoader loader;
     private int lebarCell= -1;
 
-    private String kategoriItem= "foto"; // "foto" atau "video" tergantung tab yang dipilih
+    //private String kategoriItem= "foto"; // "foto" atau "video" tergantung tab yang dipilih
+    private int kategoriItem= GaleriLoader.JENIS_FOTO; // "foto" atau "video" tergantung tab yang dipilih
     private boolean transisiKategori= false;
 
     /*
@@ -125,8 +143,9 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
 */
 
     private Array<String> pathDipilih= new Array<>();
+//    private Array<Integer> jenisDipilih= new Array<>(); //GaleriLoader.JENIS_FOTO; GaleriLoader.JENIS_VIDEO;
     private Array<BitmapHandler> bitmapDipilih= new Array<>();
-    private Array<String> kategoriItemDipilih= new Array<>();
+    private Array<Integer> kategoriItemDipilih= new Array<>();
     private int urutanItemDipilih[]= {0,1,2,3,4,5,6,7,8,9}; //untuk urutan dipilih baik foto maupun video
 
 //    private ArrayList<Bitmap> filePhoto = new ArrayList<Bitmap>();
@@ -194,6 +213,10 @@ Bagian EXPERT / TambahJawaban
         wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
         tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
                 (View) findViewById(R.id.tambah_properti_icon));
+        if(idHalaman == R.layout.activity_tambah_jawaban_exprt)
+            initTabIcon(new int[]{R.id.tambah_gambar, R.id.tambah_link});
+        else
+            initTabIcon(new int[]{R.id.tambah_gambar, R.id.tambah_video, R.id.tambah_link});
         tabBarIcon.aturTabIcon(tabIcon);
         tabBarIcon.aturIdWarnaDitekan(WARNA_DITEKAN);
         tabBarIcon.aturIdWarnaTakDitekan(WARNA_TAK_DITEKAN);
@@ -288,6 +311,10 @@ Bagian EXPERT / TambahJawaban
         }
     }
 
+    private void initTabIcon(int tabIcon[]){
+        this.tabIcon= tabIcon;
+    }
+
     /*
     ================================
     Bagian EXPERT / TambahJawaban
@@ -330,6 +357,7 @@ Bagian EXPERT / TambahJawaban
     //judul dan bidang pertanyaan sudah di-init di header
     private void isiPertanyaan(){
         View viewPertanyaan= getLayoutInflater().inflate(R.layout.model_timeline_pertanyaan, null);
+        viewPertanyaan.findViewById(R.id.tl_vote).setVisibility(View.GONE);
         //Lakukan modifikasi data
         final TextView deskripsi = viewPertanyaan.findViewById(R.id.tl_deskripsi);
         final TextView waktu = viewPertanyaan.findViewById(R.id.tl_waktu);
@@ -421,6 +449,7 @@ Bagian EXPERT / TambahJawaban
             teksJudul.setText(judul);
             jenisPost = JENIS_POST_JAWAB;
         }else{
+            jenisPost = intentSebelumnya.getIntExtra("jenisPost", 0);
             String judul= intentSebelumnya.getStringExtra("judul");
             String deskripsi= intentSebelumnya.getStringExtra("deskripsi");
             ArrayList<String> urlFoto = intentSebelumnya.getStringArrayListExtra("urlFoto");
@@ -573,10 +602,13 @@ Bagian EXPERT / TambahJawaban
         View view;
         View viewIcon;
 
+        private int tinggiDefault = -1;
+
         TabBarIcon(){}
         TabBarIcon(View view, View viewIcon){
             this.view= view;
             this.viewIcon= viewIcon;
+            initTinggiDefault();
         }
         TabBarIcon(View view, int tabIcon[], int tabGaris[], String idWarnaDitekan, String idWarnaTakDitekan){
             this.view= view;
@@ -629,21 +661,26 @@ Bagian EXPERT / TambahJawaban
                     wadahCell.setNumColumns(3);
 //                    kategoriItem= "video";
 //                    simpanPosisiUrutan(posisiVideoDipilih, urutanVideoDipilih);
-                    kategoriItem= "foto";
+                    kategoriItem= GaleriLoader.JENIS_FOTO;
                     initLoader(pathFoto, GaleriLoader.JENIS_FOTO, posisiFotoDipilih, urutanFotoDipilih);
                     jmlCell= pathFoto.length;
                 } else if(ind== 1){
-                    wadahCell.setNumColumns(3);
+                    if(idHalaman == R.layout.activity_tambah_pertanyaan_wkr){
+                        wadahCell.setNumColumns(3);
 //                    kategoriItem= "foto";
 //                    simpanPosisiUrutan(posisiFotoDipilih, urutanFotoDipilih);
-                    kategoriItem= "video";
-                    initLoader(pathVideo, GaleriLoader.JENIS_VIDEO_THUMBNAIL, posisiVideoDipilih, urutanVideoDipilih);
-                    jmlCell= pathVideo.length;
-                    RelativeLayout.LayoutParams lp= new RelativeLayout.LayoutParams(50, 50);
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-                    lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                    lp.setMargins(10, 10, 10, 10);
-                    loader.tambahAksesoris(R.drawable.obj_indek_video_lingkaran, lp);
+                        kategoriItem= GaleriLoader.JENIS_VIDEO;
+                        initLoader(pathVideo, GaleriLoader.JENIS_VIDEO_THUMBNAIL, posisiVideoDipilih, urutanVideoDipilih);
+                        jmlCell= pathVideo.length;
+                        RelativeLayout.LayoutParams lp= new RelativeLayout.LayoutParams(50, 50);
+                        lp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+                        lp.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                        lp.setMargins(10, 10, 10, 10);
+                        loader.tambahAksesoris(R.drawable.obj_indek_video_lingkaran, lp);
+                    } else{
+                        tekanItem(2);
+                        return;
+                    }
                 } else if(ind== 2)
                     wadahCell.setNumColumns(1);
 
@@ -656,6 +693,8 @@ Bagian EXPERT / TambahJawaban
             tekanGantiWarna(ind);
         }
         void tekanGantiWarna(int ind){
+            if(ind >= tabIcon.length)
+                ind--;
             if(ind != trahirDitekan) {
                 ImageView iconDitekanSkrg = view.findViewById(tabIcon[ind]);
                 if (ditekanKah) {
@@ -680,6 +719,10 @@ Bagian EXPERT / TambahJawaban
                     break;
             }*/
         }
+        void initTinggiDefault(){
+            int ukuran[]= Ukuran.ukuranView(viewIcon);
+            tinggiDefault= (int) (ukuran[1] /getResources().getDisplayMetrics().density);
+        }
         void aturDitekan(boolean ditekan){
             ditekanKah= ditekan;
         }
@@ -690,11 +733,11 @@ Bagian EXPERT / TambahJawaban
             view.setLayoutParams(lp);
         }
         void aturTinggiTabDefault(){
-            aturTinggiTab(viewIcon.getHeight());
+            aturTinggiTab(tinggiDefault);
         }
 
         int tinggiTabDitekan(){
-            return viewIcon.getHeight() +400;
+            return tinggiDefault +400;
         }
 
         void hilangkanIconTab(){
@@ -853,10 +896,10 @@ Bagian EXPERT / TambahJawaban
         return mulai;
     }
     private void simpanPosisiUrutan(int posisi){
-        if(kategoriItem.equals("foto")){
+        if(kategoriItem == GaleriLoader.JENIS_FOTO){
             posisiFotoDipilih.tambah(posisi);
             urutanFotoDipilih.tambah(loader.ambilUrutanDipilih(posisi));
-        } else if(kategoriItem.equals("video")){
+        } else if(kategoriItem == GaleriLoader.JENIS_VIDEO){
             posisiVideoDipilih.tambah(posisi);
             urutanVideoDipilih.tambah(loader.ambilUrutanDipilih(posisi));
         }
@@ -886,14 +929,14 @@ Bagian EXPERT / TambahJawaban
     private void hapusPosisiUrutan(int posisi){
         hapusPosisiUrutan(posisi, kategoriItem);
     }
-    private void hapusPosisiUrutan(int posisi, String kategoriItem){
-        if(kategoriItem.equals("foto")){
+    private void hapusPosisiUrutan(int posisi, int kategoriItem){
+        if(kategoriItem == GaleriLoader.JENIS_FOTO){
 //            int indek=;
 //            Toast.makeText(this, "indek hapus= " +indek, Toast.LENGTH_SHORT).show();
             urutanFotoDipilih.hapus(
                     posisiFotoDipilih.hapus(new Integer(posisi))
             );
-        } else if(kategoriItem.equals("video")){
+        } else if(kategoriItem == GaleriLoader.JENIS_VIDEO){
             urutanVideoDipilih.hapus(
                     posisiVideoDipilih.hapus(new Integer(posisi))
             );
@@ -1185,47 +1228,127 @@ Bagian EXPERT / TambahJawaban
         Volley.newRequestQueue(this).add(stringRequest);
     }
 
-    public void kirimJawaban(String komentar, String idKomentator){
+    public void kirimJawaban(String komentar, String idKomentator, String[] pathFoto){
         final Solusi sol = new Solusi();
         sol.setId_solusi(Utilities.getUid());
         sol.setDeskripsi(komentar);
         sol.setOrang(idKomentator);
-       /* if(pathFoto.length>0){
+         if(pathFoto.length>0){
             final ProgressDialog uploading = new ProgressDialog(this);
             String urlFotoTerupload[] = new String[1];
-            uploadFotoKomentar(0, pathFoto, urlFotoTerupload, id_solusi,this, uploading, new DetailPertanyaanActivityWkr.FotoKomentarListener() {
+            uploadFotoKomentar(0, pathFoto, urlFotoTerupload, sol.getId_solusi(),this, uploading, new FotoKomentarListener() {
                 @Override
                 public void tambahkanKomentar(String[] url) {
-                    tambahkanFotoKomentar(DetailPertanyaanActivityWkr.this, id_solusi, url);
+                    tambahkanFotoKomentar(TambahPertanyaanWkr.this, sol.getId_solusi(), url);
                     uploadKomentar(sol);
-                    initFotoBatal();
                     uploading.dismiss();
-                    setProblemStatus();
+                    setProblemStatus("1", String.valueOf(Konstanta.PROBLEM_STATUS_VERIFIED));
                 }
             });
-        }else{*/
+        }else{
             uploadKomentar(sol);
-        //}
+        }
     }
+
+    public static void tambahkanFotoKomentar(final Context c, final String id_solusi, final String[] url_foto){
+        Cache cache = new DiskBasedCache(c.getCacheDir(), 1024*1024);
+        Network network = new BasicNetwork(new HurlStack());
+        RequestQueue antrianRequest = new RequestQueue(cache, network);
+        antrianRequest.start();
+        for(int i = 0 ; i< url_foto.length; i++){
+            Log.d("foto "+Integer.toString(i), url_foto[i]);
+            //  Toast.makeText(c, "wes dijajal!", Toast.LENGTH_SHORT).show();
+            final int posisi = i ;
+            StringRequest sRequest = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_SOLUSI_FOTO_URL, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    Log.d("Respons foto", response);
+                    // Toast.makeText(c, "Wes iso nambahno foto!\n"+response, Toast.LENGTH_SHORT).show();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("Respons foto", error.toString());
+                    //Toast.makeText(c, "Jek gak iso nambahno foto!/n"+error.toString(), Toast.LENGTH_SHORT).show();
+                }
+            }){
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> foto = new HashMap<>();
+                    foto.put("id_solusi", id_solusi);
+                    foto.put("url_foto", url_foto[posisi]);
+                    return foto;
+                }
+            };
+            Volley.newRequestQueue(c).add(sRequest);
+        }
+    }
+
+    private interface FotoKomentarListener{
+        void tambahkanKomentar(String[] url);
+    }
+
+    public static void uploadFotoKomentar(final int urutanFile, final String[] alamatFile, final String[] urlFile, final String id, final Activity c, final ProgressDialog uploading, final FotoKomentarListener ls){
+        uploading.setMessage("uploading..."+" "+String.valueOf(urutanFile+1)+"/"+String.valueOf(alamatFile.length)+" 0%");
+        uploading.show();
+        Uri file = Uri.fromFile(new File(alamatFile[urutanFile]));
+        final StorageReference filepath = getSolusiImagesRef(id, urutanFile);
+        filepath.putFile(file).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        String alamatUrl = uri.toString();
+                        // Toast.makeText(c, "tes alamat : "+alamatUrl, Toast.LENGTH_SHORT).show();
+                        int urutanSekarang = urutanFile+1;
+                        String[] url = new String[urutanSekarang];
+                        url[urutanFile]=alamatUrl;
+                        if(urutanFile<alamatFile.length){
+                            for(int i=0; i<urutanFile; i++){
+                                url[i]=urlFile[i];
+                            }
+                            if(urutanFile!=alamatFile.length-1){
+                                uploadFotoKomentar(urutanSekarang, alamatFile, url, id,  c, uploading, ls);
+                            }else{
+                                ls.tambahkanKomentar(url);
+                            }
+                        }else{
+                            Toast.makeText(c, "Photos succesfully uploaded!", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(c, "foto ke "+String.valueOf(urutanFile+1)+" gagal diupload!", Toast.LENGTH_LONG).show();
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                uploading.setMessage("uploading..."+" "+String.valueOf(urutanFile+1)+"/"+String.valueOf(alamatFile.length)+" "+(int)progress+"%");
+            }
+        });
+    }
+
     //METHOD DUMMY!
     public void kirimPertanyaan(){
         //simpan pertanyaan.
+        String pathFotoDipilih[] = new String[0];
+        String pathVideoDipilih[] = new String[0];
+        if(pathDipilih.ukuran()>0){
+            int indekFoto[]= kategoriItemDipilih.indek(new Integer(GaleriLoader.JENIS_FOTO));
+            int indekVideo[]= kategoriItemDipilih.indek(new Integer(GaleriLoader.JENIS_VIDEO));
+            pathFotoDipilih = new String[indekFoto.length];
+            pathDipilih.ambil(pathFotoDipilih, indekFoto);
+            pathVideoDipilih = new String[indekVideo.length];
+            pathDipilih.ambil(pathVideoDipilih, indekVideo);
+        }
         if(jenisPost == JENIS_POST_JAWAB){
-            kirimJawaban(teksDeskripsi.getText().toString(), Utilities.getUserID(this));
-        }else{
-            String pathFotoDipilih[] = new String[0];
-            if(loader != null)
-                pathFotoDipilih= loader.ambilPathDipilih();
-            //  int jmlUdahDiload= loader.ambilJmlUdahDiload();
-            //  int batas= loader.ambilJmlDipilih();
-            String daftarInd= "";
-            for(int i=0;i<pathFotoDipilih.length;i++){
-                Toast.makeText(this, pathFotoDipilih[i], Toast.LENGTH_SHORT).show();
-            }
-            // int dipilih[]= loader.ambilUrutanDipilih();
-            // for(int i= 0; i< batas; i++)
-            ////     daftarInd+= Integer.toString(dipilih[i]) +", ";
-            // Toast.makeText(getBaseContext(), "dipilih \"" +Integer.toString(jmlUdahDiload) +"\": " +daftarInd, Toast.LENGTH_LONG).show();
+            kirimJawaban(teksDeskripsi.getText().toString(), Utilities.getUserID(this), pathFotoDipilih);
+        } else {
             String judul= teksJudul.getText().toString();
             String deskripsi= teksDeskripsi.getText().toString();
             boolean verified= verifiedQuestion;
@@ -1239,15 +1362,21 @@ Bagian EXPERT / TambahJawaban
             problem.setStatus(verified?1:0);
             problem.setpicture_id("");
             problem.setmajority_id(String.valueOf(idBidang));
-            for(int i =0 ; i<pathFotoDipilih.length;i++){
-                Toast.makeText(this, pathFotoDipilih[i], Toast.LENGTH_SHORT).show();
-            }
-            ProgressDialog uploading = new ProgressDialog(this);
-            if(pathFotoDipilih.length>0){
-                String urlFotoTerupload[] = new String[1];
-                Utilities.uploadFoto(0, pathFotoDipilih, urlFotoTerupload, PId, problem, this, uploading);
-            }else{
-                Utilities.tambahkanMasalah(this, problem, uploading, 1);
+
+            if(jenisPost == JENIS_POST_SHARE){
+                problem.setproblem_desc("");
+                kirimJawaban(deskripsi, Utilities.getUserID(this), pathFotoDipilih);
+            } else {
+                ProgressDialog uploading = new ProgressDialog(this);
+                if(pathFotoDipilih.length + pathVideoDipilih.length>0){
+                    String urlLampiranTerUpload[] = new String[1];
+                    if(pathFotoDipilih.length > 0)
+                        Utilities.uploadLampiran(0, pathFotoDipilih, pathVideoDipilih, urlLampiranTerUpload, PId, problem, this, uploading, jenisPost, 1);
+                    else
+                        Utilities.uploadLampiran(0, pathFotoDipilih, pathVideoDipilih, urlLampiranTerUpload, PId, problem, this, uploading, jenisPost, 2);
+                }else{
+                    Utilities.tambahkanMasalah(this, problem, uploading, 1, jenisPost);
+                }
             }
         }
     }

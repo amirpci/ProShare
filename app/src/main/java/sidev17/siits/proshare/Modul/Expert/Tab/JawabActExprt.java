@@ -78,6 +78,7 @@ public class JawabActExprt extends Fragment_Header {
                 loadData();
             }
         });
+
        // tmbTambah= view.findViewById(R.id.daftar_pertanyaan_tambah);
        /* tmbTambah.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -112,10 +113,10 @@ public class JawabActExprt extends Fragment_Header {
 
     @Override
     public void initHeader() {
-        MainAct_Header mainAct= (MainAct_Header) actInduk;
-        mainAct.aturJudulHeader("Pertnyaan yang Harus Dijawab");
-        mainAct.aturTambahanHeader("(" +adapter.getItemCount() +")");
-        mainAct.aturGambarOpsiHeader_Null(0);
+//        MainAct_Header mainAct= (MainAct_Header) actInduk;
+//        actInduk.aturJudulHeader("Pertnyaan yang Harus Dijawab");
+        actInduk.aturTambahanHeader("(" +adapter.getItemCount() +")");
+        actInduk.aturGambarOpsiHeader_Null(0);
 //        int resId[]= {};
     }
     private void keHalamanAwal(){
@@ -224,6 +225,8 @@ public class JawabActExprt extends Fragment_Header {
 
         @Override
         public int getItemCount() {
+            if(actInduk.halamanSekarang() == 1)
+                actInduk.aturTambahanHeader("(" +masalah.size() +")");
             return masalah.size();
         }
 
@@ -234,6 +237,7 @@ public class JawabActExprt extends Fragment_Header {
             public vH(View itemView) {
                 super(itemView);
                 view = itemView;
+                view.findViewById(R.id.opsi_pertanyaan).setVisibility(View.GONE);
                 centang = (ImageView) itemView.findViewById(R.id.daftar_pertanyaan_centang);
                 judul = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_judul);
                 isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);

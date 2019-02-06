@@ -32,8 +32,10 @@ import android.widget.VideoView;
 
 import java.util.ArrayList;
 
+import sidev17.siits.proshare.Interface.BitmapServerListener;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
+import sidev17.siits.proshare.Utils.Utilities;
 import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.ScaleGesture;
 
@@ -651,8 +653,6 @@ public class GaleriPreview extends AppCompatActivity {
                     if(GaleriLoader.Galeri.jenisFoto(pathFoto[position]) == GaleriLoader.JENIS_FOTO){
 //                    videoControl.setVisibility(View.GONE);
                         ImageView imgPanel= new ImageView(getBaseContext());
-//                imgPanel.setLayoutParams(lpPanel);
-//            panel.setImageBitmap(foto.get(position));
                         imgPanel.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
                         imgPanel= (ImageView) loader.buatFoto(imgPanel, position/*posisiLoader[position]*/);
@@ -691,13 +691,30 @@ public class GaleriPreview extends AppCompatActivity {
 //===========CARI!!!=============
                     // jika dari server
 
-                    final TextView vPath= new TextView(GaleriPreview.this);
-                    vPath.setText("*DARI SERVER*");
-                    vPath.setTextSize(15);
-                    vPath.setTextColor(Color.parseColor("#000000"));
-                    vPath.setGravity(Gravity.CENTER);
+                    final ImageView imgPanel= new ImageView(getBaseContext());
+                    imgPanel.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-                    panel= vPath;
+                    //imgPanel= (ImageView) loader.buatFoto(imgPanel, position/*posisiLoader[position]*/);
+                    Utilities.loadBitmap(pathFoto[position].substring(PANJANG_TANDA_DARI_SERVER), new BitmapServerListener() {
+                        @Override
+                        public void bitmapLoaded(Bitmap bm) {
+                            imgPanel.setImageBitmap(bm);
+                        }
+                    });
+
+                    ScaleGesture gestur= new ScaleGesture(imgPanel, getBaseContext());
+                    gestur.aturAksiZoom(new ScaleGesture.AksiZoom() {
+                        @Override
+                        public void zoomIn(View v, float scale) {
+                            zoomIn= true;
+                        }
+
+                        @Override
+                        public void zoomOut(View v, float scale) {
+                            zoomIn= false;
+                        }
+                    });
+                    panel = imgPanel;
                     indukPanel.addView(panel);
                     bufferView[indekBuffer]= indukPanel;
                 }

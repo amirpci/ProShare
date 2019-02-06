@@ -22,15 +22,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:background="@drawable/shape_rounded_rectangle">
-                    <ImageView
+                    <TextView
                         android:id="@+id/ic_search"
                         android:layout_marginLeft="16dp"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:tint="@color/grey"
-                        android:src="@drawable/obj_search"/>
+                        android:layout_width="45dp"
+                        android:layout_height="match_parent"
+                        android:text="@string/tanya"
+                        android:gravity="center"
+                        android:textSize="25sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/shape_rounded_rectangle_kanan"
+                        android:backgroundTint="@color/biruLaut"/>
                     <EditText
                         android:imeOptions="actionSearch"
                         android:id="@+id/et_search_question"
@@ -41,7 +46,8 @@
                         android:layout_marginTop="5dp"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="search your question"
+                        android:hint="ask your question"
+                        android:textCursorDrawable="@drawable/et_cursor"
                         android:singleLine="true"
                         android:textColorHint="@color/grey"
                         android:background="@android:color/transparent"/>
@@ -92,7 +98,8 @@
                                 android:id="@+id/list_timeline"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"/>
-                            <include layout="@layout/model_hasil_tak_diemukan"/>
+
+                            <include layout="@layout/model_hasil_tak_diemukan" />
                         </RelativeLayout>
                     </android.support.v4.widget.SwipeRefreshLayout>
                 </LinearLayout>

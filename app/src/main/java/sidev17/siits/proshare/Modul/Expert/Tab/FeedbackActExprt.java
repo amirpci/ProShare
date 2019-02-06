@@ -126,9 +126,9 @@ NANTI DIPAKE DI TemanTambahAct
     @Override
     public void initHeader() {
 //        Toast.makeText(actInduk, "INIT!!!", Toast.LENGTH_SHORT).show();
-        MainAct_Header mainAct= (MainAct_Header) actInduk;
-        mainAct.aturJudulHeader("Chat");
-        mainAct.aturGambarOpsiHeader_Null(0);
+//        MainAct_Header mainAct= (MainAct_Header) actInduk;
+//        actInduk.aturJudulHeader("Chat");
+        actInduk.aturGambarOpsiHeader_Null(0);
 //        mainAct.aturTambahanHeader("(" +adapter.getItemCount() +")");
 //        int resId[]= {};
     }

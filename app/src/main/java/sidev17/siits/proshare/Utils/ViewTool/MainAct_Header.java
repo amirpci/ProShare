@@ -1,6 +1,7 @@
 package sidev17.siits.proshare.Utils.ViewTool;
 
 import android.graphics.Color;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -9,13 +10,17 @@ import android.widget.Toast;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
+import sidev17.siits.proshare.ViewPagerAdapter;
 
 public class MainAct_Header extends Aktifitas {
+
+    protected ViewPager mvPager;
 
     private TextView judulHeader;
     private TextView tambahanJudulHeader;
     private ImageView opsiHeader[]= new ImageView[3];
     private String warnaOpsiHeader[]= new String[3];
+
 
     public boolean bolehInitHeader= true;
 
@@ -98,6 +103,12 @@ Khusus untuk kustomasi header
     public void aturKlikOpsiHeader_Null(int mulai){
         while(mulai < opsiHeader.length)
             aturKlikOpsiHeader(mulai++, null);
+    }
+
+    public int halamanSekarang(){
+        if(mvPager != null)
+            return mvPager.getCurrentItem();
+        return -1;
     }
 /*
 ===============================

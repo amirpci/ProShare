@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginBottom="5dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:id="@+id/lampiran_solusi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"/>
+
+    <RelativeLayout
+        android:layout_marginLeft="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tl_problem_judul"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:text="How to gain inspiration?"/>
+    </RelativeLayout>
+<!--
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/biruLaut"/>
+-->
+    <RelativeLayout
+        android:id="@+id/daftar_pertanyaan_teks"
+        android:layout_toRightOf="@id/daftar_pertanyaan_grafis"
+        android:layout_width="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tl_solusi_deskripsi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:textColor="#000000"
+            android:text="Isi dari solusi expert"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tl_problem_tanggal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="6 Juni 2019"
+            android:textColor="@color/abuSangatTua"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="5dp"
+            android:textSize="12sp"
+            />
+        <TextView
+            android:id="@+id/tl_problem_total_vote"
+            android:background="@drawable/latar_lingkaran"
+            android:backgroundTint="@color/biruLaut"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="8dp"
+            android:paddingLeft="7dp"
+            android:paddingRight="7dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/primary_white"
+            android:text="5"/>
+    </RelativeLayout>
+<!--
+    <TextView
+        android:id="@+id/tl_komentar_jumlah"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="dan 15 solusi lainnya"
+        android:textColor="@color/abuSangatTua"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="5dp"
+        android:textSize="12sp"
+        />
+-->
+</LinearLayout>

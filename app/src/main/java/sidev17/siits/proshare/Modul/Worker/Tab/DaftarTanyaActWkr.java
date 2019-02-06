@@ -212,12 +212,13 @@ public class DaftarTanyaActWkr extends MainAct_Header {
         public RC_Masalah(List<Permasalahan> masalah, Activity act) {
             this.masalah = masalah;
             this.act = act;
+            aturTambahanHeader("(" +Integer.toString(masalah.size()) +")");
         }
 
         @NonNull
         @Override
         public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
+            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan_pribadi, parent, false));
         }
 
         @Override

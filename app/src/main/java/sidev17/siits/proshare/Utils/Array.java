@@ -133,6 +133,12 @@ public class Array<Tipe> {
             throw new IndexOutOfBoundsException(pesanOutOfBound(indek));
         return (Tipe) elemen[indek];
     }
+    public Tipe[] ambil(Tipe[] array, int... indek){
+        int batas= (indek.length < array.length) ? indek.length : array.length;
+        for(int i= 0; i< batas; i++)
+            array[i]= (Tipe) elemen[indek[i]];
+        return array;
+    }
 
     public Tipe[] jadikanArray(){
         //int batas= (!bolehRumpang) ? ukuran : this.batas+1;

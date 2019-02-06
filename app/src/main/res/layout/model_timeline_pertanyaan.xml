@@ -156,11 +156,12 @@
             android:layout_marginRight="30dp"
             android:layout_marginLeft="20dp">
             <ImageView
-                android:id="@+id/tl_vote_up"
+                android:id="@+id/tl_vote_down"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
                 android:padding="10dp"
+                android:rotation="180"
                 android:src="@drawable/obj_segitiga"
                 android:tint="@color/abuLebihTua"/>
             <TextView
@@ -173,12 +174,11 @@
                 android:textStyle="bold"
                 android:layout_gravity="center_vertical"/>
             <ImageView
-                android:id="@+id/tl_vote_down"
+                android:id="@+id/tl_vote_up"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:padding="10dp"
-                android:rotation="180"
                 android:src="@drawable/obj_segitiga"
                 android:tint="@color/abuLebihTua"/>
         </LinearLayout>

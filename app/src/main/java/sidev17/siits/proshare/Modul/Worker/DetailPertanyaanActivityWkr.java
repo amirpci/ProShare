@@ -13,9 +13,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,8 +51,6 @@ import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -71,11 +66,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import sidev17.siits.proshare.Adapter.RcLampiran;
 import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
-import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.R;
@@ -89,7 +82,6 @@ import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
 import sidev17.siits.proshare.Utils.Warna;
 
-import static sidev17.siits.proshare.Utils.Utilities.getProblemImagesRef;
 import static sidev17.siits.proshare.Utils.Utilities.getSolusiImagesRef;
 import static sidev17.siits.proshare.Utils.Utilities.initViewSolusiLampiran;
 

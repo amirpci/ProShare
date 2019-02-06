@@ -219,9 +219,9 @@ public class ProfileActWkr extends Fragment_Header {
     @Override
     public void initHeader(){
 //        Toast.makeText(actInduk, "INIT!!!", Toast.LENGTH_SHORT).show();
-        MainAct_Header mainAct= (MainAct_Header) actInduk;
-        mainAct.aturJudulHeader("Profil");
-        mainAct.aturGambarOpsiHeader_Null(0);
+//        MainAct_Header mainAct= (MainAct_Header) actInduk;
+//        actInduk.aturJudulHeader("Profil");
+        actInduk.aturGambarOpsiHeader_Null(0);
 //        int resId[]= {};
     }
 
@@ -452,9 +452,9 @@ public class ProfileActWkr extends Fragment_Header {
         });
 //        menuBar.latarIndukAwal();
 
-        Aktifitas induk= (Aktifitas) actInduk;
-        induk.daftarkanBatas(menuBar.ambilBatas());
-        induk.daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
+//        Aktifitas induk= (Aktifitas) actInduk;
+        actInduk.daftarkanBatas(menuBar.ambilBatas());
+        actInduk.daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
             @Override
             public boolean backPress() {
                 if(menuBar.itemDipilihKah(0)){

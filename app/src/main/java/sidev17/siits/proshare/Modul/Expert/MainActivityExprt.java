@@ -21,6 +21,7 @@ import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ChatExprt;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ShareActWkr;
+import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas_Slider;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
@@ -32,8 +33,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
     private LinearLayout tmb_Profile, tmb_Jawab, tmb_Timeline, tmb_Feedback;
     private ImageView garis_Profile, garis_Timeline, garis_Jawab, garis_Feedback;
 
-    private ViewPagerAdapter adapter;
-    private ViewPager mvPager;
+    protected ViewPagerAdapter adapter;
     private boolean click_duaKali=false;
     private PenungguGantiHalaman pngGantiHalaman;
 
@@ -42,8 +42,8 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
     private final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
             {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
-    private Fragment_Header fragmenHalaman[]; //= {new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt()};
-    private String judulHalaman[]; //= {"", "", "", ""};
+    private Array<Fragment_Header> fragmenHalaman= new Array<>(); //= {new ProfileActWkr(), new ShareActWkr(), new ChatExprt()};
+    private Array<String> judulHalaman= new Array<>(); //= {"Profil", "Pustaka", "Chat"};
 //    private boolean bolehInitHeader= false; //false diperoleh hanya sekali saat pertama kali di-init
 
     @Override
@@ -132,18 +132,43 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
     }
 */
 
-    private void initFragment(){
-        fragmenHalaman= new Fragment_Header[]{new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt()};
-        judulHalaman= new String[]{"", "", "", ""};
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        fragmenHalaman.tambah((Fragment_Header)fragment);
+        judulHalaman.tambah(((Fragment_Header)fragment).judulHeader());
+        super.onAttachFragment(fragment);
+    }
+
+
+    private void initFragmenHolder(){
+        fragmenHalaman.aturPenungguTraverse(new Array.PenungguTraverse<Void, Void>() {
+            @Override
+            public Void traverse(int indek, Object isi) {
+                adapter.addFragment((Fragment_Header) isi, judulHalaman.ambil(indek));
+                return null;
+            }
+
+            @Override
+            public Void akhirTraverse(Void... hasilTraverse) {
+                return null;
+            }
+        });
+    }
+    private void initFragmen(){
+        initFragmenHolder();
+        if(fragmenHalaman.ukuran() == 0) {
+            Toast.makeText(this, "INIT ISI!!!", Toast.LENGTH_SHORT).show();
+            fragmenHalaman.tambah(new Fragment_Header[]{new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt()});
+            judulHalaman.tambah(new String[]{"Profil", "Pertanyaan yang Harus Dijawab", "Pustaka", "Chat"});
+        }
     }
     private void initAdapter(){
-        initFragment();
+        initFragmen();
         bolehInitHeader= false;
-//        mvPager.setCurrentItem(0);
-        mvPager.setAdapter(null);
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(fragmenHalaman, judulHalaman);
+        fragmenHalaman.traverse();
         mvPager.setAdapter(adapter);
+        mvPager.clearOnPageChangeListeners();
         mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -153,13 +178,19 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
             @Override
             public void onPageSelected(int position) {
                 gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
-                try{
-                    if(bolehInitHeader)
-                        fragmenHalaman[position].initHeader();
-                } catch(Exception e){
-                    initAdapter();
-                    Toast.makeText(MainActivityExprt.this, "posisi= " +mvPager.getCurrentItem(), Toast.LENGTH_SHORT).show();
-                }
+
+/*
+                if(fragmenHalaman.ambil(position).ambilAktifitas() != null)
+                    Toast.makeText(MainActivityWkr.this, "kelasnya= " +fragmenHalaman.ambil(position).ambilAktifitas().getClass().getName(), Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivityWkr.this, "null= " +(fragmenHalaman.ambil(position).ambilAktifitas() == null), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivityWkr.this, "boleh= " +bolehInitHeader, Toast.LENGTH_SHORT).show();
+*/
+                if(bolehInitHeader)
+                    fragmenHalaman.ambil(position).initHeader();
+                aturJudulHeader(judulHalaman.ambil(position));
+                if(position != 1)
+                    aturTambahanHeader("");
             }
 
             @Override
