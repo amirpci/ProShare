@@ -85,6 +85,8 @@ public class DaftarTanyaActWkr extends MainAct_Header {
         super.onCreate(savedInstanceState);
 //        View view= inflater.inflate(R.layout.activity_daftar_tanya_wkr, container, false);
         setContentView(R.layout.activity_daftar_tanya_wkr);
+        initHeaderDalam();
+
         loadingPertanyaan = /*(LoadingDots)view.*/findViewById(R.id.loading_pertanyaan);
         daftarTanya= /*view.*/findViewById(R.id.daftar_pertanyaan_wadah);
         refreshLayout = /*view.*/findViewById(R.id.refresh_pertanyaan);
@@ -114,17 +116,19 @@ public class DaftarTanyaActWkr extends MainAct_Header {
             }
         });
 */
-        initHeaderDalam();
         initHalamanKosong();
     }
     private void initHeaderDalam(){
 //        final MainActivityWkr mainAct= (MainActivityWkr) getActivity();
         initHeader();
         aturJudulHeader("Daftar Pertanyaan");
-        aturTambahanHeader("(" +Integer.toString(adapter.getItemCount()) +")");
+//        aturTambahanHeader("(" +Integer.toString(adapter.getItemCount()) +")");
     }
     private void initHalamanKosong(){
         halamanKosong= findViewById(R.id.daftar_pertanyaan_kosong);
+//        tampilkanHalamanKosong();
+    }
+    private void tampilkanHalamanKosong(){
         int visibilitas= (adapter.getItemCount() == 0) ? View.VISIBLE : View.GONE;
         halamanKosong.setVisibility(visibilitas);
     }
@@ -213,6 +217,7 @@ public class DaftarTanyaActWkr extends MainAct_Header {
             this.masalah = masalah;
             this.act = act;
             aturTambahanHeader("(" +Integer.toString(masalah.size()) +")");
+            tampilkanHalamanKosong();
         }
 
         @NonNull

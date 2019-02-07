@@ -102,7 +102,7 @@ public class ShareActWkr extends Fragment_Header {
     public final int PENGGUNA_BIASA= 400;
     private LinearLayout relatedQuestion, addQuestion, loading;
     private EditText search_input,question_input;
-    private TextView fileName;
+    private TextView fileName, tmbSearch;
     private ImageView search_btn, uploadPhoto, uploadedPhoto;
     private ImageView vTambahTimeline;
     private RecyclerView rcTimeline;
@@ -161,10 +161,14 @@ public class ShareActWkr extends Fragment_Header {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() > 0)
+                if(s.length() > 0){
                     vTambahTimeline.setVisibility(View.GONE);
-                else
+                    ubahWarnaTmbCari(getResources().getColor(R.color.biruLaut));
+                }
+                else{
                     vTambahTimeline.setVisibility(View.VISIBLE);
+                    ubahWarnaTmbCari(getResources().getColor(R.color.abuSangatTua));
+                }
             }
 
             @Override
@@ -199,25 +203,17 @@ public class ShareActWkr extends Fragment_Header {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                    mulaiMencari = true;
-                    adapter = new RC_Masalah(new ArrayList<Solusi>(), getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
-                    rcTimeline.setAdapter(adapter);
-                    loadingDitemukan.setVisibility(View.VISIBLE);
-                    Terjemahan.terjemahkanAsync(new String[]{search_input.getText().toString()}, Utilities.getUserBahasa(getActivity()), "en", getActivity(), new PerubahanTerjemahListener() {
-                        @Override
-                        public void dataBerubah(String[] kata) {
-                            cariMasalahan(kata[0], new PencarianListener() {
-                                @Override
-                                public void ketemu(ArrayList<Solusi> solusi) {
-                                    adapter = new RC_Masalah(solusi, getActivity(), RC_Masalah.TIPE_TIMELINE_CARI);
-                                    rcTimeline.setAdapter(adapter);
-                                }
-                            });
-                        }
-                    });
+                    cariArtikel(true);
                     return true;
                 }
                 return false;
+            }
+        });
+        tmbSearch= v.findViewById(R.id.ic_search);
+        tmbSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cariArtikel(false);
             }
         });
         ArrayList<Bidang> bdg = new ArrayList<>();
@@ -267,6 +263,7 @@ public class ShareActWkr extends Fragment_Header {
                 return false;
             }
         });
+        ubahWarnaTmbCari(getResources().getColor(R.color.abuSangatTua));
         return v;
     }
 
@@ -300,6 +297,31 @@ public class ShareActWkr extends Fragment_Header {
         super.onStop();
     }
 */
+    private void ubahWarnaTmbCari(int warna){
+        tmbSearch.getBackground().setTint(warna);
+    }
+    private void cariArtikel(boolean ngeToast){
+        if(search_input.getText().length() > 0){
+            mulaiMencari = true;
+            adapter = new RC_Masalah(new ArrayList<Solusi>(), getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
+            rcTimeline.setAdapter(adapter);
+            loadingDitemukan.setVisibility(View.VISIBLE);
+            Terjemahan.terjemahkanAsync(new String[]{search_input.getText().toString()}, Utilities.getUserBahasa(getActivity()), "en", getActivity(), new PerubahanTerjemahListener() {
+                @Override
+                public void dataBerubah(String[] kata) {
+                    cariMasalahan(kata[0], new PencarianListener() {
+                        @Override
+                        public void ketemu(ArrayList<Solusi> solusi) {
+                            adapter = new RC_Masalah(solusi, getActivity(), RC_Masalah.TIPE_TIMELINE_CARI);
+                            rcTimeline.setAdapter(adapter);
+                        }
+                    });
+                    }
+            });
+        } else if(ngeToast){
+            Toast.makeText(actInduk, "Type your question first", Toast.LENGTH_SHORT).show();
+        }
+    }
     void initPilihanMajority(ArrayList<Bidang> majority, View v){
 
         pilihanMajority= v.findViewById(R.id.timeline_pilihan_majority);
