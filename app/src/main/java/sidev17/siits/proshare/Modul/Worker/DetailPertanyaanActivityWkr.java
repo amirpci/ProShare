@@ -95,6 +95,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     private String namaPemilik;
     private String majorPemilik;
     private int statusPemilik;
+    private String statusPost;
 
     private int totalVote = 0;
     private int voteStatus = 0;
@@ -308,6 +309,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         majorityPertanyaan = paketDetailPertanyaan.getString("majority");
         waktu = paketDetailPertanyaan.getString("waktu");
         id_masalah = paketDetailPertanyaan.getString("pid");
+        statusPost = paketDetailPertanyaan.getString("status_post");
         statusPertanyaan = paketDetailPertanyaan.getInt("status", 0);
         gambar= ambilGambarDariServer();
         Toast.makeText(this, id_masalah, Toast.LENGTH_SHORT).show();
@@ -321,6 +323,11 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         for(int i= 0; i<indViewKomentar.length; i++)
             indViewKomentar[i]= init;
     }
+
+    private void initViewKnowledge(){
+
+    }
+
     private void isiViewKomentar(final int ind){
         View view= getLayoutInflater().inflate(R.layout.model_kolom_komentar, null, false);
 

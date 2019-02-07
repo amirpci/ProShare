@@ -125,10 +125,10 @@ public class ShareActWkr extends Fragment_Header {
 
     private boolean mulaiMencari= false;
 
-    private Spinner pilihanMajority;
-    private int idBidang = 0;
-    private SpinnerAdp adpMajority;
-    private boolean useMajority = false;
+  //  private Spinner pilihanMajority;
+  //  private int idBidang = 0;
+    //private SpinnerAdp adpMajority;
+   // private boolean useMajority = false;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -216,6 +216,7 @@ public class ShareActWkr extends Fragment_Header {
                 cariArtikel(false);
             }
         });
+       /*
         ArrayList<Bidang> bdg = new ArrayList<>();
         initPilihanMajority(bdg, v);
         loadPilihanMajorityServer(v);
@@ -235,7 +236,7 @@ public class ShareActWkr extends Fragment_Header {
 
             }
         });
-
+        */
         loadDaftarPertanyaan();
 //        initHeader();
         judulHeader= "Pustaka";
@@ -322,12 +323,13 @@ public class ShareActWkr extends Fragment_Header {
             Toast.makeText(actInduk, "Type your question first", Toast.LENGTH_SHORT).show();
         }
     }
+    /*
     void initPilihanMajority(ArrayList<Bidang> majority, View v){
 
         pilihanMajority= v.findViewById(R.id.timeline_pilihan_majority);
         adpMajority= new SpinnerAdp(majority, getContext());
         pilihanMajority.setAdapter(adpMajority);
-    }
+    } */
 
     void loadPilihanMajorityServer(final View v){
         final ArrayList<Bidang> bdg = new ArrayList<>();
@@ -350,7 +352,7 @@ public class ShareActWkr extends Fragment_Header {
                 all.setId(String.valueOf(0));
                 all.setBidang("All");
                 bdg.set(0, all);
-                initPilihanMajority(bdg, v);
+             //   initPilihanMajority(bdg, v);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -389,7 +391,7 @@ public class ShareActWkr extends Fragment_Header {
         //hkanList();
         layoutTidakDitemukan.setVisibility(View.GONE);
         final ArrayList<Permasalahan> Masalah = new ArrayList<>();
-        if(!useMajority){
+       // if(!useMajority){
             StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SEARCH_URL,
                     new Response.Listener<String>() {
                         @Override
@@ -409,6 +411,7 @@ public class ShareActWkr extends Fragment_Header {
                                         masalah.setTimestamp(jsonObject.getString("timestamp"));
                                         masalah.setpid(jsonObject.getString("pid"));
                                         masalah.setmajority_id(jsonObject.getString("majority_id"));
+                                        masalah.setStatuspost(jsonObject.getInt("status_post"));
                                         sol.setProblem(masalah);
                                         sol.setId_solusi(jsonObject.getString("id_solusi"));
                                         sol.setDeskripsi(jsonObject.getString("deskripsi"));
@@ -426,7 +429,7 @@ public class ShareActWkr extends Fragment_Header {
                                 if(ketemu.size()==0){
                                     initTambahPertanyaan();
                                 }else {
-                                    tetapkanJumlahKetemu(Masalah.size());
+                                    tetapkanJumlahKetemu(ketemu.size());
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
@@ -443,7 +446,8 @@ public class ShareActWkr extends Fragment_Header {
                 }
             });
             Volley.newRequestQueue(getActivity()).add(stringRequest);
-        }else{
+       // }
+        /*else{
             StringRequest stringRequestBidang = new StringRequest(Request.Method.POST, Konstanta.CARI_BIDANG,
                     new Response.Listener<String>() {
                         @Override
@@ -503,6 +507,7 @@ public class ShareActWkr extends Fragment_Header {
             };
             Volley.newRequestQueue(getActivity()).add(stringRequestBidang);
         }
+        */
     }
 
     void loadDaftarPertanyaan(){
@@ -548,6 +553,7 @@ public class ShareActWkr extends Fragment_Header {
                                     masalah.setpid(jsonObject.getString("pid"));
                                     masalah.setmajority_id(jsonObject.getString("majority_id"));
                                     masalah.setTotalVote(jsonObject.getInt("vote"));
+                                    masalah.setStatuspost(jsonObject.getInt("status_post"));
                                     sol.setProblem(masalah);
                                     sol.setId_solusi(jsonObject.getString("id_solusi"));
                                     sol.setDeskripsi(jsonObject.getString("deskripsi"));
@@ -726,6 +732,7 @@ public class ShareActWkr extends Fragment_Header {
         private List<Solusi> solusi;
         protected static final int TIPE_TIMELINE_DEFAULT = 2398;
         protected static final int TIPE_TIMELINE_CARI = 8923;
+        protected static final int TIPE_TIMELINE_KNOWLEDGE =  9282;
         private int tipeSekarang;
         Activity act;
         public RC_Masalah(List<Solusi> solusi, Activity act, int tipe) {
@@ -739,8 +746,18 @@ public class ShareActWkr extends Fragment_Header {
         public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             if(tipeSekarang == TIPE_TIMELINE_CARI)
                 return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
-            else
+            else{
+                if(viewType == TIPE_TIMELINE_KNOWLEDGE)
+                    return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_share_timeline, parent, false));
                 return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan_timeline, parent, false));
+            }
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            if (solusi.get(position).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE )
+                return TIPE_TIMELINE_KNOWLEDGE;
+            return TIPE_TIMELINE_DEFAULT;
         }
 
         @Override
@@ -755,7 +772,6 @@ public class ShareActWkr extends Fragment_Header {
 
         public class vH extends RecyclerView.ViewHolder{
             private TextView judulProblem, tanggalProblem, deskripsiSolusi, jumlahKomentar, totalVote, isi;
-            private ImageView centang, foto;
             private LinearLayout lampiranSolusi;
             private View view;
             public vH(View itemView) {
@@ -776,7 +792,7 @@ public class ShareActWkr extends Fragment_Header {
                     centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
                 } */
 
-                if(tipeSekarang == TIPE_TIMELINE_DEFAULT){
+                if (solusi.get(posisi).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE) {
                     judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
                     SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
@@ -789,15 +805,32 @@ public class ShareActWkr extends Fragment_Header {
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }
-                   // tanggalProblem.setText(solusi.get(posisi).getProblem().getTimestamp());
+                    // tanggalProblem.setText(solusi.get(posisi).getProblem().getTimestamp());
                     totalVote.setText(String.valueOf(solusi.get(posisi).getProblem().getTotalVote()));
-                    deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
-                    jumlahKomentar.setText("and "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" more comments...");
-                    gantiBahasa(TIPE_TIMELINE_DEFAULT);
-                }else{
-                    deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
-                    jumlahKomentar.setText("and "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" more comments...");
-                    gantiBahasa(TIPE_TIMELINE_CARI);
+                } else {
+                    if(tipeSekarang == TIPE_TIMELINE_DEFAULT){
+                        judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
+                        SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
+                        String waktu = solusi.get(posisi).getProblem().getTimestamp();
+                        Date date = null;
+                        try {
+                            date = format1.parse(waktu);
+                            waktu = format2.format(date);
+                            tanggalProblem.setText(waktu);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        // tanggalProblem.setText(solusi.get(posisi).getProblem().getTimestamp());
+                        totalVote.setText(String.valueOf(solusi.get(posisi).getProblem().getTotalVote()));
+                        deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
+                        jumlahKomentar.setText("and "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" more comments...");
+                        gantiBahasa(TIPE_TIMELINE_DEFAULT);
+                    }else{
+                        deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
+                        jumlahKomentar.setText("and "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" more comments...");
+                        gantiBahasa(TIPE_TIMELINE_CARI);
+                    }
                 }
 
                 loadSolusiLampiran(lampiranSolusi, solusi.get(posisi).getId_solusi(), getActivity());
@@ -812,6 +845,7 @@ public class ShareActWkr extends Fragment_Header {
                         paketDetailPetanyaan.putString("waktu", solusi.get(posisi).getProblem().getTimestamp());
                         paketDetailPetanyaan.putString("pid", solusi.get(posisi).getProblem().getpid());
                         paketDetailPetanyaan.putString("majority", solusi.get(posisi).getProblem().getmajority_id());
+                        paketDetailPetanyaan.putString("status_post", Integer.toString(solusi.get(posisi).getProblem().getStatuspost()));
                         Intent inten= new Intent(getContext(), DetailPertanyaanActivityWkr.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                         startActivity(inten);
@@ -834,7 +868,17 @@ public class ShareActWkr extends Fragment_Header {
                                 jumlahKomentar.setText(kata[3]);
                             }
                         });
-                    }else{
+                    }else if(tipe == TIPE_TIMELINE_KNOWLEDGE){
+                        String akanTranslate[] = {judulProblem.getText().toString(), tanggalProblem.getText().toString(), deskripsiSolusi.getText().toString()};
+                        Terjemahan.terjemahkanAsync(akanTranslate, "en", Utilities.getUserBahasa(getActivity()), getActivity(), new PerubahanTerjemahListener() {
+                            @Override
+                            public void dataBerubah(String[] kata) {
+                                judulProblem.setText(kata[0]);
+                                tanggalProblem.setText(kata[1]);
+                                deskripsiSolusi.setText(kata[2]);
+                            }
+                        });
+                    } else {
                         String akanTranslate[] = {deskripsiSolusi.getText().toString(), jumlahKomentar.getText().toString()};
                         Terjemahan.terjemahkanAsync(akanTranslate, "en", Utilities.getUserBahasa(getActivity()), getActivity(), new PerubahanTerjemahListener() {
                             @Override

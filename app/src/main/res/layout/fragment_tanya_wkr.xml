@@ -60,33 +60,21 @@
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="30dp"
-                        android:orientation="horizontal">
                         <RelativeLayout
+                            android:visibility="gone"
                             android:id="@+id/jumlah_ditemukan"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="30dp"
                             android:background="@color/colorPrimaryDark">
                             <TextView
                                 android:id="@+id/txt_total_ditemukan"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="23 found"
-                                android:layout_marginRight="80dp"
-                                android:layout_centerVertical="true"
-                                android:layout_alignParentRight="true"
+                                android:layout_centerInParent="true"
                                 android:textColor="@android:color/white"
                                 android:background="@color/colorPrimaryDark"/>
                         </RelativeLayout>
-                        <Spinner
-                            android:id="@+id/timeline_pilihan_majority"
-                            android:layout_width="180dp"
-                            android:layout_height="40dp"
-                            android:background="@drawable/latar_kotak_tumpul_satu_titik"
-                            android:backgroundTint="#ffffff"/>
-                    </RelativeLayout>
                     <android.support.v4.widget.SwipeRefreshLayout
                         android:id="@+id/refresh_timeline"
                         android:layout_width="match_parent"

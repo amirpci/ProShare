@@ -1147,7 +1147,7 @@ Bagian EXPERT / TambahJawaban
         });
     }
 
-    private void uploadKomentar(final Solusi solusi){
+    private void uploadKomentar(final Solusi solusi, final String id_problem){
         final ProgressDialog uploading = new ProgressDialog(this);
         uploading.setMessage("Sending solution...");
         uploading.show();
@@ -1182,7 +1182,7 @@ Bagian EXPERT / TambahJawaban
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String, String> masalah = new HashMap<>();
-                        masalah.put("id_problem", idPost);
+                        masalah.put("id_problem", id_problem);
                         masalah.put("id_solusi", solusi.getId_solusi());
                         masalah.put("deskripsi", solusi.getDeskripsi());
                         masalah.put("orang", solusi.getOrang());
@@ -1228,7 +1228,7 @@ Bagian EXPERT / TambahJawaban
         Volley.newRequestQueue(this).add(stringRequest);
     }
 
-    public void kirimJawaban(String komentar, String idKomentator, String[] pathFoto){
+    public void kirimJawaban(String komentar, String idKomentator, String[] pathFoto, final String id_problem){
         final Solusi sol = new Solusi();
         sol.setId_solusi(Utilities.getUid());
         sol.setDeskripsi(komentar);
@@ -1240,13 +1240,13 @@ Bagian EXPERT / TambahJawaban
                 @Override
                 public void tambahkanKomentar(String[] url) {
                     tambahkanFotoKomentar(TambahPertanyaanWkr.this, sol.getId_solusi(), url);
-                    uploadKomentar(sol);
+                    uploadKomentar(sol, id_problem);
                     uploading.dismiss();
                     setProblemStatus("1", String.valueOf(Konstanta.PROBLEM_STATUS_VERIFIED));
                 }
             });
         }else{
-            uploadKomentar(sol);
+            uploadKomentar(sol, id_problem);
         }
     }
 
@@ -1347,7 +1347,7 @@ Bagian EXPERT / TambahJawaban
             pathDipilih.ambil(pathVideoDipilih, indekVideo);
         }
         if(jenisPost == JENIS_POST_JAWAB){
-            kirimJawaban(teksDeskripsi.getText().toString(), Utilities.getUserID(this), pathFotoDipilih);
+            kirimJawaban(teksDeskripsi.getText().toString(), Utilities.getUserID(this), pathFotoDipilih, idPost);
         } else {
             String judul= teksJudul.getText().toString();
             String deskripsi= teksDeskripsi.getText().toString();
@@ -1363,11 +1363,12 @@ Bagian EXPERT / TambahJawaban
             problem.setpicture_id("");
             problem.setmajority_id(String.valueOf(idBidang));
 
+            ProgressDialog uploading = new ProgressDialog(this);
             if(jenisPost == JENIS_POST_SHARE){
                 problem.setproblem_desc("");
-                kirimJawaban(deskripsi, Utilities.getUserID(this), pathFotoDipilih);
+                Utilities.tambahkanMasalah(this, problem, uploading,1, jenisPost );
+                kirimJawaban(deskripsi, Utilities.getUserID(this), pathFotoDipilih, problem.getpid());
             } else {
-                ProgressDialog uploading = new ProgressDialog(this);
                 if(pathFotoDipilih.length + pathVideoDipilih.length>0){
                     String urlLampiranTerUpload[] = new String[1];
                     if(pathFotoDipilih.length > 0)

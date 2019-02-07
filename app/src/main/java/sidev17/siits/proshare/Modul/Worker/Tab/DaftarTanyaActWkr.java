@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +92,7 @@ public class DaftarTanyaActWkr extends MainAct_Header {
         daftarTanya= /*view.*/findViewById(R.id.daftar_pertanyaan_wadah);
         refreshLayout = /*view.*/findViewById(R.id.refresh_pertanyaan);
         user = FirebaseAuth.getInstance().getCurrentUser();
+        initHalamanKosong();
         loadDaftarPertanyaan();
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.abuTua), getResources().getColor(R.color.abuLebihTua),
                 getResources().getColor(R.color.abuSangatTua));
@@ -116,7 +118,6 @@ public class DaftarTanyaActWkr extends MainAct_Header {
             }
         });
 */
-        initHalamanKosong();
     }
     private void initHeaderDalam(){
 //        final MainActivityWkr mainAct= (MainActivityWkr) getActivity();
@@ -129,7 +130,9 @@ public class DaftarTanyaActWkr extends MainAct_Header {
 //        tampilkanHalamanKosong();
     }
     private void tampilkanHalamanKosong(){
-        int visibilitas= (adapter.getItemCount() == 0) ? View.VISIBLE : View.GONE;
+        int visibilitas = View.GONE;
+        if(adapter!=null)
+            visibilitas= (adapter.getItemCount() == 0) ? View.VISIBLE : View.GONE;
         halamanKosong.setVisibility(visibilitas);
     }
 
@@ -174,6 +177,7 @@ public class DaftarTanyaActWkr extends MainAct_Header {
                                     e.printStackTrace();
                                 }
                             }
+                            aturTambahanHeader("(" +Integer.toString(Masalah.size()) +")");
                             adapter.notifyDataSetChanged();
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -216,7 +220,7 @@ public class DaftarTanyaActWkr extends MainAct_Header {
         public RC_Masalah(List<Permasalahan> masalah, Activity act) {
             this.masalah = masalah;
             this.act = act;
-            aturTambahanHeader("(" +Integer.toString(masalah.size()) +")");
+            Log.d("masalah ", String.valueOf(masalah.size()));
             tampilkanHalamanKosong();
         }
 

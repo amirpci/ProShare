@@ -353,7 +353,7 @@ public class GaleriLoader {
     }
     public static class Galeri{
         public static final Array<String> ekstensiFoto= new Array<>("jpg", "jpeg", "png", "bmp", "gif");
-        public static final Array<String> ekstensiVideo= new Array<>("mp4", "mkv", "3gp");
+        public static final Array<String> ekstensiVideo= new Array<>("mp4", "mkv", "3gp", "avi");
 
 
         public static int jenisFoto(String path){

@@ -19,12 +19,14 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -690,33 +692,40 @@ public class GaleriPreview extends AppCompatActivity {
                 } else{
 //===========CARI!!!=============
                     // jika dari server
+                     //   VideoPreview
+                    if(urlVideo(pathFoto[position])){
+                        Log.d("Video", "true "+pathFoto[position]);
+                        VideoPreview vidPrev= new VideoPreview(pathFoto[position]);
+                        panel= vidPrev.pasangVideoViewKe(indukPanel);
+                        bufferView[indekBuffer]= vidPrev;
+                    } else {
+                        Log.d("Video", "false "+pathFoto[position]);
+                        final ImageView imgPanel= new ImageView(getBaseContext());
+                        imgPanel.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-                    final ImageView imgPanel= new ImageView(getBaseContext());
-                    imgPanel.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                        //imgPanel= (ImageView) loader.buatFoto(imgPanel, position/*posisiLoader[position]*/);
+                        Utilities.loadBitmap(pathFoto[position].substring(PANJANG_TANDA_DARI_SERVER), new BitmapServerListener() {
+                            @Override
+                            public void bitmapLoaded(Bitmap bm) {
+                                imgPanel.setImageBitmap(bm);
+                            }
+                        });
+                        ScaleGesture gestur= new ScaleGesture(imgPanel, getBaseContext());
+                        gestur.aturAksiZoom(new ScaleGesture.AksiZoom() {
+                            @Override
+                            public void zoomIn(View v, float scale) {
+                                zoomIn= true;
+                            }
 
-                    //imgPanel= (ImageView) loader.buatFoto(imgPanel, position/*posisiLoader[position]*/);
-                    Utilities.loadBitmap(pathFoto[position].substring(PANJANG_TANDA_DARI_SERVER), new BitmapServerListener() {
-                        @Override
-                        public void bitmapLoaded(Bitmap bm) {
-                            imgPanel.setImageBitmap(bm);
-                        }
-                    });
-
-                    ScaleGesture gestur= new ScaleGesture(imgPanel, getBaseContext());
-                    gestur.aturAksiZoom(new ScaleGesture.AksiZoom() {
-                        @Override
-                        public void zoomIn(View v, float scale) {
-                            zoomIn= true;
-                        }
-
-                        @Override
-                        public void zoomOut(View v, float scale) {
-                            zoomIn= false;
-                        }
-                    });
-                    panel = imgPanel;
-                    indukPanel.addView(panel);
-                    bufferView[indekBuffer]= indukPanel;
+                            @Override
+                            public void zoomOut(View v, float scale) {
+                                zoomIn= false;
+                            }
+                        });
+                        panel = imgPanel;
+                        indukPanel.addView(panel);
+                        bufferView[indekBuffer]= indukPanel;
+                    }
                 }
                 RelativeLayout.LayoutParams lpPanel= new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 lpPanel.addRule(RelativeLayout.CENTER_IN_PARENT);
@@ -736,6 +745,16 @@ public class GaleriPreview extends AppCompatActivity {
         public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
             container.removeView((View) object);
         }
+    }
+
+    boolean urlVideo(String url){
+        for(int i = url.length(); i>=4; i --){
+            for(int j = 0 ; j < GaleriLoader.Galeri.ekstensiVideo.ukuran(); j ++){
+                if(url.substring(i-4, i).equalsIgnoreCase("."+GaleriLoader.Galeri.ekstensiVideo.ambil(j)))
+                    return true;
+            }
+        }
+        return false;
     }
 
     class VideoPreview{
@@ -772,6 +791,8 @@ public class GaleriPreview extends AppCompatActivity {
 //        private int indekDipilih= 1;
 
         private ScaleGesture sg;
+
+
 
         public VideoPreview(String pathVideo) {
             this.pathVideo= pathVideo;
@@ -822,7 +843,6 @@ public class GaleriPreview extends AppCompatActivity {
 //            pathVideo= ambilPathVideo();
 //            listPathVideo= viewInduk.findViewById(R.id.video_path);
 //            listPathVideo.setAdapter(new AdapterPath());
-
 
             vVideo= viewInduk.findViewById(R.id.video_preview);
 //        vVideo.setVideoPath(pathDipilih);
@@ -1009,7 +1029,13 @@ public class GaleriPreview extends AppCompatActivity {
             vKontrol.setSelected(true);
             vKontrol.setImageResource(R.drawable.icon_pause);
             videoProgres= initVideoProgres();
-            vVideo.setVideoPath(pathVideo);
+
+            MediaController mediaController = new MediaController(GaleriPreview.this);
+            mediaController.setAnchorView(vVideo);
+
+            Uri uri= Uri.parse(pathVideo);
+            vVideo.setMediaController(mediaController);
+            vVideo.setVideoURI(uri);
             vVideo.seekTo((int)(durasiVid *persen));
             vPlay.setVisibility(View.GONE);
             status= JALAN;

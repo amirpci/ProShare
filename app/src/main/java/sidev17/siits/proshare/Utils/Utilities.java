@@ -1223,6 +1223,7 @@ public class Utilities {
                     @Override
                     public void onResponse(String response) {
                         uploading.dismiss();
+                        Log.d("upload masalah ", response);
                         Toast.makeText(c, response, Toast.LENGTH_SHORT).show();
                         c.finish();
                     }
