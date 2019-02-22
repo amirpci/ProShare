@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.service.carrier.CarrierIdentifier;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -104,7 +105,7 @@ public class ShareActWkr extends Fragment_Header {
     private EditText search_input,question_input;
     private TextView fileName, tmbSearch;
     private ImageView search_btn, uploadPhoto, uploadedPhoto;
-    private ImageView vTambahTimeline;
+//    private ImageView vTambahTimeline;
     private RecyclerView rcTimeline;
     private ProgressBar uploadPhotoProgress;
     private ProgressDialog addQuestionLoading;
@@ -113,9 +114,10 @@ public class ShareActWkr extends Fragment_Header {
     private DatabaseReference dataRef;
     private StorageReference storageRef;
     private RC_Masalah adapter;
+    private int ketemu= 0;
     //private ArrayList<Permasalahan> Masalah;
    //private ArrayList<Solusi> Solusi;
-    private RelativeLayout layoutTidakDitemukan;
+    private View layoutTidakDitemukan;
     private RelativeLayout jumlahDitemukan;
     private static final int UpPhotoID = 2;
     private boolean photoDiambil = false, videoDiambil = false;
@@ -143,6 +145,7 @@ public class ShareActWkr extends Fragment_Header {
         search_btn = (ImageView)v.findViewById(R.id.tanya_cari_icon);
         uploadPhoto = (ImageView)v.findViewById(R.id.tanya_add_photo);
         uploadedPhoto = (ImageView)v.findViewById(R.id.tanya_uploaded_photo);
+/*
         vTambahTimeline= v.findViewById(R.id.timeline_tambah);
         vTambahTimeline.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -152,6 +155,8 @@ public class ShareActWkr extends Fragment_Header {
                 startActivity(keTambahTimeline);
             }
         });
+*/
+
         search_input = (EditText)v.findViewById(R.id.et_search_question);
         search_input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -162,18 +167,22 @@ public class ShareActWkr extends Fragment_Header {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s.length() > 0){
-                    vTambahTimeline.setVisibility(View.GONE);
+                    mulaiMencari= true;
+//                    actInduk.tampilkanTombolUtama(false);
+//                    vTambahTimeline.setVisibility(View.GONE);
                     ubahWarnaTmbCari(getResources().getColor(R.color.biruLaut));
                 }
                 else{
-                    vTambahTimeline.setVisibility(View.VISIBLE);
-                    ubahWarnaTmbCari(getResources().getColor(R.color.abuSangatTua));
+//                    mulaiMencari= false;
+//                    actInduk.tampilkanTombolUtama(true);
+//                    vTambahTimeline.setVisibility(View.VISIBLE);
+                    ubahWarnaTmbCari(getResources().getColor(R.color.abuTua));
                 }
+                actInduk.gantiIconTombolUtama();
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
         });
         uploadPhotoProgress = (ProgressBar) v.findViewById(R.id.tanya_upPhoto_loading);
@@ -241,9 +250,12 @@ public class ShareActWkr extends Fragment_Header {
 //        initHeader();
         judulHeader= "Pustaka";
         keHalamanAwal();
-        actInduk.daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
+        daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
             @Override
             public boolean backPress() {
+                if(search_input.getText().length() > 0){
+                    search_input.setText("");
+                }
                 if(mulaiMencari){
                     mulaiMencari= false;
                     adapter = new RC_Masalah(new ArrayList<Solusi>(), getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
@@ -256,15 +268,26 @@ public class ShareActWkr extends Fragment_Header {
                             rcTimeline.setAdapter(adapter);
                         }
                     });
-                }
-                if(search_input.getText().length() > 0){
-                    search_input.setText("");
                     return true;
                 }
                 return false;
             }
         });
-        ubahWarnaTmbCari(getResources().getColor(R.color.abuSangatTua));
+        daftarkanAksiTombolUtama(new MainAct_Header.AksiTombolUtama() {
+            @Override
+            public void tekan(View v, int halaman) {
+                Intent keTambahTimeline= new Intent(getActivity(), TambahPertanyaanWkr.class);
+                keTambahTimeline.putExtra("jenisPost", TambahPertanyaanWkr.JENIS_POST_SHARE);
+                startActivity(keTambahTimeline);
+            }
+        });
+        daftarkanPenampilTombolUtama(new MainAct_Header.PenampilTombolUtama() {
+            @Override
+            public boolean tampilkan(View tombolUtama) {
+                return !mulaiMencari;
+            }
+        });
+        ubahWarnaTmbCari(getResources().getColor(R.color.abuTua));
         return v;
     }
 
@@ -367,10 +390,12 @@ public class ShareActWkr extends Fragment_Header {
         adapter.notifyDataSetChanged();
     }
 
+    private void hilangkanTandaKetemu(){
+        jumlahDitemukan.setVisibility(View.GONE);
+    }
     private void tetapkanJumlahKetemu(int ketemu){
+        this.ketemu= ketemu;
         jumlahDitemukan.setVisibility(View.VISIBLE);
-        TextView total = (TextView)jumlahDitemukan.findViewById(R.id.txt_total_ditemukan);
-        total.setText(String.valueOf(ketemu)+" found");
     }
 
     private void initTambahPertanyaan(){
@@ -387,7 +412,7 @@ public class ShareActWkr extends Fragment_Header {
         });
     }
     private void cariMasalahan(final String cari, final PencarianListener ls) {
-        jumlahDitemukan.setVisibility(View.GONE);
+        hilangkanTandaKetemu();
         //hkanList();
         layoutTidakDitemukan.setVisibility(View.GONE);
         final ArrayList<Permasalahan> Masalah = new ArrayList<>();
@@ -525,7 +550,7 @@ public class ShareActWkr extends Fragment_Header {
         });
     }
     private void loadData(final PencarianListener ls) {
-        jumlahDitemukan.setVisibility(View.GONE);
+        hilangkanTandaKetemu();
        // bersihkanList();
         layoutTidakDitemukan.setVisibility(View.GONE);
         refresh.setRefreshing(false);
@@ -733,9 +758,13 @@ public class ShareActWkr extends Fragment_Header {
         protected static final int TIPE_TIMELINE_DEFAULT = 2398;
         protected static final int TIPE_TIMELINE_CARI = 8923;
         protected static final int TIPE_TIMELINE_KNOWLEDGE =  9282;
+        protected static final int TIPE_LIHAT_LAINNYA=  123;
+        private int jmlDitampilkan;
         private int tipeSekarang;
+        private int tipeView= 0;
         Activity act;
         public RC_Masalah(List<Solusi> solusi, Activity act, int tipe) {
+            jmlDitampilkan= (tipe == TIPE_TIMELINE_CARI) ? 2 : solusi.size();
             this.solusi = solusi;
             this.act = act;
             tipeSekarang = tipe;
@@ -744,9 +773,13 @@ public class ShareActWkr extends Fragment_Header {
         @NonNull
         @Override
         public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            if(tipeSekarang == TIPE_TIMELINE_CARI)
+            if(tipeSekarang == TIPE_TIMELINE_CARI) {
+                if(viewType == TIPE_LIHAT_LAINNYA) {
+                    tipeView= TIPE_LIHAT_LAINNYA;
+                    return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_timeline_lihat_lainnya, parent, false));
+                }
                 return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
-            else{
+            } else{
                 if(viewType == TIPE_TIMELINE_KNOWLEDGE)
                     return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_share_timeline, parent, false));
                 return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan_timeline, parent, false));
@@ -755,6 +788,8 @@ public class ShareActWkr extends Fragment_Header {
 
         @Override
         public int getItemViewType(int position) {
+            if(position == jmlDitampilkan-1 && tipeSekarang == TIPE_TIMELINE_CARI)
+                return TIPE_LIHAT_LAINNYA;
             if (solusi.get(position).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE )
                 return TIPE_TIMELINE_KNOWLEDGE;
             return TIPE_TIMELINE_DEFAULT;
@@ -767,16 +802,18 @@ public class ShareActWkr extends Fragment_Header {
 
         @Override
         public int getItemCount() {
-            return solusi.size();
+            return jmlDitampilkan;
         }
 
         public class vH extends RecyclerView.ViewHolder{
-            private TextView judulProblem, tanggalProblem, deskripsiSolusi, jumlahKomentar, totalVote, isi;
+            private TextView judulProblem, tanggalProblem, deskripsiSolusi, jumlahKomentar, totalVote, isi, totalLainnya;
             private LinearLayout lampiranSolusi;
             private View view;
             public vH(View itemView) {
                 super(itemView);
                 view = itemView;
+//                if(tipeView == TIPE_LIHAT_LAINNYA)
+                totalLainnya= itemView.findViewById(R.id.teks_hasil_lainnya);
                 judulProblem = itemView.findViewById(R.id.tl_problem_judul);
                 tanggalProblem = itemView.findViewById(R.id.tl_problem_tanggal);
                 totalVote = itemView.findViewById(R.id.tl_problem_total_vote);
@@ -785,6 +822,14 @@ public class ShareActWkr extends Fragment_Header {
                 lampiranSolusi = itemView.findViewById(R.id.lampiran_solusi);
             }
             public void bind(final int posisi){
+                if(tipeView == TIPE_LIHAT_LAINNYA) {
+                    try {
+                        totalLainnya.setText("Lihat " + String.valueOf(ketemu - 1) + " solusi lainnya...");
+                    }catch (Exception e){
+//                        throw new RuntimeException("posisi= " +posisi +" jmlDitampilkan= " +jmlDitampilkan +" " +e.getMessage());
+                    }
+                    return;
+                }
                 /*
                 if(masalah.get(posisi).getStatus()==PENGGUNA_EXPERT){
                     centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
@@ -793,7 +838,8 @@ public class ShareActWkr extends Fragment_Header {
                 } */
 
                 if (solusi.get(posisi).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE) {
-                    judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
+                    if(judulProblem != null)
+                        judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
                     SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
                     String waktu = solusi.get(posisi).getProblem().getTimestamp();
@@ -801,7 +847,8 @@ public class ShareActWkr extends Fragment_Header {
                     try {
                         date = format1.parse(waktu);
                         waktu = format2.format(date);
-                        tanggalProblem.setText(waktu);
+                        if(tanggalProblem != null)
+                            tanggalProblem.setText(waktu);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }

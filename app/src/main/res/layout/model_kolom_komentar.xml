@@ -23,7 +23,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="3dp"
-                android:padding="14dp"
                 android:tint="#FFFFFF"
                 android:src="@drawable/tab_orang"
                 android:background="@drawable/latar_lingkaran"

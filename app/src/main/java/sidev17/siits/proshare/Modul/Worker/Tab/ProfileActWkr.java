@@ -454,7 +454,7 @@ public class ProfileActWkr extends Fragment_Header {
 
 //        Aktifitas induk= (Aktifitas) actInduk;
         actInduk.daftarkanBatas(menuBar.ambilBatas());
-        actInduk.daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
+        daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
             @Override
             public boolean backPress() {
                 if(menuBar.itemDipilihKah(0)){

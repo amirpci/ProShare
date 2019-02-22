@@ -64,15 +64,17 @@
                             android:visibility="gone"
                             android:id="@+id/jumlah_ditemukan"
                             android:layout_width="match_parent"
-                            android:layout_height="30dp"
+                            android:layout_height="38dp"
                             android:background="@color/colorPrimaryDark">
                             <TextView
                                 android:id="@+id/txt_total_ditemukan"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="23 found"
-                                android:layout_centerInParent="true"
+                                android:layout_marginLeft="17dp"
+                                android:text="Solusi"
+                                android:layout_centerVertical="true"
                                 android:textColor="@android:color/white"
+                                android:textSize="15sp"
                                 android:background="@color/colorPrimaryDark"/>
                         </RelativeLayout>
                     <android.support.v4.widget.SwipeRefreshLayout
@@ -85,7 +87,7 @@
                             <android.support.v7.widget.RecyclerView
                                 android:id="@+id/list_timeline"
                                 android:layout_width="match_parent"
-                                android:layout_height="match_parent"/>
+                                android:layout_height="wrap_content"/>
 
                             <include layout="@layout/model_hasil_tak_diemukan" />
                         </RelativeLayout>
@@ -102,7 +104,7 @@
             app:LoadingDots_dots_size="18dp"
             app:LoadingDots_dots_space="1dp"/>
     </RelativeLayout>
-
+<!--
     <ImageView
         android:id="@+id/timeline_tambah"
         android:layout_gravity="bottom|end"
@@ -113,5 +115,7 @@
         android:backgroundTint="@color/biruLaut"
         android:src="@drawable/obj_pensil"
         android:tint="#FFFFFF"
+        android:elevation="10dp"
         android:padding="15dp"/>
+-->
 </FrameLayout>

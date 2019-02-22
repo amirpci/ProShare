@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -665,7 +666,10 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         }
       //  System.out.println();
 
-        teksJudul.setText(judulPertanyaan);
+        String judulYgDituliskan= judulPertanyaan;
+        if(judulPertanyaan.length() > 30)
+            judulYgDituliskan= judulPertanyaan.substring(0, 30) +"...";
+        teksJudul.setText(judulYgDituliskan);
         teksMajority.setVisibility(View.GONE);
         teksDeskripsi.setText(deskripsiPertanyaan);
         loadPertanyaanLagi(teksJudul, teksMajority, teksDeskripsi, teksWaktu, waktu);
@@ -748,7 +752,11 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this),DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
             @Override
             public void dataBerubah(String[] kata) {
-                teksJudul.setText(kata[0]);
+
+                String judulYgDituliskan= kata[0];
+                if(judulYgDituliskan.length() > 30)
+                    judulYgDituliskan= judulYgDituliskan.substring(0, 30) +"...";
+                teksJudul.setText(judulYgDituliskan);
                 teksDeskripsi.setText(kata[1]);
                 teksTanggal.setText(kata[2]);
                 judulStr = kata[0];
@@ -1048,6 +1056,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 String id= Utilities.getUserID(getApplicationContext());
                 String id_solusi = Utilities.getUid();
                 kirimKomentar(id, id_solusi, komentar, pathFoto);
+                teksKomentar.setText("");
             }
         });
     }

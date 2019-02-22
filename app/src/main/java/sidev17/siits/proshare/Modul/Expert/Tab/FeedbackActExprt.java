@@ -55,7 +55,7 @@ public class FeedbackActExprt extends Fragment_Header {
     private String feedback[][] = {{"I do this everyday, but somehow..."}, {"When it happens, I don't know what to do. I need inspiration."}, {"bla bla bla..."}, {"Just bel cool bro!"}};
 
     private RecyclerView wadahFeedback;
-    private ImageView mulaiChat;
+//    private ImageView mulaiChat;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,7 +63,7 @@ public class FeedbackActExprt extends Fragment_Header {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_beranda_chat_exprt, container, false);
         wadahFeedback = (RecyclerView) view.findViewById(R.id.feedback_wadah);
-        mulaiChat = (ImageView) view.findViewById(R.id.daftar_pertanyaan_tambah);
+//        mulaiChat = (ImageView) view.findViewById(R.id.daftar_pertanyaan_tambah);
         initDaftarChat();
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         linearLayoutManager.setReverseLayout(true);
@@ -74,6 +74,14 @@ public class FeedbackActExprt extends Fragment_Header {
         wadahFeedback.setAdapter(adapter);
         // AdapterFeedback adpFeedback= new AdapterFeedback();
         //  wadahFeedback.setAdapter(adpFeedback);
+        daftarkanAksiTombolUtama(new MainAct_Header.AksiTombolUtama() {
+            @Override
+            public void tekan(View v, int halaman) {
+                Intent keDaftarTeman= new Intent(getContext(), TemanDaftarAct.class);
+                startActivity(keDaftarTeman);
+            }
+        });
+/*
         mulaiChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -115,9 +123,11 @@ NANTI DIPAKE DI TemanTambahAct
                 });
                 dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 dialog.show();
-*/
+* /
             }
+
         });
+*/
 //        initHeader();
         judulHeader= "Chat";
         return view;

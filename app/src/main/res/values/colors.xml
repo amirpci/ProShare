@@ -9,6 +9,8 @@
     <color name="abuSangatTua">#A3A3A3</color>
     <color name="biruMuda">#B5CFF2</color>
     <color name="biruLaut">#4972AD</color>
+    <color name="biruLaut_gelap">#274D82</color>
+    <color name="biruLaut_lebihGelap">#274D82</color>
     <color name="hitam">#000000</color>
     <color name="merah">#E61717</color>
     <color name="abuTeks">#494949</color>

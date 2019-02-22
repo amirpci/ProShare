@@ -42,8 +42,8 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
     private final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
             {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
-    private Array<Fragment_Header> fragmenHalaman= new Array<>(); //= {new ProfileActWkr(), new ShareActWkr(), new ChatExprt()};
-    private Array<String> judulHalaman= new Array<>(); //= {"Profil", "Pustaka", "Chat"};
+//    private Array<Fragment_Header> fragmenHalaman= new Array<>(); //= {new ProfileActWkr(), new ShareActWkr(), new ChatExprt()};
+//    private Array<String> judulHalaman= new Array<>(); //= {"Profil", "Pustaka", "Chat"};
 //    private boolean bolehInitHeader= false; //false diperoleh hanya sekali saat pertama kali di-init
 
     @Override
@@ -58,8 +58,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
         tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab_Exprt);
         tmb_Feedback = (LinearLayout) findViewById(R.id.tab_feedback_Exprt);
 
-        mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
-        initAdapter();
+        initAdapter_Int();
 /*
         adapter.addFragment(new ProfileActExprt(), "");
         adapter.addFragment(new JawabActExprt(), "");
@@ -118,6 +117,42 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
         bolehInitHeader= true;
         mvPager.setCurrentItem(ke);
     }
+
+    private void initAdapter_Int(){
+        mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
+        aturFragmen(new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt());
+        aturJudul("Profil", "Pertanyaan yang Harus Dijawab", "Pustaka", "Chat");
+        initAdapter();
+        mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
+//                gantiIconTombolUtama();
+
+/*
+                if(fragmenHalaman.ambil(position).ambilAktifitas() != null)
+                    Toast.makeText(MainActivityWkr.this, "kelasnya= " +fragmenHalaman.ambil(position).ambilAktifitas().getClass().getName(), Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivityWkr.this, "null= " +(fragmenHalaman.ambil(position).ambilAktifitas() == null), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivityWkr.this, "boleh= " +bolehInitHeader, Toast.LENGTH_SHORT).show();
+*/
+                if(bolehInitHeader)
+                    fragmenHalaman.ambil(position).initHeader();
+                aturJudulHeader(judulHalaman.ambil(position));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+    }
+
 /*
     @Override
     protected void onStop() {
@@ -131,7 +166,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
         super.onResumeFragments();
     }
 */
-
+/*
     @Override
     public void onAttachFragment(Fragment fragment) {
         fragmenHalaman.tambah((Fragment_Header)fragment);
@@ -185,7 +220,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
                 else
                     Toast.makeText(MainActivityWkr.this, "null= " +(fragmenHalaman.ambil(position).ambilAktifitas() == null), Toast.LENGTH_SHORT).show();
 //                Toast.makeText(MainActivityWkr.this, "boleh= " +bolehInitHeader, Toast.LENGTH_SHORT).show();
-*/
+* /
                 if(bolehInitHeader)
                     fragmenHalaman.ambil(position).initHeader();
                 aturJudulHeader(judulHalaman.ambil(position));
@@ -200,6 +235,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
         });
         mvPager.setOffscreenPageLimit(4);
     }
+*/
 
     public interface PenungguGantiHalaman{
         void gantiHalaman(int halSebelumnnya, int halamanSkrg);

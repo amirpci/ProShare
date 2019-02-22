@@ -141,12 +141,15 @@ AksiBackPress
         boolean backPress();
     }
     private Array<AksiBackPress> aksiBackPress;
-    private void initAksiBackPress(){
+    protected void initAksiBackPress(){
         aksiBackPress= new Array<>();
-        aksiBackPress.aturPenungguTraverse(new Array.PenungguTraverse<Boolean, Boolean>(){
+        aksiBackPress.aturPenungguTraverse(buat_penungguBackPress());
+    }
+    protected final Array.PenungguTraverse<Void, Boolean, Boolean> buat_penungguBackPress(){
+        return new Array.PenungguTraverse<Void, Boolean, Boolean>(){
             @Override
-            public Boolean traverse(int indek, Object isi) {
-                return ((AksiBackPress)isi).backPress();
+            public Boolean traverse(Array array, int indek, Object isiArray) {
+                return ((AksiBackPress)isiArray).backPress();
             }
 
             @Override
@@ -156,7 +159,7 @@ AksiBackPress
                     hasil |= hasilTraverse[i];
                 return hasil;
             }
-        });
+        };
     }
     public void daftarkanAksiBackPress(AksiBackPress a){
         if(aksiBackPress == null)
@@ -185,10 +188,14 @@ AksiBackPress
         if(aksiBackPress != null)
             keAnak |= (Boolean) aksiBackPress.traverse();
         if(!keAnak)
-            if(aksiBackPress_Int != null)
-                aksiBackPress_Int.backPress_Int();
-            else
-                super.onBackPressed();
+            backPress_int();
+    }
+
+    protected final void backPress_int(){
+        if(aksiBackPress_Int != null)
+            aksiBackPress_Int.backPress_Int();
+        else
+            super.onBackPressed();
     }
 
 }

@@ -16,8 +16,10 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.InputType;
 import android.text.SpannableString;
+import android.text.TextWatcher;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.util.TypedValue;
@@ -101,7 +103,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private int jenisPost= JENIS_POST_SHARE;
 
     private View parentUtama;
-    private GridView wadahCell;
+    private GridView wadahCell, liveQuestion;
     private TabBarIcon tabBarIcon;
 
     private EditText teksJudul;
@@ -113,8 +115,9 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private ImageView tmbCentang;
 
     private int tabIcon[];
-    private final String WARNA_DITEKAN= "#4972AD"; //biruLaut
-    private final String WARNA_TAK_DITEKAN= "#ADADAD"; //ambilWarna(R.color.abuLebihTua)
+    private int tabIconInduk[];
+    private final String WARNA_DITEKAN= "#FFFFFF"; //"#4972AD"; //biruLaut
+    private final String WARNA_TAK_DITEKAN= "#C9C9C9"; //ambilWarna(R.color.abuTua)
 
     private String pathFoto[];
     private String pathVideo[];
@@ -136,7 +139,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     untuk foto atau video yang habis didownload / dari server
     ================================
     */
-    private int jmlItemAwal= 0;
+    private int jmlLampiranDariServer = 0;
 /*  private "FileGambar" gambarAwal[] //kalau bisa tipe Bitmap
 
 ================================
@@ -166,6 +169,17 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private int batasBufferUdahDiload = 0;
 
     private int idHalaman;
+
+/*
+================================
+Bisa-tidaknya pertanyaan/post dikirim
+================================
+*/
+    private boolean bisaDikirim= false;
+
+    private String judulAwal= "";
+    private String deskripsiAwal= "";
+    private boolean samaDgAwal= true;
 
 
 /*
@@ -205,19 +219,26 @@ Bagian EXPERT / TambahJawaban
 //        aturIdHalaman(getIntent().getIntExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr));
         aturIdHalaman_Default();
 
+        initUrutanDipilih();
         parentUtama= getLayoutInflater().inflate(idHalaman, null);
         setContentView(parentUtama);
 
+        tmbCentang= findViewById(R.id.tambah_ok);
         initTeks();
         ambilData();
         wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
+        liveQuestion= findViewById(R.id.tambah_properti_cell_dipilih);
         tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
                 (View) findViewById(R.id.tambah_properti_icon));
-        if(idHalaman == R.layout.activity_tambah_jawaban_exprt)
-            initTabIcon(new int[]{R.id.tambah_gambar, R.id.tambah_link});
-        else
-            initTabIcon(new int[]{R.id.tambah_gambar, R.id.tambah_video, R.id.tambah_link});
+        if(idHalaman == R.layout.activity_tambah_jawaban_exprt) {
+            initTabIcon(new int[]{R.id.tambah_gambar_gmb, R.id.tambah_link_gmb});
+            initTabIconInduk(new int[]{R.id.tambah_gambar, R.id.tambah_link});
+        }else {
+            initTabIcon(new int[]{R.id.tambah_gambar_gmb, R.id.tambah_video_gmb, R.id.tambah_link_gmb});
+            initTabIconInduk(new int[]{R.id.tambah_gambar, R.id.tambah_video, R.id.tambah_link});
+        }
         tabBarIcon.aturTabIcon(tabIcon);
+        tabBarIcon.aturTabIconInduk(tabIconInduk);
         tabBarIcon.aturIdWarnaDitekan(WARNA_DITEKAN);
         tabBarIcon.aturIdWarnaTakDitekan(WARNA_TAK_DITEKAN);
         initAksiTekan();
@@ -313,6 +334,11 @@ Bagian EXPERT / TambahJawaban
 
     private void initTabIcon(int tabIcon[]){
         this.tabIcon= tabIcon;
+        for(int i= 0; i< tabIcon.length; i++)
+            findViewById(tabIcon[i]).getBackground().setAlpha(0);
+    }
+    private void initTabIconInduk(int tabIconInduk[]){
+        this.tabIconInduk= tabIconInduk;
     }
 
     /*
@@ -435,29 +461,60 @@ Bagian EXPERT / TambahJawaban
 
 //====================================
 
+    private void cekTeksSamaDgAwal(){
+        if(judulAwal.compareTo(teksJudul.getText().toString()) == 0
+        && deskripsiAwal.compareTo(teksDeskripsi.getText().toString()) == 0)
+            samaDgAwal= true;
+        else samaDgAwal= false;
+        cekSamaDgAwal();
+    }
+    private void cekSamaDgAwal(){
+        int warna;
+        if(samaDgAwal || teksJudul.getText().length() <= 0){
+            warna= getResources().getColor(R.color.abuTua);
+            bisaDikirim= false;
+        }else{
+            warna= getResources().getColor(R.color.biruLaut);
+            bisaDikirim= true;
+        }
+//        if(tmbCentang != null)
+        tmbCentang.getDrawable().setTint(warna);
+    }
+    private void cekLampiranSamaDgAwal(){
+        if(pathDipilih.ukuran() == 0 && jmlLampiranDariServer != liveQuestion.getCount())
+            samaDgAwal= false;
+        else
+            samaDgAwal= true;
+        cekSamaDgAwal();
+    }
     private void ambilData(){
         Intent intentSebelumnya= getIntent();
 
         if(intentSebelumnya.getIntExtra("jenisPost", 0)==JENIS_POST_JAWAB){
             Bundle bundle = intentSebelumnya.getBundleExtra("paket_detail_pertanyaan");
-            String judul = bundle.getString("judul_pertanyaan");
+            judulAwal= bundle.getString("judul_pertanyaan");
             deskripsiPost = bundle.getString("deskripsi_pertanyaan");
             bidangPost = bundle.getString("majority");
             orangPost = bundle.getString("owner");
             waktuPost = bundle.getString("waktu");
             idPost = bundle.getString("pid");
-            teksJudul.setText(judul);
+            teksJudul.setText(judulAwal);
             jenisPost = JENIS_POST_JAWAB;
         }else{
             jenisPost = intentSebelumnya.getIntExtra("jenisPost", 0);
-            String judul= intentSebelumnya.getStringExtra("judul");
-            String deskripsi= intentSebelumnya.getStringExtra("deskripsi");
+            judulAwal= intentSebelumnya.getStringExtra("judul");
+            deskripsiAwal= intentSebelumnya.getStringExtra("deskripsi");
             ArrayList<String> urlFoto = intentSebelumnya.getStringArrayListExtra("urlFoto");
             int bidang= intentSebelumnya.getIntExtra("bidang", 0);
 
-            if(judul != null && judul.length() > 0){
-                teksJudul.setText(judul);
-                teksDeskripsi.setText(deskripsi);
+            if(judulAwal == null)
+                judulAwal= "";
+            if(deskripsiAwal== null)
+                deskripsiAwal= "";
+
+            if(judulAwal.length() > 0){
+                teksJudul.setText(judulAwal);
+                teksDeskripsi.setText(deskripsiAwal);
                 idBidang= bidang;
                 if(idHalaman == R.layout.activity_tambah_jawaban_exprt)
                     vBidang.setText(ambilBidang(idBidang));
@@ -474,14 +531,44 @@ Bagian EXPERT / TambahJawaban
 /*
         gambarAwal[]= intentSebelumnya.getStringArrayExtra("gambarAwal");
         if(gambarAwal != null && gambarAwal.length > 0){
-            jmlItemAwal= pathAwal.length;
+            jmlLampiranDariServer= pathAwal.length;
             //Bitmap array=
         }
 */
     }
-    private void initTeks(){
-        teksJudul= findViewById(R.id.tambah_judul);
 /*
+    private void cekPanjangTeksIsian(){
+        boolean isiaKosong= (teksJudul.getText().length() <= 0);// && teksDeskripsi.getText().length() <= 0);
+        int warna= getResources().getColor(R.color.biruLaut);
+        if(isiaKosong) warna= getResources().getColor(R.color.abuLebihTua);
+        tmbCentang.getDrawable().setTint(warna);
+        bisaDikirim= !isiaKosong;
+    }
+*/
+    private void initTeks(){
+        TextWatcher twIsian= new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+/*
+                if(s.length() > 0){
+                    bisaDikirim= true;
+                    tmbCentang.getDrawable().setTint(getResources().getColor(R.color.biruLaut));
+                }else{
+                    bisaDikirim= false;
+                    tmbCentang.getDrawable().setTint(getResources().getColor(R.color.abuTua));
+                }
+*/
+                cekTeksSamaDgAwal();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        };
+        teksJudul= findViewById(R.id.tambah_judul);
+
         teksJudul.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -490,6 +577,7 @@ Bagian EXPERT / TambahJawaban
                 teksJudul.requestFocus();
                 final InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
                 imm.showSoftInput(teksJudul, InputMethodManager.SHOW_IMPLICIT);
+/*
                 tmbCentang.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -505,15 +593,17 @@ Bagian EXPERT / TambahJawaban
                     }
                 });
                 tmbCentang.setImageResource(R.drawable.obj_centang);
-                return true;
+*/
+                return false;
             }
         });
-*/
+
         // initTeksJudul();
         teksJudul.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         teksJudul.clearFocus();
+        teksJudul.addTextChangedListener(twIsian);
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
-/*
+        teksDeskripsi.addTextChangedListener(twIsian);
         teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -522,6 +612,7 @@ Bagian EXPERT / TambahJawaban
                 teksDeskripsi.requestFocus();
                 final InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
                 imm.showSoftInput(teksDeskripsi, InputMethodManager.SHOW_IMPLICIT);
+/*
                 tmbCentang.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -537,14 +628,15 @@ Bagian EXPERT / TambahJawaban
                     }
                 });
                 tmbCentang.setImageResource(R.drawable.obj_centang);
-                return true;
+*/
+                return false;
             }
         });
-*/
 //        teksDeskripsi.setTextIsSelectable(true);
         teksDeskripsi.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         teksDeskripsi.setMaxLines(1000);
         teksDeskripsi.setSingleLine(false);
+//        teksDeskripsi.addTextChangedListener(twIsian);
         if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
 //            EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
             EditTextMod.enableEditText(teksJudul, InputType.TYPE_NULL, false);
@@ -592,6 +684,7 @@ Bagian EXPERT / TambahJawaban
     class TabBarIcon {
         private int tabIcon[];
         private int tabGaris[];
+        private int tabIconInduk[];
 
         private String idWarnaDitekan;
         private String idWarnaTakDitekan;
@@ -620,6 +713,9 @@ Bagian EXPERT / TambahJawaban
         void aturTabIcon(int tabIcon[]){
             this.tabIcon= tabIcon;
         }
+        void aturTabIconInduk(int tabIconInduk[]){
+            this.tabIconInduk= tabIconInduk;
+        }
         void aturTabGaris(int tabGaris[]){
             this.tabGaris= tabGaris;
         }
@@ -636,7 +732,7 @@ Bagian EXPERT / TambahJawaban
 
         void setClickListenerTab(View.OnClickListener l[]){
             for(int i= 0; i< tabIcon.length; i++) {
-                View v= view.findViewById(tabIcon[i]);
+                View v= view.findViewById(tabIconInduk[i]);
                 v.setOnClickListener(l[i]);
             }
         }
@@ -700,13 +796,16 @@ Bagian EXPERT / TambahJawaban
                 if (ditekanKah) {
                     ImageView iconDitekanTadi = view.findViewById(tabIcon[trahirDitekan]);
                     iconDitekanTadi.setColorFilter(Color.parseColor(idWarnaTakDitekan));
+                    iconDitekanTadi.getBackground().setAlpha(0);
                 }
                 iconDitekanSkrg.setColorFilter(Color.parseColor(idWarnaDitekan));
+                iconDitekanSkrg.getBackground().setAlpha(255);
                 trahirDitekan= ind;
                 aturDitekan(true);
             } else{
                 ImageView iconDitekanTadi = view.findViewById(tabIcon[trahirDitekan]);
                 iconDitekanTadi.setColorFilter(Color.parseColor(idWarnaTakDitekan));
+                iconDitekanTadi.getBackground().setAlpha(0);
                 trahirDitekan= -1;
                 aturDitekan(false);
             }/*
@@ -759,7 +858,7 @@ Bagian EXPERT / TambahJawaban
     }
     void initPilihanMajority(ArrayList<Bidang> majority){
         pilihanMajority= findViewById(R.id.tambah_majority);
-        adpMajority= new SpinnerAdp(majority, getBaseContext());
+        adpMajority= new SpinnerAdp(majority, getBaseContext(), Color.parseColor("#FFFFFF"));
         pilihanMajority.setAdapter(adpMajority);
     }
 
@@ -890,6 +989,26 @@ Bagian EXPERT / TambahJawaban
         return listOfAllVideo;
     }
 
+    private void initUrutanDipilih(){
+        Array.PenungguTraverse<Integer, Void, Void> pngTraverse= new Array.PenungguTraverse<Integer, Void, Void>() {
+            int urutanHilang;
+
+            @Override
+            public void awalTraverse(Integer... masukan) {
+                urutanHilang= masukan[0];
+            }
+
+            @Override
+            public Void traverse(Array array, int indek, Object isiArray) {
+                int isi= (Integer) isiArray;
+                if(isi >= urutanHilang)
+                    array.ganti(indek, new Integer(--isi));
+                return null;
+            }
+        };
+        urutanFotoDipilih.aturPenungguTraverse(pngTraverse);
+        urutanVideoDipilih.aturPenungguTraverse(pngTraverse);
+    }
     private int ambilUrutan(int mulai){
         while(!kategoriItemDipilih.ambil(urutanItemDipilih[mulai]).equals(kategoriItem))
             mulai++;
@@ -927,20 +1046,28 @@ Bagian EXPERT / TambahJawaban
 */
 
     private void hapusPosisiUrutan(int posisi){
-        hapusPosisiUrutan(posisi, kategoriItem);
+        hapusPosisiUrutan(posisi, -1, kategoriItem);
     }
-    private void hapusPosisiUrutan(int posisi, int kategoriItem){
+    private int hapusPosisiUrutan(int posisi, int urutan, int kategoriItem){
+        int indekYgHilang= -1;
         if(kategoriItem == GaleriLoader.JENIS_FOTO){
 //            int indek=;
 //            Toast.makeText(this, "indek hapus= " +indek, Toast.LENGTH_SHORT).show();
-            urutanFotoDipilih.hapus(
-                    posisiFotoDipilih.hapus(new Integer(posisi))
-            );
+            if(urutan == -1)
+                urutan= posisiFotoDipilih.hapus(new Integer(posisi));
+            else
+                posisiFotoDipilih.hapus(urutan);
+            indekYgHilang= urutanFotoDipilih.hapus(urutan);
         } else if(kategoriItem == GaleriLoader.JENIS_VIDEO){
-            urutanVideoDipilih.hapus(
-                    posisiVideoDipilih.hapus(new Integer(posisi))
-            );
+            if(urutan == -1)
+                urutan= posisiVideoDipilih.hapus(new Integer(posisi));
+            else
+                posisiVideoDipilih.hapus(urutan);
+            indekYgHilang= urutanVideoDipilih.hapus(urutan);
         }
+        urutanFotoDipilih.traverse(indekYgHilang);
+        urutanVideoDipilih.traverse(indekYgHilang);
+        return indekYgHilang;
     }
 
 
@@ -959,6 +1086,7 @@ Bagian EXPERT / TambahJawaban
         loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
             @Override
             public void pilihFoto(View v, int posisi) {
+                cekLampiranSamaDgAwal();
                 if(!transisiKategori){
                     Toast.makeText(TambahPertanyaanWkr.this, "kategori= " +kategoriItem, Toast.LENGTH_SHORT).show();
                     int urutan= loader.ambilUrutanDipilih(posisi);
@@ -974,15 +1102,9 @@ Bagian EXPERT / TambahJawaban
                 noUrut.getBackground().setAlpha(255);
                 noUrut.setSelected(true);
 
-                GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
-                int lebar= lebarCell; //v.getLayoutParams().width;
+//                int lebar= lebarCell; //v.getLayoutParams().width;
 
-                AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar);
-                liveQuestion.setAdapter(adpDipilih);
-                if(loader.ambilBitmapDipilih().ukuran() <= 3)
-                    aturTinggiGrid(liveQuestion, lebar);
-                else
-                    aturTinggiGrid(liveQuestion, lebar+90);
+                muatAdapterDipilih();
 /*                try{
                 } catch (Exception e){
 //                    Toast.makeText(TambahPertanyaanWkr.this, "error= " +e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -992,12 +1114,10 @@ Bagian EXPERT / TambahJawaban
             @Override
             public void batalPilihFoto(View v, int posisi) {
                 try{
-                    int urutan= ambilUrutan(loader.ambilUrutanDipilih(posisi)-1);
-                    bitmapDipilih.hapus(urutan);
-                    pathDipilih.hapus(urutan);
-                    kategoriItemDipilih.hapus(urutan);
-//                    Toast.makeText(TambahPertanyaanWkr.this, "urutan hapus= " +urutan, Toast.LENGTH_SHORT).show();
-                    hapusPosisiUrutan(posisi);
+                    int urutan= (loader.ambilUrutanDipilih(posisi)-1);
+                    Toast.makeText(TambahPertanyaanWkr.this, "urutan hapus= " +urutan, Toast.LENGTH_SHORT).show();
+                    batalPilihan(urutan, true);
+//                    hapusPosisiUrutan(posisi, -1, kategoriItemDipilih.ambil(urutan));
 
                     Array<View> itemDipilih= loader.ambilViewDipilih();
                     TextView noUrut = v.findViewById(R.id.tambah_cell_centang_no);
@@ -1010,17 +1130,10 @@ Bagian EXPERT / TambahJawaban
                         noUrut.setText(Integer.toString(ambilUrutan(i-1)+1));
                     }
 
-                    GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
-                    int lebar= lebarCell; //v.getLayoutParams().width;
+//                    muatAdapterDipilih();
+//                    GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
+//                    int lebar= lebarCell; //v.getLayoutParams().width;
 
-                    AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebar);
-                    liveQuestion.setAdapter(adpDipilih);
-                    if(loader.ambilBitmapDipilih().ukuran() == 0)
-                        aturTinggiGrid(liveQuestion, 0);
-                    else if(loader.ambilBitmapDipilih().ukuran() <= 3)
-                        aturTinggiGrid(liveQuestion, lebar);
-                    else
-                        aturTinggiGrid(liveQuestion, lebar+90);
                 } catch (Exception e){
                     Toast.makeText(TambahPertanyaanWkr.this, "error= " +e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
@@ -1057,12 +1170,35 @@ Bagian EXPERT / TambahJawaban
         transisiKategori= false;
     }
 
+    private void batalPilihan(int urutan, boolean urutanSesuai){
+        int kategoriSkrg= kategoriItem;
+        int urutanMasingKategori= urutan;
+        if(!urutanSesuai) {
+            kategoriSkrg= kategoriItemDipilih.ambil(urutan);
+            Array<Integer> indek= new Array<>(kategoriItemDipilih.indek(new Integer(kategoriSkrg)));
+            urutanMasingKategori= indek.indekAwal(new Integer((urutan)));
+        }
+        urutan= hapusPosisiUrutan(-1, urutanMasingKategori, kategoriSkrg) -1;
+        bitmapDipilih.hapus(urutan);
+        pathDipilih.hapus(urutan);
+        kategoriItemDipilih.hapus(urutan);
+        muatAdapterDipilih();
+    }
+    private void muatAdapterDipilih(){
+        AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebarCell);
+        liveQuestion.setAdapter(adpDipilih);
+        if(loader.ambilBitmapDipilih().ukuran() == 0)
+            aturTinggiGrid(liveQuestion, 0);
+        else if(loader.ambilBitmapDipilih().ukuran() <= 3)
+            aturTinggiGrid(liveQuestion, lebarCell);
+        else
+            aturTinggiGrid(liveQuestion, lebarCell+90);
+    }
     void aturTinggiGrid(GridView grid, int tinggi){
         grid.getLayoutParams().height= tinggi;
     }
 
     public void inisiasiOk(){
-        tmbCentang= findViewById(R.id.tambah_ok);
         tmbCentang.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1092,7 +1228,7 @@ Bagian EXPERT / TambahJawaban
                     kirimPertanyaan();
             }
         });
-
+/*
         teksJudul.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -1145,6 +1281,7 @@ Bagian EXPERT / TambahJawaban
                 return true;
             }
         });
+*/
     }
 
     private void uploadKomentar(final Solusi solusi, final String id_problem){
@@ -1335,6 +1472,13 @@ Bagian EXPERT / TambahJawaban
 
     //METHOD DUMMY!
     public void kirimPertanyaan(){
+        if(!bisaDikirim){
+            Toast.makeText(this, "Isi judul terlebih dahulu!", Toast.LENGTH_LONG).show();
+            return;
+        }else if(samaDgAwal){
+            finish();
+            return;
+        }
         //simpan pertanyaan.
         String pathFotoDipilih[] = new String[0];
         String pathVideoDipilih[] = new String[0];
@@ -1460,7 +1604,7 @@ Bagian EXPERT / TambahJawaban
 
         @Override
         public int getCount() {
-            return bitmapDipilih.ukuran() +jmlItemAwal;
+            return bitmapDipilih.ukuran() + jmlLampiranDariServer;
         }
 
         @Override
@@ -1478,7 +1622,7 @@ Bagian EXPERT / TambahJawaban
             View view= getLayoutInflater().inflate(R.layout.model_tambah_properti_cell, null);
             ImageView bg= view.findViewById(R.id.tambah_cell_pratinjau);
 
-            if(position >= jmlItemAwal){
+            if(position >= jmlLampiranDariServer){
 //                int urutan= kategoriItemDipilih.indekKe(position, kategoriItem);
 //                bg.setImageBitmap(bitmapDipilih.ambil(position));
                 bitmapDipilih.ambil(position).pasangKeImage(bg);
@@ -1517,13 +1661,14 @@ Bitmap dari gambar yang diload dari server
             centang.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    cekLampiranSamaDgAwal();
 /*
 ================
 !!!!!!!!!!!
 Menghapus file gambar yg diload dari internet
 ================
 */
-                    if(position < jmlItemAwal);
+                    if(position < jmlLampiranDariServer);
 /*
                         gambarAwal.hapus(position)
 */
@@ -1532,6 +1677,8 @@ Menghapus file gambar yg diload dari internet
                             loader.batalPilihFoto(posisiFotoDipilih.ambil(position));
                         else if(tabBarIcon.trahirDitekan() == 1)
                             loader.batalPilihFoto(posisiVideoDipilih.ambil(position));
+                        else if(tabBarIcon.trahirDitekan() != 2)
+                            batalPilihan(position -jmlLampiranDariServer, false);
                     }
                 }
             });

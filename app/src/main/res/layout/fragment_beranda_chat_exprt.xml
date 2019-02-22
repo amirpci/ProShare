@@ -17,12 +17,18 @@
         android:id="@+id/feedback_wadah"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
+<!--
     <ImageView
         android:id="@+id/daftar_pertanyaan_tambah"
         android:layout_gravity="bottom|end"
         android:layout_margin="30dp"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/obj_chat_lingkaran_full"/>
+        android:padding="12dp"
+        android:background="@drawable/latar_lingkaran"
+        android:backgroundTint="@color/biruLaut"
+        android:elevation="10dp"
+        android:src="@drawable/obj_chat"
+        android:tint="#FFFFFF"/>
+-->
 </FrameLayout>

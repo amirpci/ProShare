@@ -37,7 +37,6 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
     private RelativeLayout tmb_Jawab, tmb_Chat;
     private ImageView garis_Jawab;
 
-    protected ViewPagerAdapter adapter;
     private boolean click_duaKali=false;
 
     private int halamanFragmen= 0;
@@ -49,8 +48,8 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
     private final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
             {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
-    private Array<Fragment_Header> fragmenHalaman= new Array<>(); //= {new ProfileActWkr(), new ShareActWkr(), new ChatExprt()};
-    private Array<String> judulHalaman= new Array<>(); //= {"Profil", "Pustaka", "Chat"};
+    private ImageView tmbUtama;
+
 //    private boolean bolehInitHeader= false; //false diperoleh hanya sekali saat pertama kali di-init
 
     @Override
@@ -59,6 +58,8 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
         setContentView(R.layout.activity_main_wkr);
 
         bolehInitHeader= false;
+
+        tombolUtama(tmbUtama= findViewById(R.id.tombol_utama));
 
         final ImageView icon_Profile = (ImageView) findViewById(R.id.tab_profile_ikon_wkr);
         garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis_wkr);
@@ -113,8 +114,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
             }
         });
         initHeader();
-        mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
-        initAdapter();
+        initAdapter_Int();
         initBackPress();
     }
 
@@ -122,6 +122,42 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
     public void keHalaman(int ke) {
         bolehInitHeader= true;
         mvPager.setCurrentItem(ke);
+    }
+
+    private void initAdapter_Int(){
+        aturIconTombolUtama(TOMBOL_UTAMA_HILANG, R.drawable.obj_pensil, R.drawable.obj_chat);
+        mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_wkr);
+        aturFragmen(new ProfileActWkr(), new ShareActWkr(), new ChatExprt());
+        aturJudul("Profil", "Pustaka", "Chat");
+        initAdapter();
+        mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
+                gantiIconTombolUtama();
+
+/*
+                if(fragmenHalaman.ambil(position).ambilAktifitas() != null)
+                    Toast.makeText(MainActivityWkr.this, "kelasnya= " +fragmenHalaman.ambil(position).ambilAktifitas().getClass().getName(), Toast.LENGTH_SHORT).show();
+                else
+                    Toast.makeText(MainActivityWkr.this, "null= " +(fragmenHalaman.ambil(position).ambilAktifitas() == null), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivityWkr.this, "boleh= " +bolehInitHeader, Toast.LENGTH_SHORT).show();
+*/
+                if(bolehInitHeader)
+                    fragmenHalaman.ambil(position).initHeader();
+                aturJudulHeader(judulHalaman.ambil(position));
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 /*
     protected void bolehInitHeader(boolean boleh){
@@ -140,7 +176,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
         super.onResumeFragments();
     }
 */
-
+/*
     @Override
     public void onAttachFragment(Fragment fragment) {
         fragmenHalaman.tambah((Fragment_Header)fragment);
@@ -188,6 +224,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
             @Override
             public void onPageSelected(int position) {
                 gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
+                gantiIconTombolUtama();
 
 /*
                 if(fragmenHalaman.ambil(position).ambilAktifitas() != null)
@@ -195,7 +232,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
                 else
                     Toast.makeText(MainActivityWkr.this, "null= " +(fragmenHalaman.ambil(position).ambilAktifitas() == null), Toast.LENGTH_SHORT).show();
 //                Toast.makeText(MainActivityWkr.this, "boleh= " +bolehInitHeader, Toast.LENGTH_SHORT).show();
-*/
+* /
                 if(bolehInitHeader)
                     fragmenHalaman.ambil(position).initHeader();
                 aturJudulHeader(judulHalaman.ambil(position));
@@ -212,7 +249,18 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
         for(int i= 0; i< fragmenHalaman.ukuran(); i++)
             fragmenHalaman.ambil(i).getFragmentManager().beginTransaction().remove(fragmenHalaman.ambil(i)).commit();
     }
-
+*/
+/*
+    private void gantiIconTombolUtama(){
+        int icon= iconTombolUtama[mvPager.getCurrentItem()];
+        if(icon != TOMBOL_UTAMA_HILANG){
+            tmbUtama.setImageResource(icon);
+            tmbUtama.setVisibility(View.VISIBLE);
+        }
+        else
+            tmbUtama.setVisibility(View.GONE);
+    }
+*/
     @Override
     protected void onResume() {
 //        bolehInitHeader= false;

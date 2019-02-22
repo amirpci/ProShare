@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
@@ -53,5 +54,8 @@ public class EditTextMod {
             InputMethodManager imm= (InputMethodManager) ed.getContext().getSystemService(INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(ed.getWindowToken(), 0);
         }
+    }
+
+    public static void aturTulisan(TextView tv, CharSequence tulisan, int batas){
     }
 }

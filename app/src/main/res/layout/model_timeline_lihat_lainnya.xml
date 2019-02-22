@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/hasil_lainnya"
+    android:layout_below="@id/list_timeline"
+    android:layout_width="match_parent"
+    android:layout_height="44dp">
+    <TextView
+        android:id="@+id/teks_hasil_lainnya"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="17dp"
+        android:text="Lihat 23 solusi lainnya..."
+        android:layout_centerVertical="true"
+        android:textColor="@color/biruLaut"
+        android:textStyle="bold"
+        android:textSize="20sp"/>
+</RelativeLayout>

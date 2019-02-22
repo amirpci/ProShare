@@ -1,5 +1,4 @@
-package sidev17.siits.proshare.Utils;//package cob.cob3_1_2.Tools;
-
+package sidev17.siits.proshare.Utils;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,6 +12,7 @@ public class Array<Tipe> {
     private int ukuran= 0;
     private int indIsi= 0;  //berguna untuk array yang boleh rumpang
     private int batas= -1;
+    private Class kelas;
 
     public final ArrayPrimitif PRIMITIF= new ArrayPrimitif();
 
@@ -128,6 +128,14 @@ public class Array<Tipe> {
         }
     }
 
+    public boolean isiNull(int ke){
+        try{
+            return (ambil(ke) == null);
+        }catch(Exception e){
+            //jika ke melebihi batas dari elemen[]
+            return true;
+        }
+    }
     public Tipe ambil(int indek){
         if((!bolehRumpang && indek >= ukuran) || indek >= elemen.length)
             throw new IndexOutOfBoundsException(pesanOutOfBound(indek));
@@ -160,6 +168,13 @@ public class Array<Tipe> {
         return array;
     }
 
+    public Class kelas(){
+        if(kelas == null) {
+            if(ukuran == 0) throw new RuntimeException("Gak bisa mengambil kelas selagi Array kosong!");
+            kelas= elemen[indekIsiPertama()].getClass();
+        }
+        return kelas;
+    }
 
     public class ArrayPrimitif{
         //method harus sesuai dengan Tipe dari isi Array
@@ -742,28 +757,31 @@ public class Array<Tipe> {
         return batas;
     }
 
-    public Object traverse(){
+    public <Awal> Object traverse(Awal... masukan){
         if(pngTraverse != null){
 //            int batas= (!bolehRumpang) ? ukuran : (this.batas+1);
             int batas= this.batas+1;
             Object hasil[]= new Object[batas];
+            pngTraverse.awalTraverse(masukan);
             for(int i= 0; i< batas; i++)
-                hasil[i]= pngTraverse.traverse(i, (Tipe) elemen[i]);
+                hasil[i]= pngTraverse.traverse(this, i, (Tipe) elemen[i]);
 //            pngTraverse.getClass().getTypeParameters()[1].getGenericDeclaration().cast(hasil);
             return pngTraverse.transisi(hasil);
         }
         return null;
     }
 
-    public void aturPenungguTraverse(PenungguTraverse p){
+    public Array<Tipe> aturPenungguTraverse(PenungguTraverse p){
         pngTraverse= p;
+        return this;
     }
     //Progres adalah keluaran dari tiap iterasi pada proses traverse
     //Akhir adalah kelauran akhir setelah pengolahan Progres
     //Akhir juga merupakan keluaran dari Array<Tipe>.traverse()
-    public static abstract class PenungguTraverse<Progres, Akhir>{
-        public abstract Progres traverse(int indek, Object isiArray);
-        public abstract Akhir akhirTraverse(Progres ... hasilTraverse);
+    public static abstract class PenungguTraverse<Awal, Progres, Akhir>{
+        public void awalTraverse(Awal... masukan){}
+        public abstract Progres traverse(Array array, int indek, Object isiArray);
+        public Akhir akhirTraverse(Progres ... hasilTraverse){return null;}
         private final Akhir transisi(Object ... hasil){
             int indek= 0;
             while(indek < hasil.length && hasil[indek] == null) indek++;
@@ -797,9 +815,9 @@ Struktur Array Elemen
         indek()
     }
 */
-    public void aturBolehRumpang(boolean boleh){
+    public Array<Tipe> aturBolehRumpang(boolean boleh){
         if(boleh== bolehRumpang)
-            return;
+            return this;
         if(bolehRumpang){
             rampingkan();
             indIsi= -1;
@@ -807,6 +825,7 @@ Struktur Array Elemen
             indIsi= ukuran;
         }
         bolehRumpang= boleh;
+        return this;
     }
     public boolean bolehRumpang(){
         return bolehRumpang;

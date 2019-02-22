@@ -43,19 +43,19 @@
     <RelativeLayout
         android:id="@+id/timeline_header"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="80dp"
         android:orientation="vertical"
-        android:background="@color/abu">
+        android:background="#FFFFFF"
+        android:elevation="8dp">
         <sidev17.siits.proshare.Utils.View.MenuBarView
             android:id="@+id/tl_opsi"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
-            android:layout_margin="10dp"
             android:tint="@color/biruLaut"
             app:BAR_latarInduk="@drawable/latar_kotak_tumpul_bawah"
             app:warna_latar="@color/abuTua"
@@ -66,26 +66,28 @@
             android:id="@+id/tl_header"
             android:layout_toLeftOf="@id/tl_opsi"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/tl_judul"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="17dp"
                 android:layout_marginTop="10dp"
                 android:text="How to gain inspiration?"
-                android:textColor="@color/hitam"
-                android:textSize="20sp" />
+                android:textColor="#000000"
+                android:textSize="17sp" />
             <TextView
                 android:id="@+id/tl_majority"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
+                android:layout_height="20dp"
+                android:gravity="center_vertical"
+                android:layout_marginLeft="17dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="10dp"
                 android:text="Problem Majority"
-                android:textColor="@color/hitam"
+                android:textColor="#000000"
                 android:textSize="15sp" />
         </LinearLayout>
     </RelativeLayout>

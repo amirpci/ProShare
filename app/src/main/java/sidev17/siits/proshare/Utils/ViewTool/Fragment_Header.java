@@ -25,5 +25,15 @@ public abstract class Fragment_Header extends Fragment {
         return judulHeader;
     }
 
+    public void daftarkanAksiTombolUtama(MainAct_Header.AksiTombolUtama a){
+        actInduk.daftarkanAksiTombolUtama(a, this);
+    }
+    public void daftarkanPenampilTombolUtama(MainAct_Header.PenampilTombolUtama p){
+        actInduk.daftarkanPenampilTombolUtama(p, this);
+    }
+    public void daftarkanAksiBackPress(Aktifitas.AksiBackPress a){
+        actInduk.daftarkanAksiBackPress(a, this);
+    }
+
     public abstract void initHeader();
 }

@@ -18,8 +18,10 @@ public class SpinnerAdp extends BaseAdapter {
     int jmlElemen;
     ArrayList<Bidang> elemen;
     Context c;
+    int warnaTeks;
 
-    public SpinnerAdp(ArrayList<Bidang> elemen, Context c ){
+    public SpinnerAdp(ArrayList<Bidang> elemen, Context c, int warnaTeks){
+        this.warnaTeks= warnaTeks;
         this.elemen = elemen;
         jmlElemen = elemen.size();
         this.c = c;
@@ -42,11 +44,11 @@ public class SpinnerAdp extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewGroup.LayoutParams lpElemen= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, Ukuran.DpKePx(30, c.getResources().getDisplayMetrics()));
+        ViewGroup.LayoutParams lpElemen= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, /*ViewGroup.LayoutParams.MATCH_PARENT*/Ukuran.DpKePx(30, c.getResources().getDisplayMetrics()));
 
         TextView teksElemen= new TextView(c);
         teksElemen.setGravity(Gravity.LEFT);
-        teksElemen.setTextColor(Color.parseColor("#000000"));
+        teksElemen.setTextColor(warnaTeks);
         teksElemen.setTextSize(19);
         teksElemen.setPadding(15,0,15,0);
         teksElemen.setText(elemen.get(position).getBidang());

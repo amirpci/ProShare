@@ -879,7 +879,7 @@ public class GaleriLoader {
 */
         if(indPosisiDipilih.ukuran() != indUrutanDipilih.ukuran())
             throw new RuntimeException("Ukuran indPosisiDipilih (" +indPosisiDipilih.ukuran()
-                    +") tidak sama dengan ukurang indUkuranDipilih (" +indUrutanDipilih.ukuran() +")");
+                    +") tidak sama dengan ukuran indUrutanDipilih (" +indUrutanDipilih.ukuran() +")");
         if(indPosisiDipilih.ukuran() == 0)
             return;
 

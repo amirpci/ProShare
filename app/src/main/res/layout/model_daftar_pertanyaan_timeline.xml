@@ -46,7 +46,7 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="3dp"
-        android:background="@color/biruLaut"/>
+        android:background="@color/abuTua"/>
     <LinearLayout
         android:layout_marginTop="10dp"
         android:visibility="gone"
