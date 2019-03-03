@@ -167,7 +167,7 @@ public class ShareActWkr extends Fragment_Header {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if(s.length() > 0){
-                    mulaiMencari= true;
+//                    mulaiMencari= true;
 //                    actInduk.tampilkanTombolUtama(false);
 //                    vTambahTimeline.setVisibility(View.GONE);
                     ubahWarnaTmbCari(getResources().getColor(R.color.biruLaut));
@@ -253,9 +253,7 @@ public class ShareActWkr extends Fragment_Header {
         daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
             @Override
             public boolean backPress() {
-                if(search_input.getText().length() > 0){
-                    search_input.setText("");
-                }
+                boolean aksiBackPress= false;
                 if(mulaiMencari){
                     mulaiMencari= false;
                     adapter = new RC_Masalah(new ArrayList<Solusi>(), getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
@@ -268,9 +266,14 @@ public class ShareActWkr extends Fragment_Header {
                             rcTimeline.setAdapter(adapter);
                         }
                     });
-                    return true;
+                    aksiBackPress |= true;
+                    actInduk.tampilkanTombolUtama(true);
                 }
-                return false;
+                if(search_input.getText().length() > 0){
+                    search_input.setText("");
+                    aksiBackPress |= true;
+                }
+                return aksiBackPress;
             }
         });
         daftarkanAksiTombolUtama(new MainAct_Header.AksiTombolUtama() {
@@ -284,7 +287,7 @@ public class ShareActWkr extends Fragment_Header {
         daftarkanPenampilTombolUtama(new MainAct_Header.PenampilTombolUtama() {
             @Override
             public boolean tampilkan(View tombolUtama) {
-                return !mulaiMencari;
+                return !mulaiMencari && search_input.getText().length() <= 0;
             }
         });
         ubahWarnaTmbCari(getResources().getColor(R.color.abuTua));
@@ -764,7 +767,7 @@ public class ShareActWkr extends Fragment_Header {
         private int tipeView= 0;
         Activity act;
         public RC_Masalah(List<Solusi> solusi, Activity act, int tipe) {
-            jmlDitampilkan= (tipe == TIPE_TIMELINE_CARI) ? 2 : solusi.size();
+            jmlDitampilkan= (tipe == TIPE_TIMELINE_CARI && solusi.size() > 0) ? 2 : solusi.size();
             this.solusi = solusi;
             this.act = act;
             tipeSekarang = tipe;

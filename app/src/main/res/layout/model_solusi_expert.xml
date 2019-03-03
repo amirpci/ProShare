@@ -21,11 +21,12 @@
         android:id="@+id/komentar_orang"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/komentar_header">
+        android:layout_below="@id/komentar_header"
+        android:paddingTop="5dp">
         <RelativeLayout
             android:id="@+id/komentar_orang_dp"
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
             android:layout_marginTop="7dp"
             android:layout_marginBottom="7dp"
             android:layout_marginLeft="15dp"
@@ -43,17 +44,17 @@
                 android:id="@+id/komentar_orang_centang"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
-                android:layout_width="20dp"
-                android:layout_height="20dp"/>
+                android:layout_width="15dp"
+                android:layout_height="15dp"/>
         </RelativeLayout>
         <TextView
             android:id="@+id/komentar_orang_nama"
             android:layout_toRightOf="@id/komentar_orang_dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="8dp"
             android:layout_marginLeft="10dp"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:textColor="#000000"
             android:text="Mr. Your Name Here"/>
         <TextView
@@ -62,7 +63,7 @@
             android:layout_below="@id/komentar_orang_nama"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="6dp"
             android:layout_marginLeft="10dp"
             android:textSize="14sp"
             android:textColor="#000000"
@@ -84,9 +85,9 @@
         android:layout_below="@id/lampiran_solusi"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="40dp"
-        android:layout_marginTop="10dp"
-        android:textSize="13sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:textSize="12sp"
         android:textColor="#000000"
         android:text="Your proble can de described here..."/>
     <TextView
@@ -95,7 +96,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="14dp"
         android:textSize="10sp"
         android:textColor="@color/abuLebihTua"
         android:text="6 Jul 2018"/>
@@ -108,8 +109,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="30dp"
         android:layout_marginLeft="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="2dp">
+        android:layout_marginTop="14dp">
         <ImageView
             android:id="@+id/komentar_vote_down"
             android:layout_width="40dp"
@@ -143,9 +143,7 @@
         android:layout_below="@id/komentar_vote"
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:background="@color/abu"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"/>
+        android:background="@color/abu"/>
 
 
 </RelativeLayout>

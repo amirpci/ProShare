@@ -48,7 +48,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
     private final int warnaTab[][] = {{R.color.colorAccent, R.color.colorPrimaryDark},
             {R.color.colorPrimary, R.color.colorPrimaryDark}};
 
-    private ImageView tmbUtama;
+//    private ImageView tmbUtama;
 
 //    private boolean bolehInitHeader= false; //false diperoleh hanya sekali saat pertama kali di-init
 
@@ -59,7 +59,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
 
         bolehInitHeader= false;
 
-        tombolUtama(tmbUtama= findViewById(R.id.tombol_utama));
+        tombolUtama((ImageView)findViewById(R.id.tombol_utama));
 
         final ImageView icon_Profile = (ImageView) findViewById(R.id.tab_profile_ikon_wkr);
         garis_Profile = (ImageView) findViewById(R.id.tab_profile_garis_wkr);

@@ -3,13 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:paddingBottom="10dp"
     android:layout_marginBottom="5dp"
     android:background="@android:color/white">
-
+<!--
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/biruLaut"/>
+-->
     <LinearLayout
-        android:layout_marginTop="10dp"
-        android:visibility="gone"
         android:id="@+id/lampiran_solusi"
+        android:layout_margin="10dp"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"/>
@@ -22,7 +28,10 @@
             android:id="@+id/tl_problem_judul"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="18dp"
             android:textColor="#000000"
             android:textSize="20sp"
             android:text="How to gain inspiration?"/>
@@ -43,7 +52,9 @@
             android:id="@+id/tl_solusi_deskripsi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
             android:textColor="#000000"
             android:text="Isi dari solusi expert"/>
 

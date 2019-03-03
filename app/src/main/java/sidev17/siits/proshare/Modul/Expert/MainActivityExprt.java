@@ -53,6 +53,8 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
 
         bolehInitHeader= false;
 
+        tombolUtama((ImageView)findViewById(R.id.tombol_utama));
+
         tmb_Profile = (LinearLayout) findViewById(R.id.tab_profile_Exprt);
         tmb_Timeline = (LinearLayout) findViewById(R.id.tab_timeline_Exprt);
         tmb_Jawab = (LinearLayout) findViewById(R.id.tab_jawab_Exprt);
@@ -119,6 +121,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
     }
 
     private void initAdapter_Int(){
+        aturIconTombolUtama(TOMBOL_UTAMA_HILANG, R.drawable.obj_pensil, R.drawable.obj_chat);
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
         aturFragmen(new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt());
         aturJudul("Profil", "Pertanyaan yang Harus Dijawab", "Pustaka", "Chat");

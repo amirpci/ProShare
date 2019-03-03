@@ -167,5 +167,20 @@
         android:layout_above="@id/layout_tab_Exprt"
         android:layout_below="@id/main_header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@color/abuTua"/>
+
+    <ImageView
+        android:id="@+id/tombol_utama"
+        android:layout_alignParentRight="true"
+        android:layout_above="@id/layout_tab_Exprt"
+        android:layout_margin="20dp"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:padding="12dp"
+        android:background="@drawable/latar_lingkaran"
+        android:backgroundTint="@color/biruLaut"
+        android:elevation="10dp"
+        android:src="@drawable/obj_titik_tiga_horizontal"
+        android:tint="#FFFFFF"/>
 </RelativeLayout>

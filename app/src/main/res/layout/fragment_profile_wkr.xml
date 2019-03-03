@@ -3,19 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:background="@color/colorAccent"
     android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/colorAccent">
+        android:layout_height="wrap_content">
         <LinearLayout
             android:id="@+id/profil_idenstitas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/abuTua">
+            android:orientation="vertical">
             <LinearLayout
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
@@ -142,7 +139,7 @@
                         android:id="@+id/txt_profile_0"
                         android:layout_gravity="center_horizontal"
                         android:gravity="center_horizontal"
-                        android:text="You answered"
+                        android:text="You shared"
                         android:textSize="12sp"
                         android:layout_weight="1"
                         android:layout_width="wrap_content"
@@ -164,7 +161,7 @@
                         android:id="@+id/txt_profile_2"
                         android:layout_gravity="center_horizontal"
                         android:gravity="center_horizontal"
-                        android:text="questions"
+                        android:text="knowledges"
                         android:textSize="12sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -221,6 +218,7 @@
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
+                android:visibility="gone"
                 android:id="@+id/profil_skill"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"

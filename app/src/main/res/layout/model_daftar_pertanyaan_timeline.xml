@@ -3,8 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:layout_marginBottom="5dp"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:paddingBottom="10dp"
+    android:layout_marginBottom="5dp">
+<!--
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/biruLaut"/>
+-->
     <RelativeLayout
         android:layout_marginLeft="10dp"
         android:layout_width="match_parent"
@@ -13,27 +20,29 @@
             android:id="@+id/tl_problem_judul"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="20dp"
             android:textColor="#000000"
             android:textSize="20sp"
             android:text="How to gain inspiration?"/>
         <TextView
             android:id="@+id/tl_problem_tanggal"
+            android:layout_below="@id/tl_problem_judul"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="6 Juni 2019"
-            android:layout_below="@+id/tl_problem_judul"
             android:textColor="@color/abuSangatTua"
             android:layout_marginLeft="10dp"
             android:layout_marginBottom="5dp"
-            android:textSize="12sp"
-            />
+            android:textSize="12sp"/>
         <TextView
             android:id="@+id/tl_problem_total_vote"
             android:background="@drawable/latar_lingkaran"
             android:backgroundTint="@color/biruLaut"
-            android:layout_alignParentRight="true"
             android:layout_below="@id/tl_problem_judul"
+            android:layout_alignParentRight="true"
             android:layout_marginRight="15dp"
             android:layout_marginBottom="5dp"
             android:paddingLeft="7dp"
@@ -45,8 +54,8 @@
     </RelativeLayout>
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="@color/abuTua"/>
+        android:layout_height="1dp"
+        android:background="@color/abu"/>
     <LinearLayout
         android:layout_marginTop="10dp"
         android:visibility="gone"
@@ -79,7 +88,6 @@
         android:textColor="@color/abuSangatTua"
         android:layout_marginLeft="20dp"
         android:layout_marginBottom="5dp"
-        android:textSize="12sp"
-        />
+        android:textSize="12sp"/>
 
 </LinearLayout>
