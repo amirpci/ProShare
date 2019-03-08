@@ -83,16 +83,24 @@
             android:layout_alignParentTop="true"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:padding="10dp"
             android:orientation="horizontal"
             android:background="#FFFFFF">
-            <ImageView
+            <RelativeLayout
                 android:id="@+id/tambah_gambar"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/icon_klip"
-                android:tint="@color/abuLebihTua"/>
+                android:layout_weight="1">
+                <ImageView
+                    android:id="@+id/tambah_gambar_gmb"
+                    android:padding="10dp"
+                    android:layout_height="match_parent"
+                    android:layout_width="50dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/tab_tambah_gambar"
+                    android:tint="@color/abuTua"
+                    android:background="@drawable/latar_kotak_tumpul_fix"
+                    android:backgroundTint="@color/biruLaut"/>
+            </RelativeLayout>
 <!--
             <ImageView
                 android:id="@+id/tambah_video"
@@ -102,13 +110,22 @@
                 android:src="@drawable/tab_tambah_video"
                 android:tint="@color/abuLebihTua"/>
 -->
-            <ImageView
+            <RelativeLayout
                 android:id="@+id/tambah_link"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:src="@drawable/tab_tambah_link"
-                android:tint="@color/abuLebihTua"/>
+                android:layout_weight="1">
+                <ImageView
+                    android:id="@+id/tambah_link_gmb"
+                    android:padding="10dp"
+                    android:layout_height="match_parent"
+                    android:layout_width="50dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/tab_tambah_link"
+                    android:tint="@color/abuTua"
+                    android:background="@drawable/latar_kotak_tumpul_fix"
+                    android:backgroundTint="@color/biruLaut"/>
+            </RelativeLayout>
         </LinearLayout>
         <GridView
             android:id="@+id/tambah_properti_cell_wadah"

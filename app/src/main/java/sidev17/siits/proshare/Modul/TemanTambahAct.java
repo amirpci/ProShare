@@ -86,8 +86,8 @@ public class TemanTambahAct extends AppCompatActivity implements BidangListener 
         Utilities.getUserRef().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                if (snapshot.hasChild(email.replace(".",","))) {
-                    Pengguna pengguna = snapshot.child(email.replace(".", ",")).getValue(Pengguna.class);
+                if (snapshot.hasChild(email.toLowerCase().replace(".",","))) {
+                    Pengguna pengguna = snapshot.child(email.toLowerCase().replace(".", ",")).getValue(Pengguna.class);
                     if(getApplicationContext() != null){
                         vInformasiOrang.setVisibility(View.VISIBLE);
                         vTmbTambah.setVisibility(View.VISIBLE);

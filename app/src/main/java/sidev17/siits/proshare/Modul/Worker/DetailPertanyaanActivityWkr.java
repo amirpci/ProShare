@@ -186,13 +186,16 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
        // initIndViewKomentar(jmlBuffer);
         isiViewPertanyaan();
         initBarKomen();
-        initMenuBar();
-        ((ViewGroup) findViewById(R.id.detail_bar_komen)).addView(viewBarKomen);
+        if(emailOrang.equalsIgnoreCase(Utilities.getUserID(this))) {
+            initMenuBar();
+            ((ViewGroup) findViewById(R.id.detail_bar_komen)).addView(viewBarKomen);
+        }
     }
 
     private void initMenuBar(){
         menuBar= findViewById(R.id.tl_opsi);
         header = findViewById(R.id.tl_header);
+        menuBar.setVisibility(View.VISIBLE);
         header.post(new Runnable() {
             @Override
             public void run() {
@@ -381,7 +384,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                     tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
                     tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                 }
-                Utilities.voteSolusi("1", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(ind).getId_solusi());
+                Utilities.voteSolusi("1", DetailPertanyaanActivityWkr.this, solusi.get(ind).getId_solusi());
             }
         });
         tmbVoteDown.setOnClickListener(new View.OnClickListener() {
@@ -406,7 +409,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                     tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
                     tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                 }
-                Utilities.voteSolusi("0", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(ind).getId_solusi());
+                Utilities.voteSolusi("0", DetailPertanyaanActivityWkr.this, solusi.get(ind).getId_solusi());
             }
         });
         teksOrang.setText(solusi.get(ind).getNamaOrang());
@@ -505,7 +508,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                     tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
                     tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                 }
-                Utilities.voteSolusi("1", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(0).getId_solusi());
+                Utilities.voteSolusi("1", DetailPertanyaanActivityWkr.this, solusi.get(0).getId_solusi());
             }
         });
         tmbVoteDown.setOnClickListener(new View.OnClickListener() {
@@ -530,7 +533,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                     tmbVoteDown.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.biruLaut), android.graphics.PorterDuff.Mode.SRC_IN);
                     tmbVoteUp.setColorFilter(ContextCompat.getColor(DetailPertanyaanActivityWkr.this, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                 }
-                Utilities.voteSolusi("0", tmbVoteUp, tmbVoteDown, voteJumlah, DetailPertanyaanActivityWkr.this, solusi.get(0).getId_solusi());
+                Utilities.voteSolusi("0", DetailPertanyaanActivityWkr.this, solusi.get(0).getId_solusi());
             }
         });
 
@@ -763,35 +766,35 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 descStr = kata[1];
             }
         });
+            new AsyncTask<Void, Void, String>(){
 
-        new AsyncTask<Void, Void, String>(){
+                @Override
+                protected String doInBackground(Void... voids) {
+                    String output = "";
+                    output = Utilities.loadBidangKu(majorityPertanyaan, DetailPertanyaanActivityWkr.this);
+                    return output;
+                }
 
-            @Override
-            protected String doInBackground(Void... voids) {
-                String output = "";
-                output = Utilities.loadBidangKu(majorityPertanyaan, DetailPertanyaanActivityWkr.this);
-                return output;
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                String[] akanDiterjemahkan = {s};
-                Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this), DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
-                    @Override
-                    public void dataBerubah(String[] kata) {
-                        teksMajority.setVisibility(View.VISIBLE);
-                        teksMajority.setText(kata[0]);
-                        majorStr = kata[0];
-                        header.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                menuBar.getLayoutParams().height = header.getHeight();
-                            }
-                        });
-                    }
-                });
-            }
-        }.execute();
+                @Override
+                protected void onPostExecute(String s) {
+                    String[] akanDiterjemahkan = {s};
+                    Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this), DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
+                        @Override
+                        public void dataBerubah(String[] kata) {
+                            teksMajority.setVisibility(View.VISIBLE);
+                            teksMajority.setText(kata[0]);
+                            majorStr = kata[0];
+                            if(id_masalah.equalsIgnoreCase(Utilities.getUserID(DetailPertanyaanActivityWkr.this)))
+                            header.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    menuBar.getLayoutParams().height = header.getHeight();
+                                }
+                            });
+                        }
+                    });
+                }
+            }.execute();
     }
 
     private void tampilanToastDiterjemahkan(String pesan){

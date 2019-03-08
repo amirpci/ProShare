@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 
 import sidev17.siits.proshare.Konstanta;
+import sidev17.siits.proshare.Login_Register.GantiPassword;
 import sidev17.siits.proshare.Login_Register.Login;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.PackBahasa;
@@ -55,6 +56,7 @@ public class SettingAct extends AppCompatActivity implements View.OnClickListene
 
     void gantiPassword(){
         //lakukan sesuatu
+        startActivity(new Intent(this, GantiPassword.class));
     }
     void logout(){
         FirebaseAuth.getInstance().signOut();

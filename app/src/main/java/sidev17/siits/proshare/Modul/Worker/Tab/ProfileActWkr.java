@@ -61,7 +61,6 @@ import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
-import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Konstanta;
@@ -534,7 +533,7 @@ public class ProfileActWkr extends Fragment_Header {
         int index = Terjemahan.indexBahasa(getActivity());
 
         for(int i=0;i<textProfile.length;i++){
-            textProfile[i].setText(PackBahasa.BahasaProfile[index][i]);
+            textProfile[i].setText(PackBahasa.bahasaProfile[index][i]);
         }
         int indexStatus = 0;
         switch ((int)Utilities.getUserBidang(getActivity())){
@@ -547,13 +546,13 @@ public class ProfileActWkr extends Fragment_Header {
             case 202:
                 indexStatus = 2;
         }
-        status.setText(PackBahasa.BahasaStatusAkun[index][indexStatus]);
+        status.setText(PackBahasa.bahasaStatusAkun[index][indexStatus]);
         /*new AsyncTask<Void, Void , String[]>(){
 
 
             @Override
             protected String[] doInBackground(Void... voids) {
-                String[] bahasa = PackBahasa.BahasaProfile;
+                String[] bahasa = PackBahasa.bahasaProfile;
                 for (int i = 0; i < textProfile.length; i++) {
                     if(getActivity()!=null)
                         bahasa[i] = Utilities.ubahBahasa(bahasa[i], Utilities.getUserNegara(getActivity()), getActivity());

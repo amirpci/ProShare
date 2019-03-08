@@ -7,13 +7,14 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
-        android:largeHeap="true"
         android:allowBackup="true"
         android:icon="@mipmap/app_logo_launcher"
         android:label="@string/app_name"
+        android:largeHeap="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".Login_Register.GantiPassword"></activity>
         <activity
             android:name=".Login_Register.Splash"
             android:theme="@style/SplashTheme">
@@ -72,8 +73,8 @@
         <activity android:name=".Modul.SettingAct" />
         <activity android:name=".Modul.AmbilGambarAct" />
         <activity android:name=".Modul.TemanDaftarAct" />
-        <activity android:name=".Modul.TemanTambahAct"></activity>
-        <activity android:name=".Modul.Worker.Tab.DaftarTanyaActWkr"/>
+        <activity android:name=".Modul.TemanTambahAct" />
+        <activity android:name=".Modul.Worker.Tab.DaftarTanyaActWkr" />
     </application>
 
 </manifest>

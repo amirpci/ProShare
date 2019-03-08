@@ -376,7 +376,7 @@ public class Utilities {
         Volley.newRequestQueue(act).add(stringRequest);
     }
 
-    public static void voteSolusi(final String type, final ImageView voteup, final ImageView votedown, final TextView txtCount, final Activity act, final String id_solusi) {
+    public static void voteSolusi(final String type, final Activity act, final String id_solusi) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SOLUTION_VOTE,
                 new Response.Listener<String>() {
                     @Override
@@ -387,7 +387,7 @@ public class Utilities {
                             if (json.get("terhapus").toString().equals("1")) {
                                 if (!json.get("type").toString().equals(type)) {
                                     //  Toast.makeText(act, Utilities.ubahBahasa("Vote changed!", Utilities.getUserNegara(act), act), Toast.LENGTH_SHORT).show();
-                                    voteSolusi(type, voteup, votedown, txtCount, act, id_solusi);
+                                    voteSolusi(type, act, id_solusi);
                                     // if(json.get("type").toString().equals("1")){
                                     //      voteup.setColorFilter(ContextCompat.getColor(act, R.color.abuLebihTua), android.graphics.PorterDuff.Mode.SRC_IN);
                                     ///  }else{
@@ -1222,6 +1222,7 @@ public class Utilities {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        if(c != null)
                         uploading.dismiss();
                         Log.d("upload masalah ", response);
                         Toast.makeText(c, response, Toast.LENGTH_SHORT).show();

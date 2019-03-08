@@ -93,6 +93,7 @@ import sidev17.siits.proshare.Utils.ViewTool.GaleriLoader;
 import sidev17.siits.proshare.Utils.Utilities;
 
 import static sidev17.siits.proshare.Utils.Utilities.getSolusiImagesRef;
+import static sidev17.siits.proshare.Utils.Utilities.getUserBahasa;
 
 
 public class TambahPertanyaanWkr extends AppCompatActivity {
@@ -279,6 +280,7 @@ Bagian EXPERT / TambahJawaban
                 }
             });
 
+            translateAksi(vLempar, vTolak, vJawab);
             tabBarIcon.aturTinggiTab(tabBarIcon.tinggiTabDitekan());
             tabBarIcon.hilangkanIconTab();
 
@@ -332,10 +334,16 @@ Bagian EXPERT / TambahJawaban
         }
     }
 
+    void translateAksi(TextView ... tv){
+        for(int i = 0 ; i < tv.length; i ++)
+            tv[i].setText(PackBahasa.tambahJawab[Terjemahan.indexBahasa(this)][i]);
+    }
+
     private void initTabIcon(int tabIcon[]){
         this.tabIcon= tabIcon;
-        for(int i= 0; i< tabIcon.length; i++)
+        for(int i= 0; i< tabIcon.length; i++) {
             findViewById(tabIcon[i]).getBackground().setAlpha(0);
+        }
     }
     private void initTabIconInduk(int tabIconInduk[]){
         this.tabIconInduk= tabIconInduk;
@@ -603,6 +611,7 @@ Bagian EXPERT / TambahJawaban
         teksJudul.clearFocus();
         teksJudul.addTextChangedListener(twIsian);
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
+        teksDeskripsi.setHint(PackBahasa.tambahKnowledge[Terjemahan.indexBahasa(this)][1]);
         teksDeskripsi.addTextChangedListener(twIsian);
         teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -1302,6 +1311,7 @@ Bagian EXPERT / TambahJawaban
                                     finish();
                                     if(!obj.getBoolean("error"))
                                         setProblemStatus("1", String.valueOf(Konstanta.PROBLEM_STATUS_VERIFIED));
+                                    uploading.dismiss();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -1377,13 +1387,26 @@ Bagian EXPERT / TambahJawaban
                 @Override
                 public void tambahkanKomentar(String[] url) {
                     tambahkanFotoKomentar(TambahPertanyaanWkr.this, sol.getId_solusi(), url);
-                    uploadKomentar(sol, id_problem);
-                    uploading.dismiss();
+                    String[] komen = new String[]{sol.getDeskripsi()};
+                    Terjemahan.terjemahkanAsync(komen, getUserBahasa(TambahPertanyaanWkr.this), "en", TambahPertanyaanWkr.this, new PerubahanTerjemahListener() {
+                        @Override
+                        public void dataBerubah(String[] kata) {
+                            sol.setDeskripsi(kata[0]);
+                            uploadKomentar(sol, id_problem);
+                        }
+                    });
                     setProblemStatus("1", String.valueOf(Konstanta.PROBLEM_STATUS_VERIFIED));
                 }
             });
         }else{
-            uploadKomentar(sol, id_problem);
+             String[] komen = new String[]{sol.getDeskripsi()};
+             Terjemahan.terjemahkanAsync(komen, getUserBahasa(TambahPertanyaanWkr.this), "en", TambahPertanyaanWkr.this, new PerubahanTerjemahListener() {
+                 @Override
+                 public void dataBerubah(String[] kata) {
+                     sol.setDeskripsi(kata[0]);
+                     uploadKomentar(sol, id_problem);
+                 }
+             });
         }
     }
 
