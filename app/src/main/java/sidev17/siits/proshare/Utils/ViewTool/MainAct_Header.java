@@ -325,4 +325,36 @@ Khusus untuk kustomasi header
         else
             penampilTombolUtama.ganti(indek, p);
     }
+
+
+    public interface AksiGantiHalaman{
+        void gantiHalaman(int posisi);
+    }
+    private Array<AksiGantiHalaman> aksiGantiHalaman;//= new Array<>(true);
+
+    public void daftarkanAksiGantiHalaman(AksiGantiHalaman a){
+        if(aksiGantiHalaman== null){
+            aksiGantiHalaman= new Array<>();
+            aksiGantiHalaman.aturPenungguTraverse(new Array.PenungguTraverse<Integer, Void, Void>() {
+                int posisiHalaman= 0;
+                @Override
+                public void awalTraverse(Integer... masukan) {
+                    posisiHalaman= masukan[0];
+                }
+
+                @Override
+                public Void traverse(Array array, int indek, Object isiArray) {
+                    if(array.isiNull(indek))
+                        return null;
+                    ((AksiGantiHalaman)isiArray).gantiHalaman(posisiHalaman);
+                        return null;
+                }
+            });
+        }
+        aksiGantiHalaman.tambah(a);
+    }
+    protected void aksiGantiHalaman(int posisi){
+        if(aksiGantiHalaman != null)
+            aksiGantiHalaman.traverse(posisi);
+    }
 }

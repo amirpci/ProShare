@@ -1,7 +1,5 @@
 package sidev17.siits.proshare.Login_Register.RegisterPage;
 
-import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -65,7 +63,7 @@ public class Register2 extends Fragment {
             public void afterTextChanged(Editable s) {
                 if(passwordKuat(s.toString())){
                     passStrong = true;
-                    PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.green_light));
+                    PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.ijo));
                 }else{
                     passStrong = false;
                     PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), android.R.color.white));

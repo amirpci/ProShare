@@ -40,7 +40,6 @@ import sidev17.siits.proshare.Login_Register.Register;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Model.Country;
 import sidev17.siits.proshare.R;
-import sidev17.siits.proshare.Utils.Benar;
 import sidev17.siits.proshare.Utils.Utilities;
 
 public class Register1 extends Fragment {
@@ -128,7 +127,7 @@ public class Register1 extends Fragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if(registerRef1.halamanPertama){
                             if(!dataSnapshot.child(str.replace(".",",")).exists() && cekEmail(str.toCharArray())){
-                                PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.green_light));
+                                PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.ijo));
                             }else{
                                 PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), android.R.color.white));
                             }
@@ -184,7 +183,7 @@ public class Register1 extends Fragment {
 
     private void initEmail(){
         if(registerRef1.emailBenar){
-            PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.green_light));
+            PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), R.color.ijo));
         }else{
             PasswordStrong.setColorFilter(ContextCompat.getColor(getActivity(), android.R.color.white));
         }

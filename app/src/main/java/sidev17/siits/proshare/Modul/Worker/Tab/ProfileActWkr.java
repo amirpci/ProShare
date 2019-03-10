@@ -91,7 +91,7 @@ public class ProfileActWkr extends Fragment_Header {
     // private StorageReference storageRef;
     private EditText nama;
     private ImageView editNama;
-    private TextView status, terjawab, rating, penilai;
+    private TextView status;
     private TextView[] textProfile;
     private String idUser,pp_url;
     private ImageView signout,pp_view, addPhoto;
@@ -106,7 +106,8 @@ public class ProfileActWkr extends Fragment_Header {
     private Spinner bidang;
     private String bidangUser;
 
-    private ListView daftarSkill;
+    private ListView daftarShare;
+    private TextView vShareIsi, vRatingIsi, vRatingUp, vRatingDown;
     private String skill[];
     private int tingkatRekom[];
 
@@ -127,13 +128,12 @@ public class ProfileActWkr extends Fragment_Header {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
-
-
         textProfile = new TextView[4];
-        textProfile[0] = v.findViewById(R.id.txt_profile_0);
-        textProfile[1] = v.findViewById(R.id.txt_profile_1);
-        textProfile[2] = v.findViewById(R.id.txt_profile_2);
+        textProfile[0] = v.findViewById(R.id.txt_share_judul);
+        textProfile[1] = v.findViewById(R.id.txt_rating_judul);
+        textProfile[2] = v.findViewById(R.id.txt_share_penjelas);
         textProfile[3] = v.findViewById(R.id.txt_profile_3);
+
         //dataRef = FirebaseDatabase.getInstance().getReference("User");
         //storageRef = FirebaseStorage.getInstance().getReference("User");
         uploading = new ProgressDialog(getActivity());
@@ -142,14 +142,15 @@ public class ProfileActWkr extends Fragment_Header {
         initEditNama();
         bidang = v.findViewById(R.id.bidang_profile);
         status = (TextView)v.findViewById(R.id.status_profile);
-        terjawab = (TextView)v.findViewById(R.id.answered_profile);
-        rating = (TextView)v.findViewById(R.id.rating_profile);
-        penilai = (TextView)v.findViewById(R.id.rater_profile);
+        vShareIsi = (TextView)v.findViewById(R.id.txt_share_isi);
+        vRatingIsi = (TextView)v.findViewById(R.id.txt_rating_isi);
+        vRatingUp = (TextView)v.findViewById(R.id.txt_rating_penjelas_up);
+        vRatingDown = (TextView)v.findViewById(R.id.txt_rating_penjelas_down);
 //        signout = (ImageView)v.findViewById(R.id.signOut);
         pp_view = (ImageView)v.findViewById(R.id.pp_preview);
         addPhoto = (ImageView)v.findViewById(R.id.addphoto_profile);
         menuBar= v.findViewById(R.id.opsi_profil);
-        daftarSkill= v.findViewById(R.id.skill_daftar);
+        daftarShare = v.findViewById(R.id.daftar_share);
         profile_photo = (de.hdodenhof.circleimageview.CircleImageView)v.findViewById(R.id.img_profile);
         profile_photo.setVisibility(View.GONE);
         idUser = FirebaseAuth.getInstance().getUid();

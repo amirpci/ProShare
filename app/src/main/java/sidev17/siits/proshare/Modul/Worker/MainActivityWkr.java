@@ -151,6 +151,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
                 if(bolehInitHeader)
                     fragmenHalaman.ambil(position).initHeader();
                 aturJudulHeader(judulHalaman.ambil(position));
+                aksiGantiHalaman(position);
             }
 
             @Override

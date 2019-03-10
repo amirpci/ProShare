@@ -58,7 +58,7 @@ public class GantiPassword extends AppCompatActivity implements View.OnClickList
             public void afterTextChanged(Editable s) {
                 if(passwordKuat(s.toString())){
                     passKuat = true;
-                    centangPass.setColorFilter(ContextCompat.getColor(GantiPassword.this, R.color.green_light));
+                    centangPass.setColorFilter(ContextCompat.getColor(GantiPassword.this, R.color.ijo));
                 }else{
                     passKuat = false;
                     centangPass.setColorFilter(ContextCompat.getColor(GantiPassword.this, android.R.color.white));

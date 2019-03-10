@@ -133,7 +133,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/hitam"/>
                     <TextView
-                        android:id="@+id/answered_profile"
+                        android:id="@+id/txt_share_isi"
                         android:paddingTop="10dp"
                         android:paddingBottom="10dp"
                         android:layout_gravity="center_horizontal"
@@ -168,7 +168,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/hitam"/>
                     <TextView
-                        android:id="@+id/rating_profile"
+                        android:id="@+id/txt_rating_isi"
                         android:paddingTop="10dp"
                         android:paddingBottom="10dp"
                         android:layout_gravity="center_horizontal"
@@ -190,7 +190,7 @@
                             android:layout_height="20dp"
                             android:src="@drawable/tab_orang"/>
                         <TextView
-                            android:id="@+id/rater_profile"
+                            android:id="@+id/txt_rating_penjelas"
                             android:layout_margin="2dp"
                             android:layout_gravity="center_vertical"
                             android:gravity="center_horizontal"
@@ -203,7 +203,7 @@
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
-                android:id="@+id/profil_skill"
+                android:id="@+id/profil_share"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 android:layout_width="match_parent"

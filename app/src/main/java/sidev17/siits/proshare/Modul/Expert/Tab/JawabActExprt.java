@@ -115,7 +115,15 @@ public class JawabActExprt extends Fragment_Header {
     public void initHeader() {
 //        MainAct_Header mainAct= (MainAct_Header) actInduk;
 //        actInduk.aturJudulHeader("Pertnyaan yang Harus Dijawab");
-        actInduk.aturTambahanHeader("(" +adapter.getItemCount() +")");
+        actInduk.daftarkanAksiGantiHalaman(new MainAct_Header.AksiGantiHalaman() {
+                    @Override
+                    public void gantiHalaman(int posisi) {
+                        if(posisi != 1)
+                            actInduk.aturTambahanHeader("");
+                        else
+                            actInduk.aturTambahanHeader("(" +adapter.getItemCount() +")");
+                    }
+                });
         actInduk.aturGambarOpsiHeader_Null(0);
 //        int resId[]= {};
     }

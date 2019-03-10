@@ -186,9 +186,9 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
        // initIndViewKomentar(jmlBuffer);
         isiViewPertanyaan();
         initBarKomen();
+        ((ViewGroup) findViewById(R.id.detail_bar_komen)).addView(viewBarKomen);
         if(emailOrang.equalsIgnoreCase(Utilities.getUserID(this))) {
             initMenuBar();
-            ((ViewGroup) findViewById(R.id.detail_bar_komen)).addView(viewBarKomen);
         }
     }
 

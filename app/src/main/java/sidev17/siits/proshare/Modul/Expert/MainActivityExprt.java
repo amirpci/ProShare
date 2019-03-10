@@ -121,7 +121,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
     }
 
     private void initAdapter_Int(){
-        aturIconTombolUtama(TOMBOL_UTAMA_HILANG, R.drawable.obj_pensil, R.drawable.obj_chat);
+        aturIconTombolUtama(TOMBOL_UTAMA_HILANG, TOMBOL_UTAMA_HILANG, R.drawable.obj_pensil, R.drawable.obj_chat);
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
         aturFragmen(new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt());
         aturJudul("Profil", "Pertanyaan yang Harus Dijawab", "Pustaka", "Chat");
@@ -135,6 +135,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
             @Override
             public void onPageSelected(int position) {
                 gantiWarnaTab(position, tmbTab[0], tmbTab[1], warnaTab);
+                gantiIconTombolUtama();
 //                gantiIconTombolUtama();
 
 /*
@@ -147,6 +148,7 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
                 if(bolehInitHeader)
                     fragmenHalaman.ambil(position).initHeader();
                 aturJudulHeader(judulHalaman.ambil(position));
+                aksiGantiHalaman(position);
             }
 
             @Override
