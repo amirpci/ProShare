@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
 import android.text.method.KeyListener;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -664,8 +665,44 @@ public class ProfileActWkr extends Fragment_Header {
         bidangSekarang = new ArrayList<>();
         nama.setText(Utilities.getUserNama(getActivity()));
         gantiBahasa();
+        loadRating(Utilities.getUserBidang(getActivity()));
         if(Utilities.getUserFoto(getActivity())!=null)
             Utilities.setFotoDariUrlSingle(Utilities.getUserFoto(getActivity()), profile_photo, 150);
+    }
+
+    private void loadRating(final long status) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.RATING,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("rating ", response);
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            vRatingIsi.setText(obj.getString("rating"));
+                            vRatingUp.setText(obj.getString("total_vote_up"));
+                            vRatingDown.setText(obj.getString("total_vote_down"));
+                            if(status>200)
+                                vShareIsi.setText(obj.getString("total_answered"));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("id_owner", Utilities.getUserID(getActivity()));
+                masalah.put("type", (status>200)?"23":"20");
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(getActivity()).add(stringRequest);
     }
 
     private void loadBidang(final String bidang_, final Language languageID) {

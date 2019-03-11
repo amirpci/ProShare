@@ -1,6 +1,7 @@
 package sidev17.siits.proshare.Modul.Worker;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -52,6 +54,7 @@ import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -268,6 +271,59 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     private void hapusPertanyaan() {
         //lakukan sesuatu...
         //kalau bisa pake konfirmasi dulu
+        final Dialog dialog= new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_kirim_jawaban);
+        TextView vHapus= dialog.findViewById(R.id.tindakan_kirim);
+        TextView vBatal = dialog.findViewById(R.id.tindakan_lempar);
+        TextView vKonfirmasi = dialog.findViewById(R.id.tindakan_konfirmasi);
+        terjemahkanMenuBar(vKonfirmasi, vBatal, vHapus);
+        vHapus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(DetailPertanyaanActivityWkr.this, PackBahasa.toastDetail[Terjemahan.indexBahasa(getApplicationContext())][0], Toast.LENGTH_SHORT).show();
+                Utilities.setHapusPertanyaaanStatus(DetailPertanyaanActivityWkr.this, "hapus");
+                hapusDariServer();
+                finish();
+            }
+        });
+        vBatal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+//                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.show();
+    }
+
+    private void hapusDariServer() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DELETE_PROBLEM,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("delete oke", response);
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(DetailPertanyaanActivityWkr.this, "Something wrong must happen!", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("id_problem", id_masalah);
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(DetailPertanyaanActivityWkr.this).add(stringRequest);
+    }
+
+    private void terjemahkanMenuBar(TextView ... txt){
+        for(int i = 0; i < 3; i++)
+            txt[i].setText(PackBahasa.menuBarDetail[Terjemahan.indexBahasa(this)][i]);
     }
 
     public void setTotalVote(int totalVote){
@@ -1089,6 +1145,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 uploadFotoKomentar(0, pathFoto, urlFotoTerupload, id_solusi,this, uploading, new FotoKomentarListener() {
                     @Override
                     public void tambahkanKomentar(String[] url) {
+                        for(int i = 0; i < url.length; i ++)
+                            Log.d("url "+String.valueOf(i), url[i]);
                         tambahkanFotoKomentar(DetailPertanyaanActivityWkr.this, id_solusi, url);
                         uploadKomentar(sol);
                         initFotoBatal();

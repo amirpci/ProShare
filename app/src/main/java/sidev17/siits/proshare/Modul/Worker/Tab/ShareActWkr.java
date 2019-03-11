@@ -92,8 +92,10 @@ import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.Utilities;
 
 import static android.app.Activity.RESULT_OK;
+import static sidev17.siits.proshare.Utils.Utilities.getHapusPertanyaanStatus;
 import static sidev17.siits.proshare.Utils.Utilities.getSolusiImagesRef;
 import static sidev17.siits.proshare.Utils.Utilities.initViewSolusiLampiran;
+import static sidev17.siits.proshare.Utils.Utilities.setHapusPertanyaaanStatus;
 
 /**
  * Created by USER on 02/05/2018.
@@ -1020,6 +1022,19 @@ public class ShareActWkr extends Fragment_Header {
     public void onResume() {
         super.onResume();
         search_input.setHint(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][0]);
+        if(getHapusPertanyaanStatus(getActivity()) != null){
+            adapter = new RC_Masalah(new ArrayList<Solusi>(), getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
+            rcTimeline.setAdapter(adapter);
+            loadData(new PencarianListener() {
+                @Override
+                public void ketemu(ArrayList<Solusi> solusi) {
+                    Log.d("kresume", "io");
+                    adapter = new RC_Masalah(solusi, getActivity(), RC_Masalah.TIPE_TIMELINE_DEFAULT);
+                    rcTimeline.setAdapter(adapter);
+                }
+            });
+            setHapusPertanyaaanStatus(getActivity(), null);
+        }
     }
 }
 

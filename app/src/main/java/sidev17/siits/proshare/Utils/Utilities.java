@@ -1576,6 +1576,21 @@ public class Utilities {
         editor.commit();
     }
 
+    public static String getHapusPertanyaanStatus(Context c) {
+        if (c != null) {
+            SharedPreferences prefs = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE);
+            String lang = prefs.getString("hapus", null);
+            return lang;
+        }
+        return "en";
+    }
+
+    public static void setHapusPertanyaaanStatus(Context c, String state) {
+        SharedPreferences.Editor editor = c.getSharedPreferences(Konstanta.PENGGUNA_PREFS, MODE_PRIVATE).edit();
+        editor.putString("hapus", state);
+        editor.commit();
+    }
+
     public static String getUserBahasaDariNegara(String userNegara) {
         switch (userNegara) {
             case "2":

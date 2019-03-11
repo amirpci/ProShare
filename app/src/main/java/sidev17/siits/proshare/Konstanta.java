@@ -20,6 +20,7 @@ public class Konstanta {
     public static final String TAMBAH_SOLUSI_URL = ROOT_URL + "addSolusi.php";
     public static final String TAMBAH_PROBLEM_FOTO_URL  = ROOT_URL + "addFoto.php";
     public static final String TAMBAH_SOLUSI_FOTO_URL  = ROOT_URL + "addFotoKomentar.php";
+    public static final String DELETE_PROBLEM = ROOT_URL + "DeleteProblem.php";
     public static final String PERTANYAAN_SAYA_URL = ROOT_URL+"DaftarDitanyakan.php";
     public static final String DAFTAR_BIDANG = ROOT_URL + "DaftarBidang.php";
     public static final String DAFTAR_NEGARA = ROOT_URL + "DaftarNegara.php";
@@ -30,6 +31,7 @@ public class Konstanta {
     public static final String BIDANGKU =  ROOT_URL + "Bidangku.php";
     public static final String TIMELINE_URL = ROOT_URL+"Timeline.php";
     public static final String SEARCH_URL = ROOT_URL+"SearchProblem.php";
+    public static final String RATING = ROOT_URL + "rating.php";
     public static final String SEARCH_SOLUSI = ROOT_URL + "SearchSolusi.php";
     public static final String PROBLEM_VOTE = ROOT_URL+"VoteProblem.php";
     public static final String PROBLEM_VOTE_COUNT = ROOT_URL + "VoteCountProblem.php";

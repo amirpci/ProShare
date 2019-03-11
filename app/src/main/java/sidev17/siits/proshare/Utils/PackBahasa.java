@@ -47,4 +47,8 @@ public class PackBahasa {
                                             {"Silahkan isi yang kosong!", "Kata sandi tidak cocok!", "Kata sandi setidaknya mempunyai panjang 6 karakter!", "Kata sandi harus mengandung huruf dan angka!", "Kata sandi telah dirubah", "Kata sandi gagal dirubah"},
                                             {"空白を入力してください！", "パスワードが一致しません！", "パスワードは6文字以上にする必要があります！", "パスワードには文字と数字を含める必要があります！","パスワードが更新されました", "エラーパスワードが更新されていません"}};
 
+    public static String[][] menuBarDetail = {{"Are you sure to detele this problem/question?", "Cancel", "Delete"},
+                                                {"Apakah anda yakin menghapus masalah/pertanyaan ini?", "Batal", "Hapus"},
+                                                    {"この問題/質問を削除しますか？","キャンセル」","削除"}};
+    public static String[][] toastDetail ={{"problem/question has been deleted!"}, {"masalah/pertanyaan telah dihapus!"}, {"問題/質問は削除されました！"}};
 }

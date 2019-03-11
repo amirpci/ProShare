@@ -41,8 +41,10 @@ public class MainAct_Header extends Aktifitas {
 
     @Override
     public void onAttachFragment(Fragment fragment) {
-        fragmenHalaman.tambah((Fragment_Header)fragment);
-        judulHalaman.tambah(((Fragment_Header)fragment).judulHeader());
+        if(fragment instanceof Fragment_Header) {
+            fragmenHalaman.tambah((Fragment_Header) fragment);
+            judulHalaman.tambah(((Fragment_Header) fragment).judulHeader());
+        }
         super.onAttachFragment(fragment);
     }
 
