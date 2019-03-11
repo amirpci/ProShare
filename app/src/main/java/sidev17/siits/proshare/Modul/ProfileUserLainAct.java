@@ -1,4 +1,4 @@
-package sidev17.siits.proshare.Modul.Worker.Tab;
+package sidev17.siits.proshare.Modul;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
@@ -87,7 +88,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
  * Created by USER on 02/05/2018.
  */
 
-public class ProfileActWkr extends Fragment_Header {
+public class ProfileUserLainAct extends AppCompatActivity {
     //private DatabaseReference dataRef;
     // private StorageReference storageRef;
     private EditText nama;
@@ -121,10 +122,12 @@ public class ProfileActWkr extends Fragment_Header {
 
     public View vIndukProfil;
 
-    @Nullable
+
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_profile_wkr, container, false);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        View v = LayoutInflater.from(this).inflate(R.layout.fragment_profile_wkr, null);
+        setContentView(vIndukProfil= v);
         // untuk menghindari kesalahan multithreading dalam network connection
         if (android.os.Build.VERSION.SDK_INT > 9)
         {
@@ -139,7 +142,7 @@ public class ProfileActWkr extends Fragment_Header {
 
         //dataRef = FirebaseDatabase.getInstance().getReference("User");
         //storageRef = FirebaseStorage.getInstance().getReference("User");
-        uploading = new ProgressDialog(getActivity());
+        uploading = new ProgressDialog(this);
         nama = (EditText) v.findViewById(R.id.nama_profile);
         editNama= v.findViewById(R.id.prfile_edit_nama);
         initEditNama();
@@ -166,26 +169,26 @@ public class ProfileActWkr extends Fragment_Header {
                 add.setType("image/*");
                 startActivityForResult(add, ambilPhoto);
 */
-                if(Utilities.isStoragePermissionGranted(getActivity())){
-                    // Toast.makeText(getActivity(), "sudah", Toast.LENGTH_SHORT).show();
-                    Intent keAmbilGambar= new Intent(getContext(), AmbilGambarAct.class);
+                if(Utilities.isStoragePermissionGranted(ProfileUserLainAct.this)){
+                    // Toast.makeText(ProfileUserLainAct.this, "sudah", Toast.LENGTH_SHORT).show();
+                    Intent keAmbilGambar= new Intent(ProfileUserLainAct.this, AmbilGambarAct.class);
                     keAmbilGambar.putExtra("jenisPengambilan", AmbilGambarAct.JENIS_AMBIL_SATU);
                     startActivityForResult(keAmbilGambar, ambilPhoto);
                 }else {
-                    Toast.makeText(getActivity(), "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileUserLainAct.this, "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
         addPhoto.setVisibility(View.GONE);
 
         initMenuBar();
-        bidangAwal = Utilities.getUserMajor(getActivity());
-        namaAwal = Utilities.getUserNama(getActivity());
+        bidangAwal = Utilities.getUserMajor(this);
+        namaAwal = Utilities.getUserNama(this);
         loadPilihanMajorityServer();
         // initBidang(new ArrayList<Bidang>());
-
-        if(getActivity() instanceof  MainActivityWkr){
-            ((MainActivityWkr)getActivity()).aturPenungguGantiHalaman(new MainActivityWkr.PenungguGantiHalaman() {
+/*
+        if(this instanceof  MainActivityWkr){
+            ((MainActivityWkr)ProfileUserLainAct.this).aturPenungguGantiHalaman(new MainActivityWkr.PenungguGantiHalaman() {
                 @Override
                 public void gantiHalaman(int halSebelumnnya, int halamanSkrg) {
                     if(!menuBar.menuBisaDitampilkan() || menuBar.menuDitampilkan())
@@ -193,7 +196,7 @@ public class ProfileActWkr extends Fragment_Header {
                 }
             });
         }else{
-            ((MainActivityExprt)getActivity()).aturPenungguGantiHalaman(new MainActivityExprt.PenungguGantiHalaman() {
+            ((MainActivityExprt)ProfileUserLainAct.this).aturPenungguGantiHalaman(new MainActivityExprt.PenungguGantiHalaman() {
                 @Override
                 public void gantiHalaman(int halSebelumnnya, int halamanSkrg) {
                     if(!menuBar.menuBisaDitampilkan() || menuBar.menuDitampilkan())
@@ -205,9 +208,9 @@ public class ProfileActWkr extends Fragment_Header {
         signout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              //  Utilities.removeDataLogin(getActivity());
+              //  Utilities.removeDataLogin(ProfileUserLainAct.this);
                 FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getActivity(), Login.class);
+                Intent intent = new Intent(ProfileUserLainAct.this, Login.class);
                 intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_LOGOUT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -215,10 +218,10 @@ public class ProfileActWkr extends Fragment_Header {
         });
 */
 //        initHeader();
-        judulHeader= "Profil";
-        return vIndukProfil= v;
+//        judulHeader= "Profil";
     }
 
+/*
     @Override
     public void initHeader(){
 //        Toast.makeText(actInduk, "INIT!!!", Toast.LENGTH_SHORT).show();
@@ -228,7 +231,7 @@ public class ProfileActWkr extends Fragment_Header {
             actInduk.aturGambarOpsiHeader_Null(0);
 //        int resId[]= {};
     }
-
+*/
     void loadPilihanMajorityServer(){
         new AsyncTask<Void, Void, ArrayList<Bidang>>(){
 
@@ -292,18 +295,18 @@ public class ProfileActWkr extends Fragment_Header {
         @Override
         protected String[] doInBackground(String[]... params) {
             String[] output = params[0];
-            String idBahasa  = Utilities.getUserBahasa(getActivity());
+            String idBahasa  = Utilities.getUserBahasa(ProfileUserLainAct.this);
             bahasaSekarang = idBahasa;
             for(int i=0; i<params[0].length;i++){
-                if(getActivity()!=null)
-                   output[i] = Utilities.ubahBahasaDariId(params[0][i], idBahasa, getActivity());
+                if(ProfileUserLainAct.this!=null)
+                    output[i] = Utilities.ubahBahasaDariId(params[0][i], idBahasa, ProfileUserLainAct.this);
             }
             return output;
         }
 
         @Override
         protected void onPostExecute(String[] result) {
-            if(getActivity()!=null && bidang!=null) {
+            if(ProfileUserLainAct.this!=null && bidang!=null) {
                 bidang.setAdapter(new AdapterBidang(result));
                 bidang.setSelection(Integer.parseInt(bidangAwal) - 1);
                 bgAwalSpinner = bidang.getBackground();
@@ -353,7 +356,7 @@ public class ProfileActWkr extends Fragment_Header {
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewGroup.LayoutParams lp= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
 
-            TextView tv= new TextView(getContext());
+            TextView tv= new TextView(ProfileUserLainAct.this);
             tv.setLayoutParams(lp);
             tv.setTextColor(Color.parseColor("#000000"));
             tv.setGravity(Gravity.CENTER);
@@ -444,19 +447,20 @@ public class ProfileActWkr extends Fragment_Header {
             @Override
             public void klik(View v) {
 /*
-                Utilities.removeDataLogin(getActivity());
+                Utilities.removeDataLogin(ProfileUserLainAct.this);
                 //FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(getActivity(), Login.class);
+                Intent intent = new Intent(ProfileUserLainAct.this, Login.class);
                 intent.putExtra(Konstanta.LOGIN_INTENT, Konstanta.LOGIN_LOGOUT);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
 */
-                startActivity(new Intent(getContext(), SettingAct.class));
+                startActivity(new Intent(ProfileUserLainAct.this, SettingAct.class));
             }
         });
 //        menuBar.latarIndukAwal();
 
 //        Aktifitas induk= (Aktifitas) actInduk;
+        /*
         if(actInduk != null) {
             actInduk.daftarkanBatas(menuBar.ambilBatas());
             daftarkanAksiBackPress(new Aktifitas.AksiBackPress() {
@@ -472,7 +476,7 @@ public class ProfileActWkr extends Fragment_Header {
                     return false;
                 }
             });
-        }
+        }*/
     }
     protected void menuBarAwal(){
         editProfil(false);
@@ -504,11 +508,11 @@ public class ProfileActWkr extends Fragment_Header {
             namaAwal = nama.getText().toString();
             profileBerubah = false;
         } else
-            Toast.makeText(getActivity(), "No changes has been saved!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ProfileUserLainAct.this, "No changes has been saved!", Toast.LENGTH_SHORT).show();
     }
     void simpanProfil(final String nama, final String bidang){
         //lakukan sesuatu
-        final DatabaseReference userRef = Utilities.getUserRef(Utilities.getUserID(getActivity()));
+        final DatabaseReference userRef = Utilities.getUserRef(Utilities.getUserID(ProfileUserLainAct.this));
         userRef.child("nama").setValue(nama).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -516,19 +520,19 @@ public class ProfileActWkr extends Fragment_Header {
                     userRef.child("bidang").setValue(bidang).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            if (getActivity() != null) {
+                            if (ProfileUserLainAct.this != null) {
                                 if (task.isSuccessful()) {
-                                    Utilities.setUserMajor(getActivity(), bidang);
-                                    Utilities.setUserNama(getActivity(), nama);
-                                    Toast.makeText(getActivity(), "Profile succesfully updated!", Toast.LENGTH_SHORT).show();
+                                    Utilities.setUserMajor(ProfileUserLainAct.this, bidang);
+                                    Utilities.setUserNama(ProfileUserLainAct.this, nama);
+                                    Toast.makeText(ProfileUserLainAct.this, "Profile succesfully updated!", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(getActivity(), "Failed to update profile!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ProfileUserLainAct.this, "Failed to update profile!", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         }
                     });
                 } else {
-                    Toast.makeText(getActivity(), "Failed to update profile!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileUserLainAct.this, "Failed to update profile!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -537,13 +541,13 @@ public class ProfileActWkr extends Fragment_Header {
     }
 
     void gantiBahasa(){
-        int index = Terjemahan.indexBahasa(getActivity());
+        int index = Terjemahan.indexBahasa(ProfileUserLainAct.this);
 
         for(int i=0;i<textProfile.length;i++){
             textProfile[i].setText(PackBahasa.bahasaProfile[index][i]);
         }
         int indexStatus = 0;
-        switch ((int)Utilities.getUserBidang(getActivity())){
+        switch ((int)Utilities.getUserBidang(ProfileUserLainAct.this)){
             case 200:
                 indexStatus = 0;
                 break;
@@ -561,8 +565,8 @@ public class ProfileActWkr extends Fragment_Header {
             protected String[] doInBackground(Void... voids) {
                 String[] bahasa = PackBahasa.bahasaProfile;
                 for (int i = 0; i < textProfile.length; i++) {
-                    if(getActivity()!=null)
-                        bahasa[i] = Utilities.ubahBahasa(bahasa[i], Utilities.getUserNegara(getActivity()), getActivity());
+                    if(ProfileUserLainAct.this!=null)
+                        bahasa[i] = Utilities.ubahBahasa(bahasa[i], Utilities.getUserNegara(ProfileUserLainAct.this), ProfileUserLainAct.this);
                 }
                 return bahasa;
             }
@@ -633,30 +637,30 @@ public class ProfileActWkr extends Fragment_Header {
             });
             ed.getBackground().setAlpha(255);
             ed.getBackground().setTint(Color.parseColor("#000000"));
-            InputMethodManager imm= (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+            InputMethodManager imm= (InputMethodManager) ProfileUserLainAct.this.getSystemService(INPUT_METHOD_SERVICE);
             imm.showSoftInput(ed, InputMethodManager.SHOW_IMPLICIT);
             Selection.setSelection(ed.getText(), ed.length());
         } else{
             ed.setInputType(InputType.TYPE_NULL);
             ed.setKeyListener(null);
             ed.getBackground().setAlpha(0);
-            InputMethodManager imm= (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+            InputMethodManager imm= (InputMethodManager) ProfileUserLainAct.this.getSystemService(INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(ed.getWindowToken(), 0);
         }
     }
 
     void loadUploadedPP(){
-        Utilities.getUserRef(Utilities.getUserID(getActivity())).addValueEventListener(new ValueEventListener() {
+        Utilities.getUserRef(Utilities.getUserID(ProfileUserLainAct.this)).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String alamatPP = dataSnapshot.child("photoProfile").getValue(String.class);
                 if(alamatPP!=null){
-                    Glide.with(getActivity()).load(alamatPP).into(profile_photo);
+                    Glide.with(ProfileUserLainAct.this).load(alamatPP).into(profile_photo);
                     pp_view.setVisibility(View.GONE);
                     addPhoto.setVisibility(View.GONE);
                     profile_photo.setVisibility(View.VISIBLE);
                     uploading.dismiss();
-                    Toast.makeText(getActivity(), "Profile photo updated!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileUserLainAct.this, "Profile photo updated!", Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -668,11 +672,11 @@ public class ProfileActWkr extends Fragment_Header {
 
     void loadData(){
         bidangSekarang = new ArrayList<>();
-        nama.setText(Utilities.getUserNama(getActivity()));
+        nama.setText(Utilities.getUserNama(ProfileUserLainAct.this));
         gantiBahasa();
-        loadRating(Utilities.getUserBidang(getActivity()));
-        if(Utilities.getUserFoto(getActivity())!=null)
-            Utilities.setFotoDariUrlSingle(Utilities.getUserFoto(getActivity()), profile_photo, 150);
+        loadRating(Utilities.getUserBidang(ProfileUserLainAct.this));
+        if(Utilities.getUserFoto(ProfileUserLainAct.this)!=null)
+            Utilities.setFotoDariUrlSingle(Utilities.getUserFoto(ProfileUserLainAct.this), profile_photo, 150);
     }
 
     private void loadRating(final long status) {
@@ -696,18 +700,18 @@ public class ProfileActWkr extends Fragment_Header {
                 , new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileUserLainAct.this, "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
             }
         }){
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> masalah = new HashMap<>();
-                masalah.put("id_owner", Utilities.getUserID(getActivity()));
+                masalah.put("id_owner", Utilities.getUserID(ProfileUserLainAct.this));
                 masalah.put("type", (status>200)?"23":"20");
                 return masalah;
             }
         };
-        Volley.newRequestQueue(getActivity()).add(stringRequest);
+        Volley.newRequestQueue(ProfileUserLainAct.this).add(stringRequest);
     }
 
     private void loadBidang(final String bidang_, final Language languageID) {
@@ -732,7 +736,7 @@ public class ProfileActWkr extends Fragment_Header {
                 , new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Toast.makeText(getActivity(), "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileUserLainAct.this, "Terjadi kesalahan jaringan!", Toast.LENGTH_SHORT).show();
             }
         }){
             @Override
@@ -742,7 +746,7 @@ public class ProfileActWkr extends Fragment_Header {
                 return masalah;
             }
         };
-        Volley.newRequestQueue(getActivity()).add(stringRequest);
+        Volley.newRequestQueue(ProfileUserLainAct.this).add(stringRequest);
     }
 
     @Override
@@ -755,7 +759,7 @@ public class ProfileActWkr extends Fragment_Header {
 //=====================YG DIPAKE=================================
             String pathFoto= data.getStringExtra("pathFoto");
 
-            final StorageReference filepath = Utilities.getProfileImageStorageRef(getActivity()).child("myProfile");
+            final StorageReference filepath = Utilities.getProfileImageStorageRef(ProfileUserLainAct.this).child("myProfile");
             filepath.putFile(alamatPhoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -764,7 +768,7 @@ public class ProfileActWkr extends Fragment_Header {
                         @Override
                         public void onSuccess(Uri uri) {
                             String alamatUrl = uri.toString();
-                            Utilities.getProfileImageRef(getActivity()).setValue(alamatUrl);
+                            Utilities.getProfileImageRef(ProfileUserLainAct.this).setValue(alamatUrl);
                             profileBerubah = true;
                             loadUploadedPP();
                         }
@@ -773,7 +777,7 @@ public class ProfileActWkr extends Fragment_Header {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getActivity(), "Upload failed!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ProfileUserLainAct.this, "Upload failed!", Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -784,9 +788,9 @@ public class ProfileActWkr extends Fragment_Header {
             case 1: {
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(getActivity(), "Permission granted!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileUserLainAct.this, "Permission granted!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getActivity(), "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileUserLainAct.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
                 }
                 return;
             }
@@ -797,7 +801,7 @@ public class ProfileActWkr extends Fragment_Header {
     public void onResume() {
         super.onResume();
         gantiBahasa();
-        if(!bahasaSekarang.equalsIgnoreCase(Utilities.getUserBahasa(getActivity()))){
+        if(!bahasaSekarang.equalsIgnoreCase(Utilities.getUserBahasa(ProfileUserLainAct.this))){
             resettBidang();
             muatBidang(bidangSekarang);
         }
