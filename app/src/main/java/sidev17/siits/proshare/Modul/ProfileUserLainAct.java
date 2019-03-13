@@ -1,5 +1,6 @@
 package sidev17.siits.proshare.Modul;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,8 @@ import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.Selection;
@@ -26,7 +29,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,13 +60,23 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import sidev17.siits.proshare.Interface.PencarianListener;
+import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
+import sidev17.siits.proshare.Model.Pengguna;
+import sidev17.siits.proshare.Model.Permasalahan;
+import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
+import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
@@ -83,6 +98,7 @@ import org.json.JSONObject;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.INPUT_METHOD_SERVICE;
+import static sidev17.siits.proshare.Utils.Utilities.initViewSolusiLampiran;
 
 /**
  * Created by USER on 02/05/2018.
@@ -103,12 +119,14 @@ public class ProfileUserLainAct extends AppCompatActivity {
     private Uri alamatPhoto;
 
     private MenuBarView menuBar;
+    private RecyclerView rvShareKu;
+    private RelativeLayout noShareKu;
+    private LinearLayout lyShareKu;
 
     private Drawable bgAwalSpinner;
     private Spinner bidang;
     private String bidangUser;
 
-    private ListView daftarShare;
     private TextView vShareIsi, vRatingIsi, vRatingUp, vRatingDown;
     private String skill[];
     private int tingkatRekom[];
@@ -121,7 +139,7 @@ public class ProfileUserLainAct extends AppCompatActivity {
     private String namaAwal = "";
 
     public View vIndukProfil;
-
+    private Pengguna orang;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -134,6 +152,11 @@ public class ProfileUserLainAct extends AppCompatActivity {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
         }
+        orang = (Pengguna) getIntent().getSerializableExtra("pengguna");
+        v.findViewById(R.id.opsi_profil).setVisibility(View.GONE);
+        rvShareKu = v.findViewById(R.id.daftar_share);
+        noShareKu = v.findViewById(R.id.share_tidak_ada);
+        lyShareKu = v.findViewById(R.id.profil_share);
         textProfile = new TextView[4];
         textProfile[0] = v.findViewById(R.id.txt_share_judul);
         textProfile[1] = v.findViewById(R.id.txt_rating_judul);
@@ -155,36 +178,17 @@ public class ProfileUserLainAct extends AppCompatActivity {
 //        signout = (ImageView)v.findViewById(R.id.signOut);
         pp_view = (ImageView)v.findViewById(R.id.pp_preview);
         addPhoto = (ImageView)v.findViewById(R.id.addphoto_profile);
+        addPhoto.setVisibility(View.GONE);
         menuBar= v.findViewById(R.id.opsi_profil);
-        daftarShare = v.findViewById(R.id.daftar_share);
         profile_photo = (de.hdodenhof.circleimageview.CircleImageView)v.findViewById(R.id.img_profile);
         profile_photo.setVisibility(View.GONE);
-        idUser = FirebaseAuth.getInstance().getUid();
         loadData();
-        addPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-/*
-                Intent add = new Intent(Intent.ACTION_PICK);
-                add.setType("image/*");
-                startActivityForResult(add, ambilPhoto);
-*/
-                if(Utilities.isStoragePermissionGranted(ProfileUserLainAct.this)){
-                    // Toast.makeText(ProfileUserLainAct.this, "sudah", Toast.LENGTH_SHORT).show();
-                    Intent keAmbilGambar= new Intent(ProfileUserLainAct.this, AmbilGambarAct.class);
-                    keAmbilGambar.putExtra("jenisPengambilan", AmbilGambarAct.JENIS_AMBIL_SATU);
-                    startActivityForResult(keAmbilGambar, ambilPhoto);
-                }else {
-                    Toast.makeText(ProfileUserLainAct.this, "Failed to get storage permission!", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        addPhoto.setVisibility(View.GONE);
 
-        initMenuBar();
+      //  initMenuBar();
         bidangAwal = Utilities.getUserMajor(this);
         namaAwal = Utilities.getUserNama(this);
         loadPilihanMajorityServer();
+        muatShareKu();
         // initBidang(new ArrayList<Bidang>());
 /*
         if(this instanceof  MainActivityWkr){
@@ -221,17 +225,80 @@ public class ProfileUserLainAct extends AppCompatActivity {
 //        judulHeader= "Profil";
     }
 
-/*
-    @Override
-    public void initHeader(){
-//        Toast.makeText(actInduk, "INIT!!!", Toast.LENGTH_SHORT).show();
-//        MainAct_Header mainAct= (MainAct_Header) actInduk;
-//        actInduk.aturJudulHeader("Profil");
-        if(actInduk != null)
-            actInduk.aturGambarOpsiHeader_Null(0);
-//        int resId[]= {};
+    private void muatShareKu(){
+        loadData(new PencarianListener() {
+            @Override
+            public void ketemu(ArrayList<Solusi> solusi) {
+                if(solusi.size()>0){
+                    lyShareKu.setVisibility(View.VISIBLE);
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(ProfileUserLainAct.this);
+                    rvShareKu.setLayoutManager(linearLayoutManager);
+                    rvShareKu.setAdapter(new RC_Masalah(solusi));
+                } else
+                    noShareKu.setVisibility(View.VISIBLE);
+
+            }
+        });
     }
-*/
+
+    private void loadData(final PencarianListener ls) {
+        // bersihkanList();
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.SHAREKU,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                        ArrayList<Solusi> solusi = new ArrayList<>();
+                        try {
+                            JSONArray jsonArr = new JSONArray(response);
+                            //Log.d("loaddata", "ok"+String.valueOf(jsonArr.length()));
+                            for(int i=0; i<jsonArr.length(); i++){
+                                try {
+                                    JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    Solusi sol = new Solusi();
+                                    Permasalahan masalah = new Permasalahan();
+                                    Log.d("loadData ", jsonObject.getString("problem_title")+"\n");
+                                    masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                    masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
+                                    masalah.setStatus(jsonObject.getInt("status"));
+                                    masalah.setTimestamp(jsonObject.getString("timestamp"));
+                                    masalah.setpid(jsonObject.getString("pid"));
+                                    masalah.setmajority_id(jsonObject.getString("majority_id"));
+                                    masalah.setTotalVote(jsonObject.getInt("vote"));
+                                    masalah.setStatuspost(jsonObject.getInt("status_post"));
+                                    sol.setProblem(masalah);
+                                    sol.setId_solusi(jsonObject.getString("id_solusi"));
+                                    sol.setDeskripsi(jsonObject.getString("deskripsi"));
+                                    sol.setJumlahKomentar(jsonObject.getInt("more"));
+                                    solusi.add(sol);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            ls.ketemu(solusi);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                if(getApplicationContext()!=null)
+                    Toast.makeText(getApplicationContext(), "Network problem occured!", Toast.LENGTH_SHORT).show();
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("id_owner", orang.getEmail());
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
+    }
+
     void loadPilihanMajorityServer(){
         new AsyncTask<Void, Void, ArrayList<Bidang>>(){
 
@@ -649,34 +716,13 @@ public class ProfileUserLainAct extends AppCompatActivity {
         }
     }
 
-    void loadUploadedPP(){
-        Utilities.getUserRef(Utilities.getUserID(ProfileUserLainAct.this)).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                String alamatPP = dataSnapshot.child("photoProfile").getValue(String.class);
-                if(alamatPP!=null){
-                    Glide.with(ProfileUserLainAct.this).load(alamatPP).into(profile_photo);
-                    pp_view.setVisibility(View.GONE);
-                    addPhoto.setVisibility(View.GONE);
-                    profile_photo.setVisibility(View.VISIBLE);
-                    uploading.dismiss();
-                    Toast.makeText(ProfileUserLainAct.this, "Profile photo updated!", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {}
-
-        });
-    }
-
     void loadData(){
         bidangSekarang = new ArrayList<>();
-        nama.setText(Utilities.getUserNama(ProfileUserLainAct.this));
+        nama.setText(orang.getNama());
         gantiBahasa();
-        loadRating(Utilities.getUserBidang(ProfileUserLainAct.this));
-        if(Utilities.getUserFoto(ProfileUserLainAct.this)!=null)
-            Utilities.setFotoDariUrlSingle(Utilities.getUserFoto(ProfileUserLainAct.this), profile_photo, 150);
+        loadRating(orang.getStatus());
+        if(orang.getPhotoProfile()!=null)
+            Utilities.setFotoDariUrlSingle(orang.getPhotoProfile(), profile_photo, 150);
     }
 
     private void loadRating(final long status) {
@@ -706,7 +752,7 @@ public class ProfileUserLainAct extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> masalah = new HashMap<>();
-                masalah.put("id_owner", Utilities.getUserID(ProfileUserLainAct.this));
+                masalah.put("id_owner", orang.getEmail());
                 masalah.put("type", (status>200)?"23":"20");
                 return masalah;
             }
@@ -749,61 +795,142 @@ public class ProfileUserLainAct extends AppCompatActivity {
         Volley.newRequestQueue(ProfileUserLainAct.this).add(stringRequest);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==ambilPhoto && resultCode==RESULT_OK){
-            uploading.setMessage("uploading...");
-            uploading.show();
-            alamatPhoto = data.getData();
+    public class RC_Masalah extends RecyclerView.Adapter<RC_Masalah.vH>{
+        private List<Solusi> solusi;
+        public RC_Masalah(List<Solusi> solusi) {
+            this.solusi = solusi;
+        }
 
-//=====================YG DIPAKE=================================
-            String pathFoto= data.getStringExtra("pathFoto");
+        @NonNull
+        @Override
+        public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_share_timeline, parent, false));
+        }
 
-            final StorageReference filepath = Utilities.getProfileImageStorageRef(ProfileUserLainAct.this).child("myProfile");
-            filepath.putFile(alamatPhoto).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    //    pp_url = taskSnapshot.getDownloadUrl().toString();
-                    filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        @Override
+        public void onBindViewHolder(@NonNull final vH holder, final int position) {
+            Log.d("Item ke - ", String.valueOf(position));
+            holder.bind(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return solusi.size();
+        }
+
+        public class vH extends RecyclerView.ViewHolder{
+            private TextView judulProblem, tanggalProblem, deskripsiSolusi, jumlahKomentar, totalVote, isi, totalLainnya;
+            private LinearLayout lampiranSolusi;
+            private View view;
+            public vH(View itemView) {
+                super(itemView);
+                view = itemView;
+//                if(tipeView == TIPE_LIHAT_LAINNYA)
+                totalLainnya= itemView.findViewById(R.id.teks_hasil_lainnya);
+                judulProblem = itemView.findViewById(R.id.tl_problem_judul);
+                tanggalProblem = itemView.findViewById(R.id.tl_problem_tanggal);
+                totalVote = itemView.findViewById(R.id.tl_problem_total_vote);
+                deskripsiSolusi = itemView.findViewById(R.id.tl_solusi_deskripsi);
+                jumlahKomentar = itemView.findViewById(R.id.tl_komentar_jumlah);
+                lampiranSolusi = itemView.findViewById(R.id.lampiran_solusi);
+            }
+
+            public void bind(final int posisi){
+                if(judulProblem != null)
+                    judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
+                SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
+                String waktu = solusi.get(posisi).getProblem().getTimestamp();
+                Date date = null;
+                try {
+                    date = format1.parse(waktu);
+                    waktu = format2.format(date);
+                    if(tanggalProblem != null)
+                        tanggalProblem.setText(waktu);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                // tanggalProblem.setText(solusi.get(posisi).getProblem().getTimestamp());
+                if(totalVote!=null)
+                    totalVote.setText(String.valueOf(solusi.get(posisi).getProblem().getTotalVote()));
+
+                loadSolusiLampiran(lampiranSolusi, solusi.get(posisi).getId_solusi(), ProfileUserLainAct.this);
+
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Bundle paketDetailPetanyaan= new Bundle();
+                        paketDetailPetanyaan.putString("judul_pertanyaan", solusi.get(posisi).getProblem().getproblem_title());
+                        paketDetailPetanyaan.putString("deskripsi_pertanyaan", solusi.get(posisi).getProblem().getproblem_desc());
+                        paketDetailPetanyaan.putString("owner", solusi.get(posisi).getProblem().getproblem_owner());
+                        paketDetailPetanyaan.putString("waktu", solusi.get(posisi).getProblem().getTimestamp());
+                        paketDetailPetanyaan.putString("pid", solusi.get(posisi).getProblem().getpid());
+                        paketDetailPetanyaan.putString("majority", solusi.get(posisi).getProblem().getmajority_id());
+                        paketDetailPetanyaan.putString("status_post", Integer.toString(solusi.get(posisi).getProblem().getStatuspost()));
+                        Intent inten= new Intent(ProfileUserLainAct.this, DetailPertanyaanActivityWkr.class);
+                        inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
+                        startActivity(inten);
+                    }
+                });
+                //  Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
+            }
+
+            private void gantiBahasa(int tipe){
+                if(!Utilities.getUserBahasa(ProfileUserLainAct.this).equalsIgnoreCase("en")){
+                    String akanTranslate[] = {judulProblem.getText().toString(), tanggalProblem.getText().toString(), deskripsiSolusi.getText().toString()};
+                    Terjemahan.terjemahkanAsync(akanTranslate, "en", Utilities.getUserBahasa(ProfileUserLainAct.this), ProfileUserLainAct.this, new PerubahanTerjemahListener() {
                         @Override
-                        public void onSuccess(Uri uri) {
-                            String alamatUrl = uri.toString();
-                            Utilities.getProfileImageRef(ProfileUserLainAct.this).setValue(alamatUrl);
-                            profileBerubah = true;
-                            loadUploadedPP();
+                        public void dataBerubah(String[] kata) {
+                            judulProblem.setText(kata[0]);
+                            tanggalProblem.setText(kata[1]);
+                            deskripsiSolusi.setText(kata[2]);
                         }
                     });
                 }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(ProfileUserLainAct.this, "Upload failed!", Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(ProfileUserLainAct.this, "Permission granted!", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(ProfileUserLainAct.this, "Permission denied to read your External storage", Toast.LENGTH_SHORT).show();
-                }
-                return;
             }
-        }
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        gantiBahasa();
-        if(!bahasaSekarang.equalsIgnoreCase(Utilities.getUserBahasa(ProfileUserLainAct.this))){
-            resettBidang();
-            muatBidang(bidangSekarang);
+            private void loadSolusiLampiran(final LinearLayout lampiran, final String id_solusi, final Activity c) {
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO_SOLUSI,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                ArrayList<String> fotoLampiran = new ArrayList<>();
+                                try {
+                                    JSONArray jsonArr = new JSONArray(response);
+                                    //  Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                                    Solusi sol = new Solusi();
+                                    if(jsonArr.length()!=0){
+                                        for(int i = 0; i < jsonArr.length(); i++){
+                                            org.json.JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                            fotoLampiran.add(jsonObject.getString("url_foto"));
+                                        }
+                                    }
+                                    initViewSolusiLampiran(fotoLampiran, lampiran, c);
+                                    //  loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                    //  loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                                }
+                            }
+                        }
+                        , new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                        // Toast.makeText(act, Utilities.ubahBahasa("error cek solusi!", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()), Toast.LENGTH_SHORT).show();
+                    }
+                }){
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> vote = new HashMap<>();
+                        vote.put("id_solusi", id_solusi);
+                        return vote;
+                    }
+                };
+                Volley.newRequestQueue(c).add(stringRequest);
+            }
+
         }
     }
 }

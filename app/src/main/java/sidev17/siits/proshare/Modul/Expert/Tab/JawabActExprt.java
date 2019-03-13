@@ -245,7 +245,7 @@ public class JawabActExprt extends Fragment_Header {
             public vH(View itemView) {
                 super(itemView);
                 view = itemView;
-                view.findViewById(R.id.opsi_pertanyaan).setVisibility(View.GONE);
+                //view.findViewById(R.id.opsi_pertanyaan).setVisibility(View.GONE);
                 centang = (ImageView) itemView.findViewById(R.id.daftar_pertanyaan_centang);
                 judul = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_judul);
                 isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);

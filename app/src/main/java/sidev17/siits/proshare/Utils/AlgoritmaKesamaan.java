@@ -153,31 +153,41 @@ public class AlgoritmaKesamaan {
         ArrayList<CVektor> qCV = new ArrayList<CVektor>();
         for (int j = 0; j < pecahKey.length; j++) {
             String key = hilangkanSimbol(pecahKey[j].toLowerCase());
-            boolean keywordKetemu = false;
-            int count = 1;
-            int keywordPosisi = -1;
-            for (int k = 0; k < listSemuaKeyword.size(); k++) {
-                if (key.equals(listSemuaKeyword.get(k).getKeyword())) {
-                    keywordPosisi = k;
-                    for (int l = 0; l < pecahKey.length; l++) {
-                        String keyL = hilangkanSimbol(pecahKey[l].toLowerCase());
-                        if (j != l) {
-                            if (key.equals(keyL)) {
-                                count++;
-                            }
-                        }
-                    }
-                    keywordKetemu = true;
+            boolean duplikat = false; // biar kata yang sama gk ditambahin lagi
+            for(int i = 0 ; i < qCV.size(); i ++){
+                if(key.equalsIgnoreCase(listSemuaKeyword.get(qCV.get(i).getKeyword()).getKeyword()));{
+                    duplikat = true;
                     break;
                 }
             }
-            if (keywordKetemu) {
-                double weight = (double) count / (double) listSemuaKeyword.get(keywordPosisi).getKejadian();
-                qCV.add(new CVektor(keywordPosisi, weight, count));
+            if(!duplikat){
+                boolean keywordKetemu = false;
+                int count = 1;
+                int keywordPosisi = -1;
+                for (int k = 0; k < listSemuaKeyword.size(); k++) {
+                    if (key.equals(listSemuaKeyword.get(k).getKeyword())) {
+                        keywordPosisi = k;
+                        for (int l = 0; l < pecahKey.length; l++) {
+                            String keyL = hilangkanSimbol(pecahKey[l].toLowerCase());
+                            if (j != l) {
+                                if (key.equals(keyL)) {
+                                    count++;
+                                }
+                            }
+                        }
+                        keywordKetemu = true;
+                        break;
+                    }
+                }
+                if (keywordKetemu) {
+                    double weight = (double) count / (double) listSemuaKeyword.get(keywordPosisi).getKejadian();
+                    qCV.add(new CVektor(keywordPosisi, weight, count));
+                }
             }
         }
         return qCV;
     }
+
 
     // mendapatkan list cv setiap faq
     static ArrayList<ArrayList<CVektor>> listFaqCV(ArrayList<Keyword> listSemuaKeyword) {

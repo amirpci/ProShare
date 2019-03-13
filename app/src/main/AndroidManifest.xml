@@ -74,6 +74,7 @@
         <activity android:name=".Modul.AmbilGambarAct" />
         <activity android:name=".Modul.TemanDaftarAct" />
         <activity android:name=".Modul.TemanTambahAct" />
+        <activity android:name=".Modul.ProfileUserLainAct" />
         <activity android:name=".Modul.Worker.Tab.DaftarTanyaActWkr" />
     </application>
 

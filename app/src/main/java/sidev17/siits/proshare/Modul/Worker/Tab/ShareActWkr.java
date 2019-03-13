@@ -554,7 +554,6 @@ public class ShareActWkr extends Fragment_Header {
     void loadDaftarPertanyaan(){
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rcTimeline.setLayoutManager(linearLayoutManager);
-        rcTimeline.setLayoutManager(new LinearLayoutManager(getActivity()));
        // Solusi = new ArrayList<>();
         loadData(new PencarianListener() {
             @Override
@@ -809,10 +808,10 @@ public class ShareActWkr extends Fragment_Header {
         public int getItemViewType(int position) {
             if(position> 0 && tipeSekarang == TIPE_TIMELINE_CARI)
                 return TIPE_LIHAT_LAINNYA;
-            if (solusi.get(position).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE )
-                return TIPE_TIMELINE_KNOWLEDGE;
             if (position>0 && tipeSekarang == TIPE_TIMELINE_CARI_DEFAULT)
                 return TIPE_TIMELINE_CARI_DEFAULT;
+            if (solusi.get(position).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE )
+                return TIPE_TIMELINE_KNOWLEDGE;
             return TIPE_TIMELINE_DEFAULT;
         }
 

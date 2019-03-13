@@ -28,6 +28,7 @@
         android:layout_toRightOf="@id/daftar_pertanyaan_grafis"
         android:layout_width="match_parent"
         android:layout_height="80dp">
+        <!--
         <sidev17.siits.proshare.Utils.View.MenuBarView
             android:id="@+id/opsi_pertanyaan"
             android:paddingBottom="10dp"
@@ -48,10 +49,10 @@
             app:warna_tersedia="#FFFFFF"
             android:tint="#FFFFFF"
             android:backgroundTint="@color/abuTua"/>
+            -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_toLeftOf="@id/opsi_pertanyaan"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/daftar_pertanyaan_judul"

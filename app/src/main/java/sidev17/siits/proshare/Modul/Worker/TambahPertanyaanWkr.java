@@ -1307,11 +1307,11 @@ Bagian EXPERT / TambahJawaban
                             public void onResponse(String response) {
                                 try {
                                     JSONObject obj = new JSONObject(response);
-                                    uploading.dismiss();
+                                   // uploading.dismiss();
                                     finish();
                                     if(!obj.getBoolean("error"))
                                         setProblemStatus("1", String.valueOf(Konstanta.PROBLEM_STATUS_VERIFIED));
-                                    uploading.dismiss();
+                                   // uploading.dismiss();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -1322,7 +1322,7 @@ Bagian EXPERT / TambahJawaban
                         , new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        uploading.dismiss();
+                       // uploading.dismiss();
                         Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
                     }
                 }) {

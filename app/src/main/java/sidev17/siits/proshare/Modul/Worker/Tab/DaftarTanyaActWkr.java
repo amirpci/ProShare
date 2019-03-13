@@ -252,10 +252,10 @@ public class DaftarTanyaActWkr extends MainAct_Header {
                 judul = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_judul);
                 isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);
                 foto = (ImageView)itemView.findViewById(R.id.daftar_pertanyaan_gambar);
-                initMenuBar();
+                //initMenuBar();
             }
             private void initMenuBar(){
-                menuBar= itemView.findViewById(R.id.opsi_pertanyaan);
+                //menuBar= itemView.findViewById(R.id.opsi_pertanyaan);
                 int gmbOpsi[]= {R.drawable.icon_edit,
                         R.drawable.icon_hapus};
                 int tersedia[]= {menuBar.ITEM_TERSEDIA, menuBar.ITEM_TERSEDIA};

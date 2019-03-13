@@ -75,6 +75,8 @@ import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
+import sidev17.siits.proshare.Modul.ChatActivity;
+import sidev17.siits.proshare.Modul.ProfileUserLainAct;
 import sidev17.siits.proshare.R;
 import sidev17.siits.proshare.Utils.Array;
 import sidev17.siits.proshare.Utils.PackBahasa;
@@ -187,7 +189,9 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         int jmlBuffer= (orang.length > BATAS_BUFFER_VIEW) ? BATAS_BUFFER_VIEW : orang.length;
         //initViewKomentar(jmlBuffer);
        // initIndViewKomentar(jmlBuffer);
-        isiViewPertanyaan();
+        if(statusPost!=null)
+            if(!statusPost.equalsIgnoreCase("10"))
+                isiViewPertanyaan();
         initBarKomen();
         ((ViewGroup) findViewById(R.id.detail_bar_komen)).addView(viewBarKomen);
         if(emailOrang.equalsIgnoreCase(Utilities.getUserID(this))) {
@@ -518,7 +522,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     private void isiViewSolusi(){
         Log.d("solusi : ", "init view solusi");
         viewSolusi= getLayoutInflater().inflate(R.layout.model_solusi_expert, null, false);
-
+        if(viewPertanyaan == null)
+            viewSolusi.findViewById(R.id.komentar_header).setVisibility(View.GONE);
         TextView teksOrang= viewSolusi.findViewById(R.id.komentar_orang_nama);
         final TextView teksJob= viewSolusi.findViewById(R.id.komentar_orang_job);
         final TextView teksSolusi= viewSolusi.findViewById(R.id.komentar_deskripsi);
@@ -1623,8 +1628,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         return null;
     }
 
-    private void munculkanAlertDialog(int idHalaman, int indUser){
-        if(detailProfil == null){
+    private void munculkanAlertDialog(int idHalaman, final int indUser){
+       // if(detailProfil == null){
             detailProfil = getLayoutInflater().inflate(idHalaman, null, false);
 
             View latarBel = detailProfil.findViewById(R.id.user_latar);
@@ -1636,10 +1641,27 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 }
             });
             ImageView aksiChat = detailProfil.findViewById(R.id.user_aksi_chat);
+            Toast.makeText(this, "ind "+String.valueOf(indUser), Toast.LENGTH_SHORT).show();
+            final String email = (indUser==-1)?emailOrang:(solusi.get(indUser).getOrang());
             aksiChat.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //inten ke chat orang itu
+                    Utilities.getUserRef().child(email.replace(".", ",")).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Pengguna orang = dataSnapshot.getValue(Pengguna.class);
+                            Intent i = new Intent(DetailPertanyaanActivityWkr.this, ChatActivity.class);
+                            //i.putExtra("idPesan", listPesan.getIdPesan());
+                            i.putExtra("pengguna", orang);
+                            //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
+                            startActivity(i);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
                 }
             });
             ImageView aksiProfil = detailProfil.findViewById(R.id.user_aksi_lihat);
@@ -1647,10 +1669,27 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 @Override
                 public void onClick(View v) {
                     //inten ke profil orang itu
+                    Utilities.getUserRef().child(email.replace(".", ",")).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Pengguna orang = dataSnapshot.getValue(Pengguna.class);
+                            Intent i = new Intent(DetailPertanyaanActivityWkr.this, ProfileUserLainAct.class);
+                            //i.putExtra("idPesan", listPesan.getIdPesan());
+                            i.putExtra("pengguna", orang);
+                            //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
+                            startActivity(i);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
                 }
             });
             CircleImageView fotoOrang = detailProfil.findViewById(R.id.user_profil);
-        }
+       // }
         if(!profilDitampilkan) {
             viewLatar.addView(detailProfil);
             CircleImageView viewFoto= detailProfil.findViewById(R.id.user_profil);
@@ -1737,7 +1776,10 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
 
         @Override
         public int getCount() {
-            return solusi.size() +1;
+            if(viewPertanyaan != null)
+                return solusi.size() +1;
+            else
+                return solusi.size();
         }
 
         @Override
@@ -1753,22 +1795,36 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View view;
-            if(position > 1){
-                //
-               // if(indViewKomentar[position % indViewKomentar.length] != position -1)
-              //  isiViewKomentar(position-1);
-                //view= viewKomentar[position-1];
-                view = viewKomentar.get(position-2);
-            }
-            else if(position == 0)
-                view= viewPertanyaan;
-            else{
-                if(solusi.get(position-1).getStatusOrang().equals("1")){
-                    adaSolusi = true;
-                    view = viewSolusi;
-                }else{
-                    adaSolusi = false;
-                    view = getLayoutInflater().inflate(R.layout.model_timeline_dumb_solusi, null, false);
+            if(viewPertanyaan != null){
+                if(position > 1){
+                    //
+                    // if(indViewKomentar[position % indViewKomentar.length] != position -1)
+                    //  isiViewKomentar(position-1);
+                    //view= viewKomentar[position-1];
+                    view = viewKomentar.get(position-2);
+                }
+                else if(position == 0)
+                    view= viewPertanyaan;
+                else{
+                    if(solusi.get(position-1).getStatusOrang().equals("1")){
+                        adaSolusi = true;
+                        view = viewSolusi;
+                    }else{
+                        adaSolusi = false;
+                        view = getLayoutInflater().inflate(R.layout.model_timeline_dumb_solusi, null, false);
+                    }
+                }
+            } else {
+                if(position > 0)
+                    view = viewKomentar.get(position-1);
+                else{
+                    if(solusi.get(position).getStatusOrang().equals("1")){
+                        adaSolusi = true;
+                        view = viewSolusi;
+                    }else{
+                        adaSolusi = false;
+                        view = getLayoutInflater().inflate(R.layout.model_timeline_dumb_solusi, null, false);
+                    }
                 }
             }
             return view;
