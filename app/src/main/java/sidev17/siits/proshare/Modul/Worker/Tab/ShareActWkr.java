@@ -578,32 +578,48 @@ public class ShareActWkr extends Fragment_Header {
                         ArrayList<Solusi> Solusi = new ArrayList<>();
                         try {
                             JSONArray jsonArr = new JSONArray(response);
+                            int batasFaq = -1;
                             //Log.d("loaddata", "ok"+String.valueOf(jsonArr.length()));
                             for(int i=0; i<jsonArr.length(); i++){
                                 try {
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
-                                    Solusi sol = new Solusi();
-                                    Permasalahan masalah = new Permasalahan();
-                                    Log.d("loadData ", jsonObject.getString("problem_title")+"\n");
-                                    masalah.setproblem_desc(jsonObject.getString("problem_desc"));
-                                    masalah.setproblem_title(jsonObject.getString("problem_title"));
-                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
-                                    masalah.setStatus(jsonObject.getInt("status"));
-                                    masalah.setTimestamp(jsonObject.getString("timestamp"));
-                                    masalah.setpid(jsonObject.getString("pid"));
-                                    masalah.setmajority_id(jsonObject.getString("majority_id"));
-                                    masalah.setTotalVote(jsonObject.getInt("vote"));
-                                    masalah.setStatuspost(jsonObject.getInt("status_post"));
-                                    sol.setProblem(masalah);
-                                    sol.setId_solusi(jsonObject.getString("id_solusi"));
-                                    sol.setDeskripsi(jsonObject.getString("deskripsi"));
-                                    sol.setJumlahKomentar(jsonObject.getInt("more"));
-                                    Solusi.add(sol);
+                                    if(jsonObject.getInt("status_post") != 12){
+                                        Solusi sol = new Solusi();
+                                        Permasalahan masalah = new Permasalahan();
+                                        Log.d("loadData ", jsonObject.getString("problem_title")+"\n");
+                                        masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                        masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                        masalah.setproblem_owner(jsonObject.getString("problem_owner"));
+                                        masalah.setStatus(jsonObject.getInt("status"));
+                                        masalah.setTimestamp(jsonObject.getString("timestamp"));
+                                        masalah.setpid(jsonObject.getString("pid"));
+                                        masalah.setmajority_id(jsonObject.getString("majority_id"));
+                                        masalah.setTotalVote(jsonObject.getInt("vote"));
+                                        masalah.setStatuspost(jsonObject.getInt("status_post"));
+                                        sol.setProblem(masalah);
+                                        sol.setId_solusi(jsonObject.getString("id_solusi"));
+                                        sol.setDeskripsi(jsonObject.getString("deskripsi"));
+                                        sol.setJumlahKomentar(jsonObject.getInt("more"));
+                                        Solusi.add(sol);
+                                    } else {
+                                        batasFaq = i;
+                                        Log.d("batas", String.valueOf(i));
+                                    }
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                     loadingDitemukan.setVisibility(View.GONE);
                                 }
                             }
+                            if(batasFaq > 0){
+                                Solusi solTemp = new Solusi();
+                                Permasalahan prob = new Permasalahan();
+                                prob.setStatuspost(12);
+                                solTemp.setProblem(prob);
+                                Solusi.add(batasFaq, solTemp);
+                                Solusi.add(0, solTemp);
+                            }
+                            Log.d("jumlah timeline ", String.valueOf(Solusi.size()));
                             ls.ketemu(Solusi);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -775,6 +791,7 @@ public class ShareActWkr extends Fragment_Header {
         protected static final int TIPE_TIMELINE_CARI_DEFAULT = 3298;
         protected static final int TIPE_TIMELINE_KNOWLEDGE =  9282;
         protected static final int TIPE_LIHAT_LAINNYA=  123;
+        protected static final int TIPE_TIMELINE_BATAS = 2598;
         private int jmlDitampilkan;
         private int tipeSekarang;
         private int tipeView= 0;
@@ -796,6 +813,8 @@ public class ShareActWkr extends Fragment_Header {
                 }
                 return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
             } else{
+                if(viewType == TIPE_TIMELINE_BATAS)
+                    return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_pembatas_list, parent, false));
                 if(viewType == TIPE_TIMELINE_CARI_DEFAULT)
                     return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan, parent, false));
                 if(viewType == TIPE_TIMELINE_KNOWLEDGE)
@@ -810,6 +829,8 @@ public class ShareActWkr extends Fragment_Header {
                 return TIPE_LIHAT_LAINNYA;
             if (position>0 && tipeSekarang == TIPE_TIMELINE_CARI_DEFAULT)
                 return TIPE_TIMELINE_CARI_DEFAULT;
+            if (solusi.get(position).getProblem().getStatuspost() == 12)
+                return TIPE_TIMELINE_BATAS;
             if (solusi.get(position).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE )
                 return TIPE_TIMELINE_KNOWLEDGE;
             return TIPE_TIMELINE_DEFAULT;
@@ -870,8 +891,14 @@ public class ShareActWkr extends Fragment_Header {
                 }else if(masalah.get(posisi).getStatus()==PENGGUNA_BIASA){
                     centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full_polos);
                 } */
-
-                if (solusi.get(posisi).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE) {
+                if (solusi.get(posisi).getProblem().getStatuspost() == 12){
+                    TextView txt = view.findViewById(R.id.pembatas_teks);
+                   if(posisi == 0){
+                       txt.setText("FAQ");
+                   } else {
+                       txt.setText("SHARE");
+                   }
+                } else if (solusi.get(posisi).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE) {
                     if(judulProblem != null)
                         judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
                     SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

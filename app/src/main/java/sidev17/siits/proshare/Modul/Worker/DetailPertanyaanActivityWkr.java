@@ -199,6 +199,32 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         if(emailOrang.equalsIgnoreCase(Utilities.getUserID(this))) {
             initMenuBar();
         }
+
+        addHit();
+    }
+
+    private void addHit() {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.ADD_HIT,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("id_problem", id_masalah);
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(this).add(stringRequest);
     }
 
     private void initMenuBar(){

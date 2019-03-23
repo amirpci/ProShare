@@ -22,6 +22,8 @@ import sidev17.siits.proshare.Modul.Worker.Tab.ChatExprt;
 import sidev17.siits.proshare.Modul.Worker.Tab.ProfileActWkr;
 import sidev17.siits.proshare.Modul.Worker.Tab.ShareActWkr;
 import sidev17.siits.proshare.Utils.Array;
+import sidev17.siits.proshare.Utils.PackBahasa;
+import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas_Slider;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
@@ -124,7 +126,10 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
         aturIconTombolUtama(TOMBOL_UTAMA_HILANG, TOMBOL_UTAMA_HILANG, R.drawable.obj_pensil, R.drawable.obj_chat);
         mvPager = (ViewPager)findViewById(R.id.layout_wadah_fragment_Exprt);
         aturFragmen(new ProfileActExprt(), new JawabActExprt(), new TimelineActExprt(), new FeedbackActExprt());
-        aturJudul("Profil", "Pertanyaan yang Harus Dijawab", "Pustaka", "Chat");
+        aturJudul(PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][0],
+                PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][1],
+                PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][2],
+                PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][3]);
         initAdapter();
         mvPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override

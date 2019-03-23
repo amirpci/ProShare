@@ -27,6 +27,7 @@ public class Konstanta {
     public static final String DAFTAR_FOTO = ROOT_URL + "DaftarFoto.php";
     public static final String DAFTAR_FOTO_SOLUSI = ROOT_URL + "DaftarFotoSolusi.php";
     public static final String DAFTAR_VIDEO = ROOT_URL + "DaftarVideo.php";
+    public static final String ADD_HIT = ROOT_URL + "addHit.php";
     public static final String CARI_BIDANG = ROOT_URL + "CariBidang.php";
     public static final String BIDANGKU =  ROOT_URL + "Bidangku.php";
     public static final String SHAREKU = ROOT_URL + "ShareKu.php";

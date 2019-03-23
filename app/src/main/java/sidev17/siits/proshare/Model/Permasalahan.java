@@ -15,20 +15,17 @@ public class Permasalahan implements Serializable {
     private int status;
     private int totalVote;
     private int statuspost;
+    private int hit;
     public Permasalahan(){
 
     }
 
-    public Permasalahan(String pid, String problem_owner, String majority_id, String timestamp, String problem_title, String problem_desc, String picture_id, String video_id, String tag) {
-        this.pid = pid;
-        this.problem_owner = problem_owner;
-        this.majority_id = majority_id;
-        this.timestamp = timestamp;
-        this.problem_title = problem_title;
-        this.problem_desc = problem_desc;
-        this.picture_id = picture_id;
-        this.video_id = video_id;
-        this.tag = tag;
+    public int getHit() {
+        return hit;
+    }
+
+    public void setHit(int hit) {
+        this.hit = hit;
     }
 
     public int getStatuspost() {

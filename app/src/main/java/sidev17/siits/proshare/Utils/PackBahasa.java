@@ -51,4 +51,8 @@ public class PackBahasa {
                                                 {"Apakah anda yakin menghapus masalah/pertanyaan ini?", "Batal", "Hapus"},
                                                     {"この問題/質問を削除しますか？","キャンセル」","削除"}};
     public static String[][] toastDetail ={{"problem/question has been deleted!"}, {"masalah/pertanyaan telah dihapus!"}, {"問題/質問は削除されました！"}};
+
+    public static String[][] mainHeader = {{"Profile" , "Should be answered" , "Timeline" , "Chat"},
+            {"Profil", "Pertanyaan yang Harus Dijawab", "Pustaka", "Chat"},
+            {"プロフィール","答えるべき","タイムライン","チャット"}};
 }

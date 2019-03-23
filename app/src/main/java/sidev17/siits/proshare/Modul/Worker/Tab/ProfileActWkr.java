@@ -69,6 +69,7 @@ import java.util.Map;
 
 import sidev17.siits.proshare.Interface.PencarianListener;
 import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
+import sidev17.siits.proshare.MainActivity;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
