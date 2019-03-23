@@ -15,6 +15,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -1090,9 +1092,30 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         urutanDipilih= new Array<>();
         posisiDipilih= new Array<>();
 
-        View klip= viewBarKomen.findViewById(R.id.tab_text_indikator);
+        final View klip= viewBarKomen.findViewById(R.id.tab_text_indikator);
+        final View kirim= viewBarKomen.findViewById(R.id.tab_text_tindakan);
         final TextView teksKomentar= viewBarKomen.findViewById(R.id.tab_text_hint);
-        View kirim= viewBarKomen.findViewById(R.id.tab_text_tindakan);
+        teksKomentar.addTextChangedListener(new TextWatcher() {
+            int jmlBaris= 1;
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(teksKomentar.getLineCount() != jmlBaris && teksKomentar.getLineCount() <= 4){
+                    jmlBaris= teksKomentar.getLineCount();
+                    kirim.getLayoutParams().height= teksKomentar.getLineHeight() *(jmlBaris+1);
+                    klip.getLayoutParams().height= teksKomentar.getLineHeight() *(jmlBaris+1);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         ((ImageView) klip.findViewById(R.id.tab_text_indikator_gambar)).setImageResource(R.drawable.icon_klip);
         teksKomentar.setHint("Masukan komentar Anda");

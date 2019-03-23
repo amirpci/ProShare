@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
+
+    <TextView
+        android:id="@+id/pembatas_teks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Teks Pembatas"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginRight="18dp"/>
+
+    <ImageView
+        android:id="@+id/pembatas_garis"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="center_vertical"
+        android:background="#000000"/>
+
+</LinearLayout>

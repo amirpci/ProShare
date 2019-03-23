@@ -232,11 +232,11 @@ Bagian EXPERT / TambahJawaban
         tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
                 (View) findViewById(R.id.tambah_properti_icon));
         if(idHalaman == R.layout.activity_tambah_jawaban_exprt) {
-            initTabIcon(new int[]{R.id.tambah_gambar_gmb, R.id.tambah_link_gmb});
-            initTabIconInduk(new int[]{R.id.tambah_gambar, R.id.tambah_link});
+            initTabIcon(new int[]{R.id.tambah_gambar_gmb/*, R.id.tambah_link_gmb*/});
+            initTabIconInduk(new int[]{R.id.tambah_gambar/*, R.id.tambah_link*/});
         }else {
-            initTabIcon(new int[]{R.id.tambah_gambar_gmb, R.id.tambah_video_gmb, R.id.tambah_link_gmb});
-            initTabIconInduk(new int[]{R.id.tambah_gambar, R.id.tambah_video, R.id.tambah_link});
+            initTabIcon(new int[]{R.id.tambah_gambar_gmb, R.id.tambah_video_gmb/*, R.id.tambah_link_gmb*/});
+            initTabIconInduk(new int[]{R.id.tambah_gambar, R.id.tambah_video/*, R.id.tambah_link*/});
         }
         tabBarIcon.aturTabIcon(tabIcon);
         tabBarIcon.aturTabIconInduk(tabIconInduk);
@@ -276,6 +276,7 @@ Bagian EXPERT / TambahJawaban
                     vTindakan.setVisibility(View.GONE);
                     tabBarIcon.aturTinggiTabDefault();
                     tabBarIcon.tampilkanIconTab();
+                    EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_TEXT_FLAG_CAP_SENTENCES, true);
                     inisiasiOk();
                 }
             });
@@ -649,6 +650,7 @@ Bagian EXPERT / TambahJawaban
         if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
 //            EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
             EditTextMod.enableEditText(teksJudul, InputType.TYPE_NULL, false);
+            EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
         }
     }
 
@@ -867,7 +869,7 @@ Bagian EXPERT / TambahJawaban
     }
     void initPilihanMajority(ArrayList<Bidang> majority){
         pilihanMajority= findViewById(R.id.tambah_majority);
-        adpMajority= new SpinnerAdp(majority, getBaseContext(), Color.parseColor("#FFFFFF"));
+        adpMajority= new SpinnerAdp(majority, getBaseContext(), Color.parseColor("#000000"));
         pilihanMajority.setAdapter(adpMajority);
     }
 
