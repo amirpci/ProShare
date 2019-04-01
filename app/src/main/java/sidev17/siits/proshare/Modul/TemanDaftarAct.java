@@ -4,10 +4,13 @@ import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +39,7 @@ public class TemanDaftarAct extends AppCompatActivity {
 
     private ImageView vCariTeman;
     private ImageView vTambahTeman;
+    private EditText vKolomCariTeman;
 
     private ListView vDaftarTeman;
 
@@ -54,25 +58,65 @@ public class TemanDaftarAct extends AppCompatActivity {
 
         vTemanJudul= findViewById(R.id.teman_judul);
         vJmlTeman = findViewById(R.id.teman_jml);
-        vCariTeman = findViewById(R.id.teman_cari);
-        vCariTeman.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
         vTambahTeman = findViewById(R.id.teman_tambah);
         vTambahTeman.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent keTambahTeman= new Intent(TemanDaftarAct.this, TemanTambahAct.class);
+                if(!vCariTeman.isSelected()) {
+                    Intent keTambahTeman = new Intent(TemanDaftarAct.this, TemanTambahAct.class);
 
-                keTambahTeman.putExtra("idUser", -1 /*MSH DUMY!!!*/);
-                startActivity(keTambahTeman);
+                    keTambahTeman.putExtra("idUser", -1 /*MSH DUMY!!!*/);
+                    startActivity(keTambahTeman);
+                } else{
+                    vKolomCariTeman.setVisibility(View.GONE);
+                    vJmlTeman.setVisibility(View.VISIBLE);
+                    vTemanJudul.setVisibility(View.VISIBLE);
+                    vTambahTeman.setImageResource(R.drawable.icon_tambah_teman);
+//                    vTambahTeman.getDrawable().setTint(getResources().getColor(R.color.hitam));
+                    vCariTeman.setSelected(false);
+                }
             }
         });
         vDaftarTeman = findViewById(R.id.teman_daftar);
+        vKolomCariTeman= findViewById(R.id.teman_kolom_cari);
+        vCariTeman = findViewById(R.id.teman_cari);
+        vCariTeman.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!v.isSelected()) {
+                    vKolomCariTeman.setVisibility(View.VISIBLE);
+                    vJmlTeman.setVisibility(View.GONE);
+                    vTemanJudul.setVisibility(View.GONE);
+                    vTambahTeman.setImageResource(R.drawable.icon_silang);
+                    vTambahTeman.getDrawable().setTint(getResources().getColor(R.color.merah));
+                    v.setSelected(true);
+                } else{
+                    cariTeman();
+                }
+            }
+        });
+/*
+        vKolomCariTeman.addTextChangedListener(new TextWatcher() {
+            int jmlBaris= 1;
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(vKolomCariTeman.getLineCount() != jmlBaris){
+                    vKolomCariTeman.setSelection(0);
+                    jmlBaris= vKolomCariTeman.getLineCount();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+*/
         ambilData();
         ubahBahasa();
     }
@@ -170,5 +214,9 @@ public class TemanDaftarAct extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void cariTeman(){
+        //LAKUKAN SESUATU!!!
     }
 }
