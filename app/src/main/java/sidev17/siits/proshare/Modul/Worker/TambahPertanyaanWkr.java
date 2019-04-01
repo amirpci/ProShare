@@ -584,8 +584,7 @@ Bagian EXPERT / TambahJawaban
                 if(tabBarIcon.trahirDitekan() > -1)
                     tabBarIcon.tekanItem(tabBarIcon.trahirDitekan());
                 teksJudul.requestFocus();
-                final InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
-                imm.showSoftInput(teksJudul, InputMethodManager.SHOW_IMPLICIT);
+                EditTextMod.tampilkanSoftKey(v, true);
 /*
                 tmbCentang.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -617,11 +616,11 @@ Bagian EXPERT / TambahJawaban
         teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if(tabBarIcon.trahirDitekan() > -1)
-                    tabBarIcon.tekanItem(tabBarIcon.trahirDitekan());
-                teksDeskripsi.requestFocus();
-                final InputMethodManager imm= (InputMethodManager) getBaseContext().getSystemService(INPUT_METHOD_SERVICE);
-                imm.showSoftInput(teksDeskripsi, InputMethodManager.SHOW_IMPLICIT);
+                if(v.isEnabled()){
+                    if(tabBarIcon.trahirDitekan() > -1)
+                        tabBarIcon.tekanItem(tabBarIcon.trahirDitekan());
+                    teksDeskripsi.requestFocus();
+                    EditTextMod.tampilkanSoftKey(teksDeskripsi, true);
 /*
                 tmbCentang.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -639,7 +638,8 @@ Bagian EXPERT / TambahJawaban
                 });
                 tmbCentang.setImageResource(R.drawable.obj_centang);
 */
-                return false;
+                    return false;
+                } else return true;
             }
         });
 //        teksDeskripsi.setTextIsSelectable(true);
@@ -1712,6 +1712,16 @@ Menghapus file gambar yg diload dari internet
         }
     }
 
-//    ==14 Jan 2019: udah diperbaiki error + re-struktur GaleriLoader;
+    @Override
+    public void onBackPressed() {
+        if(tabBarIcon.trahirDitekan() != -1)
+            tabBarIcon.tekanItem(tabBarIcon.trahirDitekan());
+        else{
+            EditTextMod.tampilkanSoftKey(teksDeskripsi, false);
+            super.onBackPressed();
+        }
+    }
+
+    //    ==14 Jan 2019: udah diperbaiki error + re-struktur GaleriLoader;
 //    !!! YG BELUM: masih ada error di bagian silang di item yg dipilih di TambahPertanyaan
 }

@@ -76,6 +76,7 @@ import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
+import sidev17.siits.proshare.Utils.Ukuran;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
@@ -505,6 +506,7 @@ public class ProfileActWkr extends Fragment_Header {
 //        menuBar.aturArahBar(menuBar.ARAH_VERTIKAL);
         menuBar.aturLetakBarRelatif(menuBar.BAR_DI_BAWAH);
         menuBar.aturWarnaTersedia("#FFFFFF");
+//        menuBar.aturUkuranItem(Ukuran.ukuranView(menuBar)[0]);
 //        menuBar.aturWarnaTakTersedia();
         menuBar.aturWarnaKuat(Warna.ambilStringWarna(getResources().getColor(R.color.biruLaut)));
         menuBar.aturLatarInduk_Akhir(menuBar.LATAR_WARNA);

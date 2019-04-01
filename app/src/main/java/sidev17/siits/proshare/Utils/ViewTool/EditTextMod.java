@@ -1,5 +1,6 @@
 package sidev17.siits.proshare.Utils.ViewTool;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.InputType;
@@ -24,17 +25,17 @@ public class EditTextMod {
 
                 @Override
                 public boolean onKeyDown(View view, Editable text, int keyCode, KeyEvent event) {
-                    return true;
+                    return false;
                 }
 
                 @Override
                 public boolean onKeyUp(View view, Editable text, int keyCode, KeyEvent event) {
-                    return true;
+                    return false;
                 }
 
                 @Override
                 public boolean onKeyOther(View view, Editable text, KeyEvent event) {
-                    return true;
+                    return false;
                 }
 
                 @Override
@@ -54,8 +55,17 @@ public class EditTextMod {
             InputMethodManager imm= (InputMethodManager) ed.getContext().getSystemService(INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(ed.getWindowToken(), 0);
         }
+        ed.setEnabled(enable);
     }
 
     public static void aturTulisan(TextView tv, CharSequence tulisan, int batas){
+    }
+
+    public static void tampilkanSoftKey(View v, boolean tampilkan){
+        final InputMethodManager imm= (InputMethodManager) v.getContext().getSystemService(INPUT_METHOD_SERVICE);
+        if(tampilkan)
+            imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+        else
+            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 }
