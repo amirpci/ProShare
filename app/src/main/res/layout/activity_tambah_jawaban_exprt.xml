@@ -186,17 +186,17 @@
                 android:id="@+id/tambah_wadah_pertanyaan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"></LinearLayout>
-<!--
+
             <GridView
                 android:id="@+id/tambah_properti_cell_dipilih"
                 android:layout_below="@id/tambah_wadah_pertanyaan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:numColumns="3"/>
--->
+
             <EditText
                 android:id="@+id/tambah_deskripsi"
-                android:layout_below="@id/tambah_wadah_pertanyaan"
+                android:layout_below="@id/tambah_properti_cell_dipilih"
                 android:layout_margin="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
