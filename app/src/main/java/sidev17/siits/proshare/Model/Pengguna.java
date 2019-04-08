@@ -42,6 +42,7 @@ public class Pengguna implements Serializable {
             }
             return 0;
         }
+
     }
 
     private String nama;

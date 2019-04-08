@@ -64,7 +64,7 @@
             android:layout_height="match_parent"
             android:layout_toLeftOf="@id/teman_tambah"
             android:paddingRight="40dp"
-            android:text="asdasdasdaasdad"
+            android:hint="search here..."
             android:maxLines="1"
             android:scrollbars="vertical"
             android:gravity="center_vertical"

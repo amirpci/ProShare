@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,6 +45,7 @@ public class TemanDaftarAct extends AppCompatActivity {
     private ListView vDaftarTeman;
 
     private Array<Teman> daftarTeman = new Array<>();
+    private Array<Teman> daftarTemanTemp  = new Array<>();
     private Array<String> namaTeman= new Array<>();
     private Array<String> bidangTeman= new Array<>();
     private Array<BitmapHandler> fotoTeman= new Array<>();
@@ -74,6 +76,11 @@ public class TemanDaftarAct extends AppCompatActivity {
                     vTambahTeman.setImageResource(R.drawable.icon_tambah_teman);
 //                    vTambahTeman.getDrawable().setTint(getResources().getColor(R.color.hitam));
                     vCariTeman.setSelected(false);
+                    if(daftarTemanTemp != null){
+                        daftarTeman = daftarTemanTemp;
+                       // Toast.makeText(TemanDaftarAct.this, "teman ok "+String.valueOf(daftarTeman.ukuran()), Toast.LENGTH_SHORT).show();
+                        vDaftarTeman.setAdapter(adp);
+                    }
                 }
             }
         });
@@ -90,6 +97,7 @@ public class TemanDaftarAct extends AppCompatActivity {
                     vTambahTeman.setImageResource(R.drawable.icon_silang);
                     vTambahTeman.getDrawable().setTint(getResources().getColor(R.color.merah));
                     v.setSelected(true);
+                    vTemanJudul.setHint(PackBahasa.chat[Terjemahan.indexBahasa(TemanDaftarAct.this)][4]);
                 } else{
                     cariTeman();
                 }
@@ -144,6 +152,7 @@ public class TemanDaftarAct extends AppCompatActivity {
                     daftarTeman.tambah(teman);
                 }
                 //Log.d("loaded panjang ", String.valueOf(daftarTeman.ukuran()+count));
+                daftarTemanTemp = daftarTeman;
                 adp= new AdapterDaftarTeman();
                 vDaftarTeman.setAdapter(adp);
             }
@@ -153,6 +162,17 @@ public class TemanDaftarAct extends AppCompatActivity {
 
             }
         });
+    }
+
+    private boolean cocok(String full, String bagian){
+        for(int i = 0; i < full.length(); i ++){
+            if(i<=full.length() - bagian.length()){
+                if(full.substring(i, i + bagian.length()).equalsIgnoreCase(bagian))
+                    return true;
+            } else
+                break;
+        }
+        return false;
     }
 
     private class AdapterDaftarTeman extends BaseAdapter{
@@ -218,5 +238,16 @@ public class TemanDaftarAct extends AppCompatActivity {
 
     private void cariTeman(){
         //LAKUKAN SESUATU!!!
+        if(this.daftarTemanTemp != null) {
+            Array<Teman> daftarTemanTemp = new Array<>();
+            for (int i = 0; i < this.daftarTemanTemp.ukuran(); i++) {
+                if (cocok(this.daftarTemanTemp.ambil(i).getNama(), vKolomCariTeman.getText().toString())) {
+                    daftarTemanTemp.tambah(this.daftarTemanTemp.ambil(i));
+                    //daftarTeman.hapus(i);
+                }
+            }
+            daftarTeman = daftarTemanTemp;
+            vDaftarTeman.setAdapter(adp);
+        }
     }
 }

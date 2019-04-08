@@ -49,6 +49,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -194,6 +195,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         if(statusPost!=null)
             if(!statusPost.equalsIgnoreCase("10"))
                 isiViewPertanyaan();
+            else
+                loadJudulBidang(teksJudul, teksMajority);
         initBarKomen();
         ((ViewGroup) findViewById(R.id.detail_bar_komen)).addView(viewBarKomen);
         if(emailOrang.equalsIgnoreCase(Utilities.getUserID(this))) {
@@ -884,6 +887,51 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                     });
                 }
             }.execute();
+    }
+
+    private void loadJudulBidang(final TextView teksJudul, final TextView teksMajority){
+        teksJudul.setText(judulPertanyaan);
+        String akanDiterjemahkan[] = {judulPertanyaan};
+        Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this),DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
+            @Override
+            public void dataBerubah(String[] kata) {
+
+                String judulYgDituliskan= kata[0];
+                if(judulYgDituliskan.length() > 30)
+                    judulYgDituliskan= judulYgDituliskan.substring(0, 30) +"...";
+                teksJudul.setText(judulYgDituliskan);
+                judulStr = kata[0];
+            }
+        });
+        new AsyncTask<Void, Void, String>(){
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                String output = "";
+                output = Utilities.loadBidangKu(majorityPertanyaan, DetailPertanyaanActivityWkr.this);
+                return output;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                String[] akanDiterjemahkan = {s};
+                Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(DetailPertanyaanActivityWkr.this), DetailPertanyaanActivityWkr.this, new PerubahanTerjemahListener() {
+                    @Override
+                    public void dataBerubah(String[] kata) {
+                        teksMajority.setVisibility(View.VISIBLE);
+                        teksMajority.setText(kata[0]);
+                        majorStr = kata[0];
+                        if(id_masalah.equalsIgnoreCase(Utilities.getUserID(DetailPertanyaanActivityWkr.this)))
+                            header.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    menuBar.getLayoutParams().height = header.getHeight();
+                                }
+                            });
+                    }
+                });
+            }
+        }.execute();
     }
 
     private void tampilanToastDiterjemahkan(String pesan){
@@ -1653,16 +1701,30 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     }
 
     private void initOrang(final TextView nama, final TextView status, final CircleImageView fotoProfil){
-        Utilities.getUserRef(emailOrang).addValueEventListener(new ValueEventListener() {
+        DatabaseReference ref = Utilities.getUserRef();
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Pengguna user = dataSnapshot.getValue(Pengguna.class);
-                namaPemilik= user.getNama();
-                urlFotoOrang = Utilities.cekNull(user.getPhotoProfile()); urlFotoOrangLoaded = true;
-                nama.setText(namaPemilik);
-                if(user.getPhotoProfile()!=null)
-                    Glide.with(DetailPertanyaanActivityWkr.this).load(user.getPhotoProfile()).into(fotoProfil);
-                status.setText(PackBahasa.statusOrang[Terjemahan.indexBahasa(DetailPertanyaanActivityWkr.this)][Pengguna.Status.statusStr(user.getStatus())]);
+                if(dataSnapshot.hasChild(emailOrang.replace(".", ","))){
+                    Utilities.getUserRef(emailOrang).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            Pengguna user = dataSnapshot.getValue(Pengguna.class);
+                            namaPemilik= user.getNama();
+                            majorPemilik = String.valueOf(user.getStatus());
+                            urlFotoOrang = Utilities.cekNull(user.getPhotoProfile()); urlFotoOrangLoaded = true;
+                            nama.setText(namaPemilik);
+                            if(user.getPhotoProfile()!=null)
+                                Glide.with(DetailPertanyaanActivityWkr.this).load(user.getPhotoProfile()).into(fotoProfil);
+                            status.setText(PackBahasa.statusOrang[Terjemahan.indexBahasa(DetailPertanyaanActivityWkr.this)][Pengguna.Status.statusStr(user.getStatus())]);
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+                }
             }
 
             @Override
@@ -1718,15 +1780,30 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 @Override
                 public void onClick(View v) {
                     //inten ke profil orang itu
-                    Utilities.getUserRef().child(email.replace(".", ",")).addValueEventListener(new ValueEventListener() {
+                    DatabaseReference ref = Utilities.getUserRef();
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Pengguna orang = dataSnapshot.getValue(Pengguna.class);
-                            Intent i = new Intent(DetailPertanyaanActivityWkr.this, ProfileUserLainAct.class);
-                            //i.putExtra("idPesan", listPesan.getIdPesan());
-                            i.putExtra("pengguna", orang);
-                            //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
-                            startActivity(i);
+                            if(dataSnapshot.hasChild(email.replace(".", ","))){
+                                Utilities.getUserRef().child(email.replace(".", ",")).addValueEventListener(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        Pengguna orang = dataSnapshot.getValue(Pengguna.class);
+                                        Intent i = new Intent(DetailPertanyaanActivityWkr.this, ProfileUserLainAct.class);
+                                        //i.putExtra("idPesan", listPesan.getIdPesan());
+                                        i.putExtra("pengguna", orang);
+                                        //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
+                                        startActivity(i);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            } else {
+                                Toast.makeText(DetailPertanyaanActivityWkr.this, "User not found!", Toast.LENGTH_SHORT).show();
+                            }
                         }
 
                         @Override
@@ -1747,7 +1824,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
 
             if(indUser >= 0) {
                 viewNama.setText(solusi.get(indUser).getNamaOrang());
-                viewStatus.setText(solusi.get(indUser).getStatus());
+                viewStatus.setText(strStatus(solusi.get(indUser).getStatus()));
                 if(solusi.get(indUser).getFotoOrang()!=null && !solusi.get(indUser).getFotoOrang().equals("null")){
                     viewFoto.setPadding(0,0,0,0);
                     Utilities.updateFotoProfile(solusi.get(indUser).getFotoOrang(), viewFoto);
@@ -1756,7 +1833,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             } else if(indUser == -1){
                 if (urlFotoOrangLoaded) {
                     viewNama.setText(namaPemilik);
-                    viewStatus.setText(majorPemilik);
+                    viewStatus.setText((majorPemilik != null)?strStatus(majorPemilik):"");
                     if (!urlFotoOrang.equals("null")) {
                         viewFoto.setPadding(0, 0, 0, 0);
                         Utilities.updateFotoProfile(urlFotoOrang, viewFoto);
@@ -1771,6 +1848,18 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             profilDitampilkan= false;
         }
 
+    }
+
+    public String strStatus(String status){
+        switch (Integer.parseInt(status)){
+            case 200 :
+                return PackBahasa.bahasaStatusAkun[Terjemahan.indexBahasa(this)][0];
+            case 201 :
+                return PackBahasa.bahasaStatusAkun[Terjemahan.indexBahasa(this)][1];
+            case 202 :
+                return PackBahasa.bahasaStatusAkun[Terjemahan.indexBahasa(this)][2];
+        }
+        return "";
     }
 
 

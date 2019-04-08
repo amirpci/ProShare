@@ -285,17 +285,19 @@ public class JawabActExprt extends Fragment_Header {
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Bundle paketDetailPetanyaan= new Bundle();
-                        paketDetailPetanyaan.putString("judul_pertanyaan", masalah.get(posisi).getproblem_title());
-                        paketDetailPetanyaan.putString("deskripsi_pertanyaan", masalah.get(posisi).getproblem_desc());
-                        paketDetailPetanyaan.putString("owner", masalah.get(posisi).getproblem_owner());
-                        paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
-                        paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
-                        paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
-                        Intent inten= new Intent(getContext(), TambahJawabanExprt.class);
-                        inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
-                        inten.putExtra("jenisPost", 12);
-                        startActivity(inten);
+                        if(Utilities.isStoragePermissionGranted(getActivity())) {
+                            Bundle paketDetailPetanyaan = new Bundle();
+                            paketDetailPetanyaan.putString("judul_pertanyaan", masalah.get(posisi).getproblem_title());
+                            paketDetailPetanyaan.putString("deskripsi_pertanyaan", masalah.get(posisi).getproblem_desc());
+                            paketDetailPetanyaan.putString("owner", masalah.get(posisi).getproblem_owner());
+                            paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
+                            paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
+                            paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
+                            Intent inten = new Intent(getContext(), TambahJawabanExprt.class);
+                            inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
+                            inten.putExtra("jenisPost", 12);
+                            startActivity(inten);
+                        }
                     }
                 });
             }

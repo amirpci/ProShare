@@ -284,9 +284,11 @@ public class ShareActWkr extends Fragment_Header {
         daftarkanAksiTombolUtama(new MainAct_Header.AksiTombolUtama() {
             @Override
             public void tekan(View v, int halaman) {
-                Intent keTambahTimeline= new Intent(getActivity(), TambahPertanyaanWkr.class);
-                keTambahTimeline.putExtra("jenisPost", TambahPertanyaanWkr.JENIS_POST_SHARE);
-                startActivity(keTambahTimeline);
+                if(Utilities.isStoragePermissionGranted(getActivity())) {
+                    Intent keTambahTimeline = new Intent(getActivity(), TambahPertanyaanWkr.class);
+                    keTambahTimeline.putExtra("jenisPost", TambahPertanyaanWkr.JENIS_POST_SHARE);
+                    startActivity(keTambahTimeline);
+                }
             }
         });
         daftarkanPenampilTombolUtama(new MainAct_Header.PenampilTombolUtama() {
