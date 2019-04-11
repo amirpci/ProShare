@@ -6,7 +6,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -47,6 +46,7 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -57,7 +57,6 @@ import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -100,6 +99,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
     public final int PENGGUNA_BIASA= 0;
 
     private static final int AMBIL_GAMBAR= 11;
+
+    private String emailPengguna= FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
     private String namaPemilik;
     private String majorPemilik;
@@ -446,7 +447,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             @Override
             public void onClick(View v) {
                 //perbesar FotoProfl
-                munculkanAlertDialog(R.layout.model_detail_user, ind);
+                munculkanDetailProfil(ind);
             }
         });
         final ImageView tmbVoteUp= view.findViewById(R.id.komentar_vote_up);
@@ -571,7 +572,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             @Override
             public void onClick(View v) {
                 //perbesar FotoProfl
-                munculkanAlertDialog(R.layout.model_detail_user, 0);
+                munculkanDetailProfil(0);
             }
         });
         final ImageView tmbVoteDown= viewSolusi.findViewById(R.id.komentar_vote_down);
@@ -696,7 +697,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             @Override
             public void onClick(View v) {
                 //perbesar FotoProfl
-                munculkanAlertDialog(R.layout.model_detail_user, -1);
+                munculkanDetailProfil(-1);
             }
         });
         final ImageView tmbVoteDown= viewPertanyaan.findViewById(R.id.tl_vote_down);
@@ -1739,115 +1740,121 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         return null;
     }
 
-    private void munculkanAlertDialog(int idHalaman, final int indUser){
-       // if(detailProfil == null){
-            detailProfil = getLayoutInflater().inflate(idHalaman, null, false);
-
-            View latarBel = detailProfil.findViewById(R.id.user_latar);
-            latarBel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewLatar.removeView(detailProfil);
-                    profilDitampilkan = false;
+    private void munculkanDetailProfil(final int indUser){
+            if(profilDitampilkan){
+                viewLatar.removeView(detailProfil);
+                profilDitampilkan= false;
+            } else {
+                final String email = (indUser==-1)? emailPengguna/*emailOrang*/ : (solusi.get(indUser).getOrang());
+                Toast.makeText(this, "EMAIL ORANG: " +emailOrang, Toast.LENGTH_LONG).show();
+                if(email.equalsIgnoreCase(emailPengguna)) {
+                    Toast.makeText(this, "Orang itu adalah diri Anda sendiri", Toast.LENGTH_LONG).show();
+                    return;
                 }
-            });
-            ImageView aksiChat = detailProfil.findViewById(R.id.user_aksi_chat);
-            Toast.makeText(this, "ind "+String.valueOf(indUser), Toast.LENGTH_SHORT).show();
-            final String email = (indUser==-1)?emailOrang:(solusi.get(indUser).getOrang());
-            aksiChat.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Utilities.getUserRef().child(email.replace(".", ",")).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            Pengguna orang = dataSnapshot.getValue(Pengguna.class);
-                            Intent i = new Intent(DetailPertanyaanActivityWkr.this, ChatActivity.class);
-                            //i.putExtra("idPesan", listPesan.getIdPesan());
-                            i.putExtra("pengguna", orang);
-                            //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
-                            startActivity(i);
-                        }
+                // if(detailProfil == null){
+                detailProfil = getLayoutInflater().inflate(R.layout.model_detail_user, null, false);
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-                }
-            });
-            ImageView aksiProfil = detailProfil.findViewById(R.id.user_aksi_lihat);
-            aksiProfil.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //inten ke profil orang itu
-                    DatabaseReference ref = Utilities.getUserRef();
-                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if(dataSnapshot.hasChild(email.replace(".", ","))){
-                                Utilities.getUserRef().child(email.replace(".", ",")).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        Pengguna orang = dataSnapshot.getValue(Pengguna.class);
-                                        Intent i = new Intent(DetailPertanyaanActivityWkr.this, ProfileUserLainAct.class);
-                                        //i.putExtra("idPesan", listPesan.getIdPesan());
-                                        i.putExtra("pengguna", orang);
-                                        //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
-                                        startActivity(i);
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                    }
-                                });
-                            } else {
-                                Toast.makeText(DetailPertanyaanActivityWkr.this, "User not found!", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                        }
-                    });
-
-                }
-            });
-            CircleImageView fotoOrang = detailProfil.findViewById(R.id.user_profil);
-       // }
-        if(!profilDitampilkan) {
-            viewLatar.addView(detailProfil);
-            CircleImageView viewFoto= detailProfil.findViewById(R.id.user_profil);
-            TextView viewNama= detailProfil.findViewById(R.id.user_nama);
-            TextView viewStatus= detailProfil.findViewById(R.id.user_status);
-
-            if(indUser >= 0) {
-                viewNama.setText(solusi.get(indUser).getNamaOrang());
-                viewStatus.setText(strStatus(solusi.get(indUser).getStatus()));
-                if(solusi.get(indUser).getFotoOrang()!=null && !solusi.get(indUser).getFotoOrang().equals("null")){
-                    viewFoto.setPadding(0,0,0,0);
-                    Utilities.updateFotoProfile(solusi.get(indUser).getFotoOrang(), viewFoto);
-                }
-                Toast.makeText(getBaseContext(), orang[indUser], Toast.LENGTH_LONG).show();
-            } else if(indUser == -1){
-                if (urlFotoOrangLoaded) {
-                    viewNama.setText(namaPemilik);
-                    viewStatus.setText((majorPemilik != null)?strStatus(majorPemilik):"");
-                    if (!urlFotoOrang.equals("null")) {
-                        viewFoto.setPadding(0, 0, 0, 0);
-                        Utilities.updateFotoProfile(urlFotoOrang, viewFoto);
+                View latarBel = detailProfil.findViewById(R.id.user_latar);
+                latarBel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        viewLatar.removeView(detailProfil);
+                        profilDitampilkan = false;
                     }
-                }
-                Toast.makeText(getBaseContext(), namaPemilik, Toast.LENGTH_LONG).show();
-            }
-            profilDitampilkan= true;
-        }
-        else {
-            viewLatar.removeView(detailProfil);
-            profilDitampilkan= false;
-        }
+                });
+                ImageView aksiChat = detailProfil.findViewById(R.id.user_aksi_chat);
+//            Toast.makeText(this, "ind "+String.valueOf(indUser), Toast.LENGTH_SHORT).show();
 
+                aksiChat.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Utilities.getUserRef().child(email.replace(".", ",")).addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                Pengguna orang = dataSnapshot.getValue(Pengguna.class);
+                                Intent i = new Intent(DetailPertanyaanActivityWkr.this, ChatActivity.class);
+                                //i.putExtra("idPesan", listPesan.getIdPesan());
+                                i.putExtra("pengguna", orang);
+                                //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
+                                startActivity(i);
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+                    }
+                });
+                ImageView aksiProfil = detailProfil.findViewById(R.id.user_aksi_lihat);
+                aksiProfil.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        //inten ke profil orang itu
+                        DatabaseReference ref = Utilities.getUserRef();
+                        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                if(dataSnapshot.hasChild(email.replace(".", ","))){
+                                    Utilities.getUserRef().child(email.replace(".", ",")).addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                            Pengguna orang = dataSnapshot.getValue(Pengguna.class);
+                                            Intent i = new Intent(DetailPertanyaanActivityWkr.this, ProfileUserLainAct.class);
+                                            //i.putExtra("idPesan", listPesan.getIdPesan());
+                                            i.putExtra("pengguna", orang);
+                                            //Toast.makeText(getActivity(), orang.getNama(), Toast.LENGTH_SHORT).show();
+                                            startActivity(i);
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                        }
+                                    });
+                                } else {
+                                    Toast.makeText(DetailPertanyaanActivityWkr.this, "User not found!", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                            }
+                        });
+
+                    }
+                });
+                CircleImageView fotoOrang = detailProfil.findViewById(R.id.user_profil);
+                // }
+//                if(!profilDitampilkan) {
+                viewLatar.addView(detailProfil);
+                CircleImageView viewFoto= detailProfil.findViewById(R.id.user_profil);
+                TextView viewNama= detailProfil.findViewById(R.id.user_nama);
+                TextView viewStatus= detailProfil.findViewById(R.id.user_status);
+
+                if(indUser >= 0) {
+                    viewNama.setText(solusi.get(indUser).getNamaOrang());
+                    viewStatus.setText(strStatus(solusi.get(indUser).getStatus()));
+                    if(solusi.get(indUser).getFotoOrang()!=null && !solusi.get(indUser).getFotoOrang().equals("null")){
+                        viewFoto.setPadding(0,0,0,0);
+                        Utilities.updateFotoProfile(solusi.get(indUser).getFotoOrang(), viewFoto);
+                    }
+//                Toast.makeText(getBaseContext(), orang[indUser], Toast.LENGTH_LONG).show();
+                } else if(indUser == -1){
+                    if (urlFotoOrangLoaded) {
+                        viewNama.setText(namaPemilik);
+                        viewStatus.setText((majorPemilik != null)?strStatus(majorPemilik):"");
+                        if (!urlFotoOrang.equals("null")) {
+                            viewFoto.setPadding(0, 0, 0, 0);
+                            Utilities.updateFotoProfile(urlFotoOrang, viewFoto);
+                        }
+                    }
+                    Toast.makeText(getBaseContext(), namaPemilik, Toast.LENGTH_LONG).show();
+                }
+                profilDitampilkan= true;
+//                }
+            }
     }
 
     public String strStatus(String status){
@@ -1907,6 +1914,13 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        if(!profilDitampilkan)
+            super.onBackPressed();
+        else
+            munculkanDetailProfil(-1);
+    }
 
     class DetailPertanyaanAdapter extends BaseAdapter{
         DetailPertanyaanAdapter (){

@@ -2,16 +2,15 @@ package sidev17.siits.proshare.Modul;
 
 import android.os.Bundle;
 import android.os.Environment;
-import android.speech.tts.UtteranceProgressListener;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.text.format.DateFormat;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -19,18 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
-import com.rmtheis.yandtran.language.Language;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,7 +47,8 @@ public class ChatActivity extends AppCompatActivity{
     TextView bidangOrgTujuan;
     RecyclerView wadahChat;
 
-    RelativeLayout barIsi;
+    RelativeLayout barIsianChat;
+    EditText isianTeks;
     ImageView tmbSisipkan;
     ImageView iconKirim;
     EditText isiPesan;
@@ -88,12 +83,13 @@ public class ChatActivity extends AppCompatActivity{
         bidangOrgTujuan= findViewById(R.id.chat_bar_status_major);
 
 
-        barIsi= findViewById(R.id.chat_bar_isi);
-        barIsi.addView(getLayoutInflater().inflate(R.layout.model_tab_edit_text, null, false));
-        tmbSisipkan= barIsi.findViewById(R.id.tab_text_indikator_gambar);
-        tmbKirim= barIsi.findViewById(R.id.tab_text_tindakan);
-        iconKirim= barIsi.findViewById(R.id.tab_text_tindakan_gambar);
-        isiPesan= barIsi.findViewById(R.id.tab_text_hint);
+        barIsianChat = findViewById(R.id.chat_bar_isi);
+        barIsianChat.addView(getLayoutInflater().inflate(R.layout.model_tab_edit_text, null, false));
+        isianTeks= barIsianChat.findViewById(R.id.tab_text_hint);
+        tmbSisipkan= barIsianChat.findViewById(R.id.tab_text_indikator_gambar);
+        tmbKirim= barIsianChat.findViewById(R.id.tab_text_tindakan);
+        iconKirim= barIsianChat.findViewById(R.id.tab_text_tindakan_gambar);
+        isiPesan= barIsianChat.findViewById(R.id.tab_text_hint);
 
         wadahChat= findViewById(R.id.chat_wadah);
         muatChat();
@@ -122,8 +118,37 @@ public class ChatActivity extends AppCompatActivity{
 
     void aturDefaultBarTeks(){
         isiPesan.setHint("Your message here");
-        tmbSisipkan.setImageResource(R.drawable.icon_klip);
+//        tmbSisipkan.setImageResource(R.drawable.icon_klip);
+        tmbSisipkan.setVisibility(View.GONE);
+        View tmbIndikator= findViewById(R.id.tab_text_indikator);
+        tmbIndikator.setVisibility(View.INVISIBLE);
+        tmbIndikator.getLayoutParams().width= 0;
         iconKirim.setImageResource(R.drawable.icon_kirim);
+
+        final View klip= barIsianChat.findViewById(R.id.tab_text_indikator);
+        final View kirim= barIsianChat.findViewById(R.id.tab_text_tindakan);
+        isianTeks.setMaxLines(4);
+        isianTeks.addTextChangedListener(new TextWatcher() {
+            int jmlBaris= 1;
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(isianTeks.getLineCount() != jmlBaris && isianTeks.getLineCount() <= 4){
+                    jmlBaris= isianTeks.getLineCount();
+                    kirim.getLayoutParams().height= isianTeks.getLineHeight() *(jmlBaris+1);
+                    klip.getLayoutParams().height= isianTeks.getLineHeight() *(jmlBaris+1);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
     void kirimChat(){
         String pesanKirim= isiPesan.getText().toString();
