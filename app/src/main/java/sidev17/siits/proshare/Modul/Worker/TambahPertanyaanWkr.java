@@ -100,8 +100,9 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     public static final int JENIS_POST_SHARE= 10;
     public static final int JENIS_POST_TANYA= 11;
     public static final int JENIS_POST_JAWAB= 12;
+    public static final int JENIS_POST_REVIEW= 13;
 
-    private int jenisPost= JENIS_POST_SHARE;
+    protected int jenisPost= 0;
 
     private View parentUtama;
     private GridView wadahCell, liveQuestion;
@@ -169,7 +170,8 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private int batasDipilih= 20;
     private int batasBufferUdahDiload = 0;
 
-    private int idHalaman;
+    protected int idHalaman;
+//    private boolean reviewShare= false;
 
 /*
 ================================
@@ -202,14 +204,15 @@ Bagian EXPERT / TambahJawaban
 
 //================================
 
-    protected void aturIdHalaman(int idHalaman){
-        this.idHalaman= idHalaman;
+    protected void aturIdHalaman(){
+        idHalaman= R.layout.activity_tambah_pertanyaan_wkr;
     }
-
+    protected void aturJenisPost(){}
+/*
     protected void aturIdHalaman_Default(){
         aturIdHalaman(R.layout.activity_tambah_pertanyaan_wkr);
     }
-
+*/
     void verifyQuestion(boolean verify){
         verifiedQuestion= verify;
     }
@@ -218,7 +221,8 @@ Bagian EXPERT / TambahJawaban
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        aturIdHalaman(getIntent().getIntExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr));
-        aturIdHalaman_Default();
+        aturIdHalaman();
+        aturJenisPost();
 
         initUrutanDipilih();
         parentUtama= getLayoutInflater().inflate(idHalaman, null);
@@ -231,18 +235,21 @@ Bagian EXPERT / TambahJawaban
         liveQuestion= findViewById(R.id.tambah_properti_cell_dipilih);
         tabBarIcon= new TabBarIcon((View) findViewById(R.id.tambah_properti_wadah),
                 (View) findViewById(R.id.tambah_properti_icon));
-        if(idHalaman == R.layout.activity_tambah_jawaban_exprt) {
+        if(idHalaman == R.layout.activity_tambah_jawaban_exprt && jenisPost != JENIS_POST_REVIEW) {
             initTabIcon(new int[]{R.id.tambah_gambar_gmb/*, R.id.tambah_link_gmb*/});
             initTabIconInduk(new int[]{R.id.tambah_gambar/*, R.id.tambah_link*/});
-        }else {
+            initTabBarIcon();
+        } else if(idHalaman == R.layout.activity_tambah_pertanyaan_wkr){
             initTabIcon(new int[]{R.id.tambah_gambar_gmb, R.id.tambah_video_gmb/*, R.id.tambah_link_gmb*/});
             initTabIconInduk(new int[]{R.id.tambah_gambar, R.id.tambah_video/*, R.id.tambah_link*/});
+            initTabBarIcon();
         }
-        tabBarIcon.aturTabIcon(tabIcon);
-        tabBarIcon.aturTabIconInduk(tabIconInduk);
-        tabBarIcon.aturIdWarnaDitekan(WARNA_DITEKAN);
-        tabBarIcon.aturIdWarnaTakDitekan(WARNA_TAK_DITEKAN);
-        initAksiTekan();
+        if(jenisPost == JENIS_POST_REVIEW) {
+            findViewById(R.id.tambah_properti_icon).setVisibility(View.GONE);
+            inisiasiOk();
+        }
+        else
+            initAksiTekan();
 
         pathFoto= ambilPathGambar();
         pathVideo= ambilPathVideo();
@@ -257,29 +264,42 @@ Bagian EXPERT / TambahJawaban
             vTolak.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    tandaiPertanyaanDitolak();
-                    finish();
+                    if(jenisPost == JENIS_POST_JAWAB){
+                        tandaiPertanyaanDitolak();
+                        finish();
+                    } else{
+                        blokReview();
+                    }
                 }
             });
             vLempar= findViewById(R.id.tambah_tindakan_lempar);
             vLempar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    lemparPertanyaan();
-                    finish();
+                    if(jenisPost == JENIS_POST_JAWAB){
+                        lemparPertanyaan();
+                        finish();
+                    } else
+                        abaikanReview();
                 }
             });
+            vLempar.setText("ABAIKAN");
             vJawab= findViewById(R.id.tambah_tindakan_jawab);
             vJawab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    vTindakan.setVisibility(View.GONE);
-                    tabBarIcon.aturTinggiTabDefault();
-                    tabBarIcon.tampilkanIconTab();
-                    EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_TEXT_FLAG_CAP_SENTENCES, true);
-                    inisiasiOk();
+                    if(jenisPost == JENIS_POST_JAWAB){
+                        vTindakan.setVisibility(View.GONE);
+                        tabBarIcon.aturTinggiTabDefault();
+                        tabBarIcon.tampilkanIconTab();
+                        EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_TEXT_FLAG_CAP_SENTENCES, true);
+                        inisiasiOk();
+                    } else{
+                        verifikasiReview();
+                    }
                 }
             });
+            vJawab.setText("VALIDASI");
 
             translateAksi(vLempar, vTolak, vJawab);
             tabBarIcon.aturTinggiTab(tabBarIcon.tinggiTabDitekan());
@@ -355,6 +375,16 @@ Bagian EXPERT / TambahJawaban
     Bagian EXPERT / TambahJawaban
     ================================
     */
+    private void verifikasiReview(){
+        //SESUATU!!!
+    }
+    private void abaikanReview(){
+        //SESUATU!!!
+    }
+    private void blokReview(){
+        //SESUATU!!!
+    }
+
     private void tandaiPertanyaanDitolak(){
         //////
         setProblemStatus("0", String.valueOf(Konstanta.PROBLEM_STATUS_REJECTED));
@@ -499,7 +529,10 @@ Bagian EXPERT / TambahJawaban
     private void ambilData(){
         Intent intentSebelumnya= getIntent();
 
-        if(intentSebelumnya.getIntExtra("jenisPost", 0)==JENIS_POST_JAWAB){
+        if(jenisPost == 0)
+            jenisPost= intentSebelumnya.getIntExtra("jenisPost", JENIS_POST_SHARE);
+
+        if(jenisPost == JENIS_POST_JAWAB || jenisPost == JENIS_POST_REVIEW){
             Bundle bundle = intentSebelumnya.getBundleExtra("paket_detail_pertanyaan");
             judulAwal= bundle.getString("judul_pertanyaan");
             deskripsiPost = bundle.getString("deskripsi_pertanyaan");
@@ -508,9 +541,7 @@ Bagian EXPERT / TambahJawaban
             waktuPost = bundle.getString("waktu");
             idPost = bundle.getString("pid");
             teksJudul.setText(judulAwal);
-            jenisPost = JENIS_POST_JAWAB;
         }else{
-            jenisPost = intentSebelumnya.getIntExtra("jenisPost", 0);
             judulAwal= intentSebelumnya.getStringExtra("judul");
             deskripsiAwal= intentSebelumnya.getStringExtra("deskripsi");
             ArrayList<String> urlFoto = intentSebelumnya.getStringArrayListExtra("urlFoto");
@@ -520,20 +551,19 @@ Bagian EXPERT / TambahJawaban
                 judulAwal= "";
             if(deskripsiAwal== null)
                 deskripsiAwal= "";
-
+/*
             if(judulAwal.length() > 0){
                 teksJudul.setText(judulAwal);
                 teksDeskripsi.setText(deskripsiAwal);
                 idBidang= bidang;
                 if(idHalaman == R.layout.activity_tambah_jawaban_exprt)
-                    vBidang.setText(ambilBidang(idBidang));
+                    vBidang.setText(ambilBidang(idBidang));/*
                 if(urlFoto!=null && urlFoto.size()>0){
 
-                }
+                }* /
             }
+*/
         }
-
-        jenisPost= intentSebelumnya.getIntExtra("jenisPost", JENIS_POST_SHARE);
 
         //file gambar yang udah diload dari server saat di activity DetailPertanyaan
         //gak harus array String
@@ -647,7 +677,7 @@ Bagian EXPERT / TambahJawaban
         teksDeskripsi.setMaxLines(1000);
         teksDeskripsi.setSingleLine(false);
 //        teksDeskripsi.addTextChangedListener(twIsian);
-        if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
+        if(idHalaman == R.layout.activity_tambah_jawaban_exprt && jenisPost != JENIS_POST_REVIEW){
 //            EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
             EditTextMod.enableEditText(teksJudul, InputType.TYPE_NULL, false);
             EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
@@ -661,6 +691,12 @@ Bagian EXPERT / TambahJawaban
     private void tekan(View v){
         tabBarIcon.tekanItem(v);
 //        wadahCell.setY(tabBarIcon.ambilLetakY());
+    }
+    private void initTabBarIcon(){
+        tabBarIcon.aturTabIcon(tabIcon);
+        tabBarIcon.aturTabIconInduk(tabIconInduk);
+        tabBarIcon.aturIdWarnaDitekan(WARNA_DITEKAN);
+        tabBarIcon.aturIdWarnaTakDitekan(WARNA_TAK_DITEKAN);
     }
     void initAksiTekan(){
         View.OnClickListener l[]= {
@@ -1210,35 +1246,38 @@ Bagian EXPERT / TambahJawaban
     }
 
     public void inisiasiOk(){
-        tmbCentang.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
-                    Dialog dialog= new Dialog(TambahPertanyaanWkr.this);
-                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog.setContentView(R.layout.dialog_kirim_jawaban);
-                    TextView vKirim= dialog.findViewById(R.id.tindakan_kirim);
-                    vKirim.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            kirimPertanyaan();
-                        }
-                    });
-                    TextView VLempar= dialog.findViewById(R.id.tindakan_lempar);
-                    vLempar.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            lemparPertanyaan();
-                            finish();
-                        }
-                    });
+        if(jenisPost == JENIS_POST_REVIEW)
+            tmbCentang.setVisibility(View.GONE);
+        else
+            tmbCentang.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
+                        Dialog dialog= new Dialog(TambahPertanyaanWkr.this);
+                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                        dialog.setContentView(R.layout.dialog_kirim_jawaban);
+                        TextView vKirim= dialog.findViewById(R.id.tindakan_kirim);
+                        vKirim.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                kirimPertanyaan();
+                            }
+                        });
+                        TextView VLempar= dialog.findViewById(R.id.tindakan_lempar);
+                        vLempar.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                lemparPertanyaan();
+                                finish();
+                            }
+                        });
 //                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                    dialog.show();
+                        dialog.show();
+                    }
+                    else
+                        kirimPertanyaan();
                 }
-                else
-                    kirimPertanyaan();
-            }
-        });
+            });
 /*
         teksJudul.setOnTouchListener(new View.OnTouchListener() {
             @Override

@@ -38,6 +38,7 @@ import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
 import sidev17.siits.proshare.Modul.Expert.TambahJawabanExprt;
+import sidev17.siits.proshare.Modul.Expert.TambahReviewExprt;
 import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
@@ -293,9 +294,10 @@ public class JawabActExprt extends Fragment_Header {
                             paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
                             paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
                             paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
-                            Intent inten = new Intent(getContext(), TambahJawabanExprt.class);
+//                            Intent inten = new Intent(getContext(), TambahJawabanExprt.class);
+                            Intent inten = new Intent(getContext(), TambahReviewExprt.class);
                             inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
-                            inten.putExtra("jenisPost", 12);
+//                            inten.putExtra("jenisPost", 12);
                             startActivity(inten);
                         }
                     }

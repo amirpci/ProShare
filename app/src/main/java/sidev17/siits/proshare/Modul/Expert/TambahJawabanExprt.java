@@ -5,7 +5,7 @@ import sidev17.siits.proshare.R;
 
 public class TambahJawabanExprt extends TambahPertanyaanWkr {
     @Override
-    protected void aturIdHalaman_Default() {
-        aturIdHalaman(R.layout.activity_tambah_jawaban_exprt);
+    protected void aturIdHalaman() {
+        idHalaman= R.layout.activity_tambah_jawaban_exprt;
     }
 }
