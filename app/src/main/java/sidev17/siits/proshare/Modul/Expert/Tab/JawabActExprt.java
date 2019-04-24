@@ -294,10 +294,10 @@ public class JawabActExprt extends Fragment_Header {
                             paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
                             paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
                             paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
-//                            Intent inten = new Intent(getContext(), TambahJawabanExprt.class);
-                            Intent inten = new Intent(getContext(), TambahReviewExprt.class);
+                            Intent inten = new Intent(getContext(), TambahJawabanExprt.class);
+//                            Intent inten = new Intent(getContext(), TambahReviewExprt.class);
                             inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
-//                            inten.putExtra("jenisPost", 12);
+                            inten.putExtra("jenisPost", 12);
                             startActivity(inten);
                         }
                     }
