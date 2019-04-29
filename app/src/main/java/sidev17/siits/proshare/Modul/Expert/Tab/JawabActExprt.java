@@ -40,6 +40,9 @@ import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
 import sidev17.siits.proshare.Modul.Expert.TambahJawabanExprt;
 import sidev17.siits.proshare.Modul.Expert.TambahReviewExprt;
 import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
+import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
+import sidev17.siits.proshare.Utils.PackBahasa;
+import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.R;
@@ -63,6 +66,11 @@ public class JawabActExprt extends Fragment_Header {
     private Image gambar[][];
     private int kategoriSoal[]= {1, 2, 0, 1};
 
+    private View halamanKosong;
+
+    // ini untuk batas antara share dan pertanyaan
+    private int batas = 0;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -70,6 +78,7 @@ public class JawabActExprt extends Fragment_Header {
         loadingPertanyaan = (LoadingDots)view.findViewById(R.id.loading_pertanyaan);
         daftarTanya= view.findViewById(R.id.daftar_pertanyaan_wadah_expert);
         refreshLayout = view.findViewById(R.id.refresh_pertanyaan);
+        initHalamanKosong(view);
         loadDaftarPertanyaan();
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.abuTua), getResources().getColor(R.color.abuLebihTua),
                 getResources().getColor(R.color.abuSangatTua));
@@ -112,6 +121,11 @@ public class JawabActExprt extends Fragment_Header {
         return view;
     }
 
+    private void initHalamanKosong(View v) {
+        halamanKosong = v.findViewById(R.id.daftar_pertanyaan_kosong);
+        halamanKosong.setVisibility(View.GONE);
+    }
+
     @Override
     public void initHeader() {
 //        MainAct_Header mainAct= (MainAct_Header) actInduk;
@@ -151,6 +165,9 @@ public class JawabActExprt extends Fragment_Header {
     }
     private void bersihkanList(){
         Masalah.clear();
+        RC_Masalah rc =  ((RC_Masalah)adapter);
+        rc.gantiJenisState();
+        rc.resetTerbuka();
         adapter.notifyDataSetChanged();
     }
     private void loadData() {
@@ -169,17 +186,29 @@ public class JawabActExprt extends Fragment_Header {
                                 try {
                                     JSONObject jsonObject = jsonArr.getJSONObject(i);
                                     Permasalahan masalah = new Permasalahan();
-                                    masalah.setproblem_desc(jsonObject.getString("problem_desc"));
-                                    masalah.setproblem_title(jsonObject.getString("problem_title"));
-                                    masalah.setproblem_owner(jsonObject.getString("problem_owner"));
-                                    masalah.setStatus(jsonObject.getInt("status"));
-                                    masalah.setpid(jsonObject.getString("pid"));
-                                    masalah.setmajority_id(jsonObject.getString("majority_id"));
-                                    masalah.setTimestamp(jsonObject.getString("timestamp"));
+                                    if(jsonObject.getInt("status_post") != 12) {
+                                        masalah.setproblem_desc(jsonObject.getString("problem_desc"));
+                                        masalah.setproblem_title(jsonObject.getString("problem_title"));
+                                        masalah.setproblem_owner(jsonObject.getString("problem_owner"));
+                                        masalah.setStatus(jsonObject.getInt("status"));
+                                        masalah.setStatuspost(jsonObject.getInt("status_post"));
+                                        masalah.setpid(jsonObject.getString("pid"));
+                                        masalah.setmajority_id(jsonObject.getString("majority_id"));
+                                        masalah.setTimestamp(jsonObject.getString("timestamp"));
+                                    } else{
+                                        batas = i;
+                                        masalah.setStatuspost(jsonObject.getInt("status_post"));
+                                    }
+
                                     Masalah.add(masalah);
+
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+                            }
+                            Log.d("jumalh masalah", String.valueOf(Masalah.size()));
+                            if(adapter instanceof RC_Masalah){
+                                ((RC_Masalah)adapter).gantiJenisState();
                             }
                             adapter.notifyDataSetChanged();
                         } catch (JSONException e) {
@@ -215,27 +244,183 @@ public class JawabActExprt extends Fragment_Header {
 
     public class RC_Masalah extends RecyclerView.Adapter<RC_Masalah.vH>{
         private List<Permasalahan> masalah;
+        private final int VIEW_BATAS_JAWAB = 111;
+        private final int VIEW_BATAS_SHARE = 222;
+        private final int VIEW_NORMAL = 333;
+        private final int JENIS_TIDAK_ADA = 239;
+        private final int JENIS_HANYA_JAWAB = 392;
+        private final int JENIS_HANYA_SHARE = 932;
+        private final int JENIS_NORMAL = 923;
+
+        private int jenisState;
+        private int jumlahPertanyaan = 0;
+        private int jumlahShare = 0;
+
+        private boolean shareTebuka = false;
+        private boolean pertanyaanTerbuka = false;
+
         Activity act;
+
         public RC_Masalah(List<Permasalahan> masalah, Activity act) {
             this.masalah = masalah;
             this.act = act;
+            if(masalah.size() < 1)
+                jenisState = JENIS_TIDAK_ADA;
+            else if (batas == 0)
+                jenisState = JENIS_HANYA_SHARE;
+            else if (batas == masalah.size() - 1)
+                jenisState = JENIS_HANYA_JAWAB;
+            else
+                jenisState = JENIS_NORMAL;
+        }
+
+        public void resetTerbuka(){
+            pertanyaanTerbuka = false;
+            shareTebuka = false;
+        }
+
+        public void gantiJenisState(){
+            Log.d("batas sekarang", String.valueOf(batas));
+            if(Masalah.size() < 1)
+                jenisState = JENIS_TIDAK_ADA;
+            else if (batas == 0)
+                jenisState = JENIS_HANYA_SHARE;
+            else if (batas == Masalah.size() - 1)
+                jenisState = JENIS_HANYA_JAWAB;
+            else
+                jenisState = JENIS_NORMAL;
         }
 
         @NonNull
         @Override
         public vH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan_pribadi, parent, false));
+            if(viewType == VIEW_NORMAL) {
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.model_daftar_pertanyaan_pribadi, parent, false);
+                return new vH(v);
+            }else if(viewType == VIEW_BATAS_JAWAB){
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.model_pembatas_list, parent, false);
+                TextView txt = v.findViewById(R.id.pembatas_teks);
+                txt.setText(PackBahasa.harusJawab[Terjemahan.indexBahasa(act)][0] + " ("+ String.valueOf(jumlahPertanyaan)+")");
+                return new vH(v);
+            } else if(viewType == VIEW_BATAS_SHARE) {
+                View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.model_pembatas_list, parent, false);
+                TextView txt = v.findViewById(R.id.pembatas_teks);
+                txt.setText(PackBahasa.harusJawab[Terjemahan.indexBahasa(act)][1] + " ("+ String.valueOf(jumlahShare)+")");
+                return new vH(v);
+            }
+            return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.view_empty, parent, false));
+        }
+
+        @Override
+        public int getItemViewType(int position) {
+            Log.d("jenis View get", String.valueOf(jenisState));
+            if(jenisState == JENIS_NORMAL){
+                if(pertanyaanTerbuka){
+                    if(position == 0)
+                        return VIEW_BATAS_JAWAB;
+                    else if (position == batas + 1)
+                        return VIEW_BATAS_SHARE;
+                    else return VIEW_NORMAL;
+                }else if(shareTebuka) {
+                    if (position == 0)
+                        return VIEW_BATAS_JAWAB;
+                    else if (position == 1)
+                        return VIEW_BATAS_SHARE;
+                    else return VIEW_NORMAL;
+                } else{
+                    if (position == 0)
+                        return VIEW_BATAS_JAWAB;
+                    else if (position == 1)
+                        return VIEW_BATAS_SHARE;
+                }
+            } else if (jenisState == JENIS_HANYA_JAWAB){
+                if(position == 0)
+                    return VIEW_BATAS_JAWAB;
+                else
+                    return VIEW_NORMAL;
+            } else if (jenisState == JENIS_HANYA_SHARE){
+                if(position == 0)
+                    return VIEW_BATAS_SHARE;
+                else
+                    return VIEW_NORMAL;
+            } else if (jenisState == JENIS_TIDAK_ADA){
+
+            }
+            return VIEW_NORMAL;
         }
 
         @Override
         public void onBindViewHolder(@NonNull vH holder, int position) {
-            holder.bind(position);
+            if(jenisState == JENIS_NORMAL){
+                if(pertanyaanTerbuka && shareTebuka) {
+                    if (position > 0 && position < batas + 1)
+                        holder.bind(position - 1);
+                    else if (position > batas + 1)
+                        holder.bind(position - 1);
+                    else if (position == 0)
+                        holder.bindPembatas(0);
+                    else if (position == batas + 1)
+                        holder.bindPembatas(1);
+                } else if(!pertanyaanTerbuka && shareTebuka){
+                    if (position > 1)
+                        holder.bind(batas + position - 1);
+                    else if (position == 0)
+                        holder.bindPembatas(0);
+                    else if (position == 1)
+                        holder.bindPembatas(1);
+                } else if(pertanyaanTerbuka && !shareTebuka){
+                    if (position > 0 && position < batas + 1)
+                        holder.bind(position - 1);
+                    else if (position == 0)
+                        holder.bindPembatas(0);
+                    else if (position == batas + 1)
+                        holder.bindPembatas(1);
+                } else{
+                    if (position == 0)
+                        holder.bindPembatas(0);
+                    else if (position == 1)
+                        holder.bindPembatas(1);
+                }
+            } else if (jenisState == JENIS_HANYA_SHARE || jenisState == JENIS_HANYA_JAWAB){
+                if(position > 0) {
+                    boolean terbuka = (jenisState == JENIS_HANYA_SHARE)?shareTebuka:pertanyaanTerbuka;
+                    holder.bind(position - 1);
+                } else
+                    holder.bindPembatas((jenisState == JENIS_HANYA_SHARE)?1:0);
+            }
         }
 
         @Override
         public int getItemCount() {
-            if(actInduk.halamanSekarang() == 1)
-                actInduk.aturTambahanHeader("(" +masalah.size() +")");
+            int jumlahitem = (masalah.size()>0)?masalah.size()-1:masalah.size();
+            if (actInduk.halamanSekarang() == 1)
+                actInduk.aturTambahanHeader("(" + jumlahitem + ")");
+
+            if (jenisState == JENIS_TIDAK_ADA) {
+                Log.d("masalah jumlah", String.valueOf(masalah.size()));
+                Log.d("jenis view", "tidak ada");
+                halamanKosong.setVisibility(View.VISIBLE);
+                return 0;
+            } else if (jenisState == JENIS_HANYA_SHARE || jenisState == JENIS_HANYA_JAWAB) {
+                Log.d("jenis view", "jenis hanya jawab");
+                jumlahPertanyaan = masalah.size() - 1;
+                jumlahShare = masalah.size() - 1;
+                halamanKosong.setVisibility(View.GONE);
+                if(!pertanyaanTerbuka || !shareTebuka)
+                    return 1;
+            } else if (jenisState == JENIS_NORMAL){
+                halamanKosong.setVisibility(View.GONE);
+                jumlahPertanyaan = batas;
+                jumlahShare = masalah.size() - jumlahPertanyaan - 1;
+                if(pertanyaanTerbuka && shareTebuka)
+                    return masalah.size() + 1;
+                else if(!pertanyaanTerbuka && shareTebuka)
+                    return masalah.size() + 1 - jumlahPertanyaan;
+                else if(pertanyaanTerbuka && !shareTebuka)
+                    return masalah.size() + 1 - jumlahShare;
+                else
+                    return 2;
+             }
             return masalah.size();
         }
 
@@ -252,7 +437,36 @@ public class JawabActExprt extends Fragment_Header {
                 isi = (TextView)itemView.findViewById(R.id.daftar_pertanyaan_deskripsi);
                 foto = (ImageView)itemView.findViewById(R.id.daftar_pertanyaan_gambar);
             }
+
+            public void openClosePertanyaan(){
+                pertanyaanTerbuka = (pertanyaanTerbuka)?false:true;
+                notifyDataSetChanged();
+            }
+
+            public void openCloseShare(){
+                shareTebuka = (shareTebuka)?false:true;
+                notifyDataSetChanged();
+            }
+
+            public void bindPembatas(int posisi){
+                if(posisi == 0)
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            openClosePertanyaan();
+                        }
+                    });
+                else
+                    view.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            openCloseShare();
+                        }
+                    });
+            }
+
             public void bind(final int posisi){
+                view.setVisibility(View.VISIBLE);
                 if(masalah.get(posisi).getStatus()==PENGGUNA_EXPERT){
                     centang.setBackgroundResource(R.drawable.obj_centang_lingkaran_full);
                 }else if(masalah.get(posisi).getStatus()==PENGGUNA_BIASA){
@@ -281,7 +495,7 @@ public class JawabActExprt extends Fragment_Header {
                         }
                     }
                 }.execute(judulIsi);
-               // Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
                 Utilities.updateFoto(masalah.get(posisi).getpid(), foto, act);
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -294,7 +508,7 @@ public class JawabActExprt extends Fragment_Header {
                             paketDetailPetanyaan.putString("waktu", masalah.get(posisi).getTimestamp());
                             paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
                             paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
-                            Intent inten = new Intent(getContext(), TambahJawabanExprt.class);
+                            Intent inten = new Intent(getContext(), (masalah.get(posisi).getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE)?TambahReviewExprt.class:TambahJawabanExprt.class);
 //                            Intent inten = new Intent(getContext(), TambahReviewExprt.class);
                             inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
                             inten.putExtra("jenisPost", 12);

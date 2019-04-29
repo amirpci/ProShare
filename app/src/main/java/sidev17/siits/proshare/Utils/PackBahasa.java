@@ -56,4 +56,8 @@ public class PackBahasa {
     public static String[][] mainHeader = {{"Profile" , "Should be answered" , "Timeline" , "Chat"},
             {"Profil", "Pertanyaan yang Harus Dijawab", "Pustaka", "Chat"},
             {"プロフィール","答えるべき","タイムライン","チャット"}};
+    public static String[][] harusJawab = {{"Questions", "Shares"}
+                                            ,{"Pertanyaan", "Share"},
+                                                    {"質問","シェア"}};
+
 }

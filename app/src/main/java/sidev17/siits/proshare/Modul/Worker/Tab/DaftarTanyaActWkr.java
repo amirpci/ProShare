@@ -129,10 +129,10 @@ public class DaftarTanyaActWkr extends MainAct_Header {
         halamanKosong= findViewById(R.id.daftar_pertanyaan_kosong);
 //        tampilkanHalamanKosong();
     }
-    private void tampilkanHalamanKosong(){
+    private void tampilkanHalamanKosong(int jumlahItem){
         int visibilitas = View.GONE;
         if(adapter!=null)
-            visibilitas= (adapter.getItemCount() == 0) ? View.VISIBLE : View.GONE;
+            visibilitas= (jumlahItem == 0) ? View.VISIBLE : View.GONE;
         halamanKosong.setVisibility(visibilitas);
     }
 
@@ -221,7 +221,6 @@ public class DaftarTanyaActWkr extends MainAct_Header {
             this.masalah = masalah;
             this.act = act;
             Log.d("masalah ", String.valueOf(masalah.size()));
-            tampilkanHalamanKosong();
         }
 
         @NonNull
@@ -237,6 +236,7 @@ public class DaftarTanyaActWkr extends MainAct_Header {
 
         @Override
         public int getItemCount() {
+            tampilkanHalamanKosong(masalah.size());
             return masalah.size();
         }
 

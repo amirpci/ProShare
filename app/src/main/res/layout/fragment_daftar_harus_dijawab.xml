@@ -22,6 +22,31 @@
             app:LoadingDots_dots_color="@color/abu"
             app:LoadingDots_dots_size="18dp"
             app:LoadingDots_dots_space="1dp"/>
+        <LinearLayout
+            android:id="@+id/daftar_pertanyaan_kosong"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true">
+            <ImageView
+                android:id="@+id/tambah_pertanyaan"
+                android:layout_gravity="center_horizontal"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:tint="@color/abuSangatTua"
+                android:src="@drawable/obj_tidak_ada"/>
+            <TextView
+                android:id="@+id/txt_jawab_pertanyaan_kosong"
+                android:layout_marginTop="30dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:textSize="22sp"
+                android:textColor="@color/abuSangatTua"
+                android:text="Empty"/>
+        </LinearLayout>
     </RelativeLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>
