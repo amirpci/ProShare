@@ -900,24 +900,33 @@ public class ShareActWkr extends Fragment_Header {
                    } else {
                        txt.setText("SHARE");
                    }
+                   return;
                 } else if (solusi.get(posisi).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE) {
-                    if(judulProblem != null)
+                    if(judulProblem != null) {
                         judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
-                    SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
-                    String waktu = solusi.get(posisi).getProblem().getTimestamp();
-                    Date date = null;
-                    try {
-                        date = format1.parse(waktu);
-                        waktu = format2.format(date);
-                        if(tanggalProblem != null)
-                            tanggalProblem.setText(waktu);
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                        deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
                     }
-                    // tanggalProblem.setText(solusi.get(posisi).getProblem().getTimestamp());
-                    if(totalVote!=null)
-                    totalVote.setText(String.valueOf(solusi.get(posisi).getProblem().getTotalVote()));
+                    if(tipeSekarang == TIPE_TIMELINE_CARI) {
+                        muatSolusi(posisi);
+                        jumlahKomentar.setText("and "+solusi.get(posisi).getJumlahKomentar()+" more comments...");
+                        gantiBahasa(TIPE_TIMELINE_CARI);
+                    }else {
+                        SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                        SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
+                        String waktu = solusi.get(posisi).getProblem().getTimestamp();
+                        Date date = null;
+                        try {
+                            date = format1.parse(waktu);
+                            waktu = format2.format(date);
+                            if (tanggalProblem != null)
+                                tanggalProblem.setText(waktu);
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                        // tanggalProblem.setText(solusi.get(posisi).getProblem().getTimestamp());
+                        if (totalVote != null)
+                            totalVote.setText(String.valueOf(solusi.get(posisi).getProblem().getTotalVote()));
+                    }
                 } else {
                     if(tipeSekarang == TIPE_TIMELINE_DEFAULT){
                         judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
@@ -935,11 +944,12 @@ public class ShareActWkr extends Fragment_Header {
                         // tanggalProblem.setText(solusi.get(posisi).getProblem().getTimestamp());
                         totalVote.setText(String.valueOf(solusi.get(posisi).getProblem().getTotalVote()));
                         deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
-                        jumlahKomentar.setText("and "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" more comments...");
+                        jumlahKomentar.setText("and "+solusi.get(posisi).getJumlahKomentar()+" more comments...");
                         gantiBahasa(TIPE_TIMELINE_DEFAULT);
                     }else{
+                        Log.d("Masuk cari", " oke");
                         deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
-                        jumlahKomentar.setText("and "+String.valueOf(solusi.get(posisi).getJumlahKomentar())+" more comments...");
+                        jumlahKomentar.setText("and "+solusi.get(posisi).getJumlahKomentar()+" more comments...");
                         gantiBahasa(TIPE_TIMELINE_CARI);
                     }
                 }
@@ -964,6 +974,42 @@ public class ShareActWkr extends Fragment_Header {
                 });
                 //  Toast.makeText(act, masalah.get(posisi).getpid(), Toast.LENGTH_SHORT).show();
                 // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
+            }
+
+            private void muatSolusi(final int posisi) {
+                // untuk memuat solusi
+                StringRequest stringRequestShare = new StringRequest(Request.Method.POST, Konstanta.LOAD_SOLUSI_URL,
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                try {
+                                    JSONObject obj = new JSONObject(response);
+                                    JSONObject objSolusi = obj.getJSONObject("0");
+                                    String desc = objSolusi.getString("deskripsi");
+                                    Log.d("deskripsi : ", desc);
+                                    deskripsiSolusi.setText(desc);
+                                    gantiBahasa(TIPE_TIMELINE_CARI);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }
+                        , new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // uploading.dismiss();
+                        Toast.makeText(getActivity(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String, String> masalah = new HashMap<>();
+                        masalah.put("id_problem", solusi.get(posisi).getProblem().getpid());
+                        return masalah;
+                    }
+                };
+                Volley.newRequestQueue(getActivity()).add(stringRequestShare);
             }
 
             private void gantiBahasa(int tipe){

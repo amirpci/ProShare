@@ -855,7 +855,7 @@ public class GaleriPreview extends AppCompatActivity {
                     vPenunjuk.setX(vBarProgres.getX());
                     vVideo.start();
                     videoProgres.execute();
-                    Toast.makeText(GaleriPreview.this, "panjang: " +(durasiVid), Toast.LENGTH_LONG).show();
+                  //  Toast.makeText(GaleriPreview.this, "panjang: " +(durasiVid), Toast.LENGTH_LONG).show();
                 }
             });
 

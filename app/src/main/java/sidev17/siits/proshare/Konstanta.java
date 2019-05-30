@@ -18,6 +18,9 @@ public class Konstanta {
     public static final String TAMBAH_PROBLEM_URL = ROOT_URL+"addProblem.php";
     public static final String TAMBAH_COMMENT_URL = ROOT_URL + "addKomen.php";
     public static final String TAMBAH_SOLUSI_URL = ROOT_URL + "addSolusi.php";
+    public static final String LOAD_FOTO_SOLUSI = ROOT_URL + "LoadFotoSolusi.php";
+    public static final String REVIEW_SHARE_URL = ROOT_URL + "Review.php";
+    public static final String LOAD_SOLUSI_URL = ROOT_URL + "loadSolusi.php";
     public static final String TAMBAH_PROBLEM_FOTO_URL  = ROOT_URL + "addFoto.php";
     public static final String TAMBAH_SOLUSI_FOTO_URL  = ROOT_URL + "addFotoKomentar.php";
     public static final String DELETE_PROBLEM = ROOT_URL + "DeleteProblem.php";

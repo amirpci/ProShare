@@ -289,7 +289,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
             pngGantiHalaman.gantiHalaman(halamanFragmen, halamanKe);
         halamanFragmen= halamanKe;
 
-        Toast.makeText(this, "ganti fragment", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, "ganti fragment", Toast.LENGTH_SHORT).show();
     }
 
     void tampilkan(ViewPager vPager, int posisi) {

@@ -838,6 +838,7 @@ public class ProfileUserLainAct extends AppCompatActivity {
             public void bind(final int posisi){
                 if(judulProblem != null)
                     judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
+                deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
                 SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 SimpleDateFormat format2 = new SimpleDateFormat("MMMM dd, yyyy");
                 String waktu = solusi.get(posisi).getProblem().getTimestamp();

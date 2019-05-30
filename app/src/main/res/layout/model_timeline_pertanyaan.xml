@@ -91,7 +91,7 @@
             android:numColumns="3"/>
         -->
         <LinearLayout
-            android:visibility="gone"
+            android:background="@color/abuLebihTua"
             android:id="@+id/lampiran_pertanyaan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -110,6 +110,7 @@
             android:textSize="12sp" />
 
         <RelativeLayout
+            android:id="@+id/tl_attribut_bawah"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"

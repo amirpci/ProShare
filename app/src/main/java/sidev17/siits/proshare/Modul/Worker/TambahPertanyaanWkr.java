@@ -55,6 +55,7 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.api.client.json.Json;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -358,6 +359,9 @@ Bagian EXPERT / TambahJawaban
     void translateAksi(TextView ... tv){
         for(int i = 0 ; i < tv.length; i ++)
             tv[i].setText(PackBahasa.tambahJawab[Terjemahan.indexBahasa(this)][i]);
+        if(jenisPost == JENIS_POST_REVIEW)
+            for(int i = 0; i < tv.length; i ++)
+                tv[i].setText(PackBahasa.review[Terjemahan.indexBahasa(this)][i]);
     }
 
     private void initTabIcon(int tabIcon[]){
@@ -375,20 +379,43 @@ Bagian EXPERT / TambahJawaban
     Bagian EXPERT / TambahJawaban
     ================================
     */
+
+    private interface ReviewIf{
+        void selesaiLoad();
+    }
+
     private void verifikasiReview(){
         //SESUATU!!!
+        reviewShare(1, new ReviewIf() {
+            @Override
+            public void selesaiLoad() {
+                finish();
+            }
+        });
     }
     private void abaikanReview(){
         //SESUATU!!!
+        reviewShare(2, new ReviewIf() {
+            @Override
+            public void selesaiLoad() {
+                finish();
+            }
+        });
     }
     private void blokReview(){
         //SESUATU!!!
+        reviewShare(3, new ReviewIf() {
+            @Override
+            public void selesaiLoad() {
+                finish();
+            }
+        });
     }
 
     private void tandaiPertanyaanDitolak(){
         //////
         setProblemStatus("0", String.valueOf(Konstanta.PROBLEM_STATUS_REJECTED));
-
+        finish();
     }
     private void lemparPertanyaan(){
         ///////
@@ -421,6 +448,29 @@ Bagian EXPERT / TambahJawaban
     //hanya berisi deskripsi dan lampiran foto atau video pertanyaan
     //judul dan bidang pertanyaan sudah di-init di header
     private void isiPertanyaan(){
+        new AsyncTask<Void, Void, String>(){
+
+            @Override
+            protected String doInBackground(Void... voids) {
+                String output = "";
+                output = Utilities.loadBidangKu(bidangPost, TambahPertanyaanWkr.this);
+                return output;
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                vBidang.setVisibility(View.VISIBLE);
+                vBidang.setText(s);
+                String[] akanDiterjemahkan = {s, waktuPost};
+                Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(TambahPertanyaanWkr.this), TambahPertanyaanWkr.this, new PerubahanTerjemahListener() {
+                    @Override
+                    public void dataBerubah(String[] kata) {
+                        vBidang.setText(kata[0]);
+                    }
+                });
+            }
+        }.execute();
+
         View viewPertanyaan= getLayoutInflater().inflate(R.layout.model_timeline_pertanyaan, null);
         viewPertanyaan.findViewById(R.id.tl_vote).setVisibility(View.GONE);
         //Lakukan modifikasi data
@@ -430,6 +480,34 @@ Bagian EXPERT / TambahJawaban
         TextView status = viewPertanyaan.findViewById(R.id.tl_status_orang);
         CircleImageView fotoProfil = viewPertanyaan.findViewById(R.id.tl_orang_gambar);
         LinearLayout lampiran = viewPertanyaan.findViewById(R.id.lampiran_pertanyaan);
+
+        if(jenisPost == JENIS_POST_REVIEW) {
+            deskripsi.setVisibility(View.GONE);
+            waktu.setVisibility(View.GONE);
+            nama.setVisibility(View.GONE);
+            status.setVisibility(View.GONE);
+            fotoProfil.setVisibility(View.GONE);
+            viewPertanyaan.findViewById(R.id.tl_info_orang).setVisibility(View.GONE);
+            viewPertanyaan.findViewById(R.id.tl_attribut_bawah).setVisibility(View.GONE);
+            Utilities.loadFotoSolusi(new ArrayList<String>(), new ArrayList<String>(), lampiran, this, idPost);
+            loadShare(new SolusiIf() {
+                @Override
+                public void loadDeskripsi(String deskripsi) {
+                    teksDeskripsi.setText(deskripsi);
+                    Terjemahan.terjemahkanAsync(new String[]{deskripsiPost, teksJudul.getText().toString()}, "en", Utilities.getUserBahasa(TambahPertanyaanWkr.this), TambahPertanyaanWkr.this, new PerubahanTerjemahListener() {
+                        @Override
+                        public void dataBerubah(String[] kata) {
+                            teksDeskripsi.setText(kata[0]);
+                            teksJudul.setText(kata[1]);
+                        }
+                    });
+                }
+            });
+            vWadahPertanyaan= findViewById(R.id.tambah_wadah_pertanyaan);
+            vWadahPertanyaan.addView(viewPertanyaan);
+            return;
+        }
+
         initOrang(nama, status, fotoProfil);
         Utilities.loadFotoLampiran(new ArrayList<String>(), new ArrayList<String>(), lampiran, this, idPost);
         deskripsi.setText(deskripsiPost);
@@ -454,28 +532,6 @@ Bagian EXPERT / TambahJawaban
             }
         });
 
-        new AsyncTask<Void, Void, String>(){
-
-            @Override
-            protected String doInBackground(Void... voids) {
-                String output = "";
-                output = Utilities.loadBidangKu(bidangPost, TambahPertanyaanWkr.this);
-                return output;
-            }
-
-            @Override
-            protected void onPostExecute(String s) {
-                vBidang.setVisibility(View.VISIBLE);
-                vBidang.setText(s);
-                String[] akanDiterjemahkan = {s, waktuPost};
-                Terjemahan.terjemahkanAsync(akanDiterjemahkan, "en", Utilities.getUserBahasa(TambahPertanyaanWkr.this), TambahPertanyaanWkr.this, new PerubahanTerjemahListener() {
-                    @Override
-                    public void dataBerubah(String[] kata) {
-                        vBidang.setText(kata[0]);
-                    }
-                });
-            }
-        }.execute();
         vWadahPertanyaan= findViewById(R.id.tambah_wadah_pertanyaan);
         vWadahPertanyaan.addView(viewPertanyaan);
     }
@@ -1135,7 +1191,7 @@ Bagian EXPERT / TambahJawaban
             public void pilihFoto(View v, int posisi) {
                 cekLampiranSamaDgAwal();
                 if(!transisiKategori){
-                    Toast.makeText(TambahPertanyaanWkr.this, "kategori= " +kategoriItem, Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(TambahPertanyaanWkr.this, "kategori= " +kategoriItem, Toast.LENGTH_SHORT).show();
                     int urutan= loader.ambilUrutanDipilih(posisi);
                     bitmapDipilih.tambah(loader.ambilBitmapHandler(urutan-1));
                     pathDipilih.tambah(loader.ambilPathFoto(posisi));
@@ -1162,7 +1218,7 @@ Bagian EXPERT / TambahJawaban
             public void batalPilihFoto(View v, int posisi) {
                 try{
                     int urutan= (loader.ambilUrutanDipilih(posisi)-1);
-                    Toast.makeText(TambahPertanyaanWkr.this, "urutan hapus= " +urutan, Toast.LENGTH_SHORT).show();
+                  //  Toast.makeText(TambahPertanyaanWkr.this, "urutan hapus= " +urutan, Toast.LENGTH_SHORT).show();
                     batalPilihan(urutan, true);
 //                    hapusPosisiUrutan(posisi, -1, kategoriItemDipilih.ambil(urutan));
 
@@ -1212,7 +1268,7 @@ Bagian EXPERT / TambahJawaban
         transisiKategori= true;
         if(posisiDipilih.ukuran() > 0 && urutanDipilih.ukuran() > 0){
             loader.aturIndDipilih(posisiDipilih, urutanDipilih);
-            Toast.makeText(this, "posisi.length= " +posisiDipilih.ukuran(), Toast.LENGTH_SHORT).show();
+       //     Toast.makeText(this, "posisi.length= " +posisiDipilih.ukuran(), Toast.LENGTH_SHORT).show();
         }
         transisiKategori= false;
     }
@@ -1253,7 +1309,7 @@ Bagian EXPERT / TambahJawaban
                 @Override
                 public void onClick(View v) {
                     if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
-                        Dialog dialog= new Dialog(TambahPertanyaanWkr.this);
+                        Dialog dialog= new Dialog(getApplicationContext());
                         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                         dialog.setContentView(R.layout.dialog_kirim_jawaban);
                         TextView vKirim= dialog.findViewById(R.id.tindakan_kirim);
@@ -1334,10 +1390,13 @@ Bagian EXPERT / TambahJawaban
 */
     }
 
-    private void uploadKomentar(final Solusi solusi, final String id_problem){
-        final ProgressDialog uploading = new ProgressDialog(this);
-        uploading.setMessage("Sending solution...");
-        uploading.show();
+    private void uploadKomentar(final Solusi solusi, final String id_problem, boolean fromShare){
+        if(!fromShare) {
+            final ProgressDialog uploading = new ProgressDialog(getApplicationContext());
+            uploading.setMessage("Sending solution...");
+            if (getApplicationContext() != null)
+                uploading.show();
+        }
         Utilities.getUserRef(solusi.getOrang().replace(".", ",")).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -1355,6 +1414,7 @@ Bagian EXPERT / TambahJawaban
                                    // uploading.dismiss();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
+                                    finish();
                                 }
 
                                 Log.d("kirim komentar :", response);
@@ -1365,6 +1425,7 @@ Bagian EXPERT / TambahJawaban
                     public void onErrorResponse(VolleyError error) {
                        // uploading.dismiss();
                         Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 }) {
                     @Override
@@ -1416,7 +1477,7 @@ Bagian EXPERT / TambahJawaban
         Volley.newRequestQueue(this).add(stringRequest);
     }
 
-    public void kirimJawaban(String komentar, String idKomentator, String[] pathFoto, final String id_problem){
+    public void kirimJawaban(String komentar, String idKomentator, String[] pathFoto, final String id_problem, final boolean fromShare){
         final Solusi sol = new Solusi();
         sol.setId_solusi(Utilities.getUid());
         sol.setDeskripsi(komentar);
@@ -1433,7 +1494,7 @@ Bagian EXPERT / TambahJawaban
                         @Override
                         public void dataBerubah(String[] kata) {
                             sol.setDeskripsi(kata[0]);
-                            uploadKomentar(sol, id_problem);
+                            uploadKomentar(sol, id_problem, fromShare);
                         }
                     });
                     setProblemStatus("1", String.valueOf(Konstanta.PROBLEM_STATUS_VERIFIED));
@@ -1445,7 +1506,7 @@ Bagian EXPERT / TambahJawaban
                  @Override
                  public void dataBerubah(String[] kata) {
                      sol.setDeskripsi(kata[0]);
-                     uploadKomentar(sol, id_problem);
+                     uploadKomentar(sol, id_problem, fromShare);
                  }
              });
         }
@@ -1534,6 +1595,86 @@ Bagian EXPERT / TambahJawaban
         });
     }
 
+    private interface SolusiIf{
+        void loadDeskripsi(String deskripsi);
+    }
+
+    private void loadShare(final SolusiIf iface){
+        StringRequest stringRequestShare = new StringRequest(Request.Method.POST, Konstanta.LOAD_SOLUSI_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject obj = new JSONObject(response);
+                            JSONObject objSolusi = obj.getJSONObject("0");
+                            String desc = objSolusi.getString("deskripsi");
+                            Log.d("deskripsi : ", desc);
+                            iface.loadDeskripsi(desc);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // uploading.dismiss();
+                Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("id_problem", idPost);
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(getApplicationContext()).add(stringRequestShare);
+    }
+
+    // ini buat mereview share
+    private void reviewShare(final int tipe, final ReviewIf ls){
+        final String update= (tipe == 1)?teksDeskripsi.getText().toString():"";
+        final ProgressDialog uploading = new ProgressDialog(this);
+        String pesan = PackBahasa.review[Terjemahan.indexBahasa(this)][2 + tipe];
+        uploading.setMessage(pesan + "...");
+        uploading.show();
+        StringRequest stringRequestShare = new StringRequest(Request.Method.POST, Konstanta.REVIEW_SHARE_URL,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("review post :", response);
+                        if(tipe == 1)
+                            uploading.dismiss();
+                        ls.selesaiLoad();
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // uploading.dismiss();
+                Log.d("error review : ", error.toString());
+                Toast.makeText(getApplicationContext(), "Failed to review!", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> masalah = new HashMap<>();
+                masalah.put("tipe", String.valueOf(tipe));
+                masalah.put("update", update);
+                masalah.put("id_expert", Utilities.getUserID(getApplicationContext()));
+                masalah.put("id_problem", idPost);
+                return masalah;
+            }
+        };
+        Volley.newRequestQueue(getApplicationContext()).add(stringRequestShare);
+    }
+
+    public interface Uploading {
+        void uploaded(ProgressDialog dialog);
+    }
+
     //METHOD DUMMY!
     public void kirimPertanyaan(){
         if(!bisaDikirim){
@@ -1555,14 +1696,14 @@ Bagian EXPERT / TambahJawaban
             pathDipilih.ambil(pathVideoDipilih, indekVideo);
         }
         if(jenisPost == JENIS_POST_JAWAB){
-            kirimJawaban(teksDeskripsi.getText().toString(), Utilities.getUserID(this), pathFotoDipilih, idPost);
+            kirimJawaban(teksDeskripsi.getText().toString(), Utilities.getUserID(this), pathFotoDipilih, idPost, false);
         } else {
             String judul= teksJudul.getText().toString();
-            String deskripsi= teksDeskripsi.getText().toString();
+            final String deskripsi= teksDeskripsi.getText().toString();
             boolean verified= verifiedQuestion;
             String PId = Utilities.getUid();
-            Toast.makeText(this, "judul : "+judul, Toast.LENGTH_SHORT).show();
-            Permasalahan problem = new Permasalahan();
+           // Toast.makeText(this, "judul : "+judul, Toast.LENGTH_SHORT).show();
+            final Permasalahan problem = new Permasalahan();
             problem.setproblem_owner(Utilities.getUserID(this).replace(",","."));
             problem.setpid(PId);
             problem.setproblem_desc(deskripsi);
@@ -1573,9 +1714,15 @@ Bagian EXPERT / TambahJawaban
 
             ProgressDialog uploading = new ProgressDialog(this);
             if(jenisPost == JENIS_POST_SHARE){
-                problem.setproblem_desc("");
-                Utilities.tambahkanMasalah(this, problem, uploading,1, jenisPost );
-                kirimJawaban(deskripsi, Utilities.getUserID(this), pathFotoDipilih, problem.getpid());
+                final String[] pathPhoto = pathFotoDipilih;
+                //problem.setproblem_desc(deskripsi);
+                Utilities.tambahkanMasalah(this, problem, uploading, 1, jenisPost, new Uploading() {
+                    @Override
+                    public void uploaded(ProgressDialog dialog) {
+                        dialog.dismiss();
+                        kirimJawaban(deskripsi, Utilities.getUserID(TambahPertanyaanWkr.this),pathPhoto, problem.getpid(), true);
+                    }
+                });
             } else {
                 if(pathFotoDipilih.length + pathVideoDipilih.length>0){
                     String urlLampiranTerUpload[] = new String[1];
@@ -1584,7 +1731,13 @@ Bagian EXPERT / TambahJawaban
                     else
                         Utilities.uploadLampiran(0, pathFotoDipilih, pathVideoDipilih, urlLampiranTerUpload, PId, problem, this, uploading, jenisPost, 2);
                 }else{
-                    Utilities.tambahkanMasalah(this, problem, uploading, 1, jenisPost);
+                    Utilities.tambahkanMasalah(this, problem, uploading, 1, jenisPost, new Uploading() {
+                        @Override
+                        public void uploaded(ProgressDialog dialog) {
+                            dialog.dismiss();
+                            finish();
+                        }
+                    });
                 }
             }
         }

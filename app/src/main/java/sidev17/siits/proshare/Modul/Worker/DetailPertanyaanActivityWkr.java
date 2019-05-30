@@ -408,7 +408,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         statusPost = paketDetailPertanyaan.getString("status_post");
         statusPertanyaan = paketDetailPertanyaan.getInt("status", 0);
         gambar= ambilGambarDariServer();
-        Toast.makeText(this, id_masalah, Toast.LENGTH_SHORT).show();
+       // Toast.makeText(this, id_masalah, Toast.LENGTH_SHORT).show();
         cekSolusi();
     }
     ArrayList<String> ambilGambarDariServer(){
@@ -801,7 +801,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
      //   Toast.makeText(this, waktu, Toast.LENGTH_SHORT).show();
     }
 
-    private void loadSolusiLampiran(final LinearLayout lampiran, final String id_solusi, final Activity c) {
+    public static void loadSolusiLampiran(final LinearLayout lampiran, final String id_solusi, final Activity c) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_FOTO_SOLUSI,
                 new Response.Listener<String>() {
                     @Override
@@ -1088,7 +1088,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.d("opo", error.toString());
-                Toast.makeText(getApplicationContext(), Utilities.ubahBahasa("error cek solusi!", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()), Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(getApplicationContext(), Utilities.ubahBahasa("error cek solusi!", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()), Toast.LENGTH_SHORT).show();
             }
         }){
             @Override
@@ -1746,9 +1746,9 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 profilDitampilkan= false;
             } else {
                 final String email = (indUser==-1)? emailPengguna/*emailOrang*/ : (solusi.get(indUser).getOrang());
-                Toast.makeText(this, "EMAIL ORANG: " +emailOrang, Toast.LENGTH_LONG).show();
+              //  Toast.makeText(this, "EMAIL ORANG: " +emailOrang, Toast.LENGTH_LONG).show();
                 if(email.equalsIgnoreCase(emailPengguna)) {
-                    Toast.makeText(this, "Orang itu adalah diri Anda sendiri", Toast.LENGTH_LONG).show();
+                 //   Toast.makeText(this, "Orang itu adalah diri Anda sendiri", Toast.LENGTH_LONG).show();
                     return;
                 }
                 // if(detailProfil == null){

@@ -31,9 +31,10 @@ public class PackBahasa {
     public static String[][] tambahKnowledge = {{"Your Title Goes Here", "You insert description here about your problem"}
     ,{"Judul Anda di Sini", "Anda memasukkan deskripsi di sini tentang masalah Anda"} ,
             { "あなたのタイトルはここに来ます","あなたはあなたの問題についてここに説明を挿入します"}};
-    public static String[][] tambahJawab = {{"Throw", "Reject", "Answer"},
-            {"Lempar", "Tolak", "Jawab"},
+    public static String[][] tambahJawab = {{"Throw", "Reject", "Answer", "Publish"},
+            {"Lempar", "Tolak", "Jawab", "Kirim"},
             {"投げる","拒絶する","答える"}};
+    public static String[][] review = {{"Block", "Ignore", "Publish", "Publishing", "Ignoring", "Blocking"}, {"Blok", "Abaikan", "Publikasikan","Menerbitkan","Mengabaikan", "Memblokir"}, {"ブロック", "無視","公開","公開","無視", "ブロック"}};
     public static String[][] barAtas = {{"Profile", "Questions should be answered", "Library", "Chat"},
             {},
             {"プロフィール","答えるべき質問","図書館」","チャット"}

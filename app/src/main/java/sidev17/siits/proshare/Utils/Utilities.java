@@ -92,6 +92,7 @@ import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 import sidev17.siits.proshare.Modul.Worker.GaleriPreview;
+import sidev17.siits.proshare.Modul.Worker.TambahPertanyaanWkr;
 import sidev17.siits.proshare.R;
 
 import static android.content.Context.MODE_PRIVATE;
@@ -558,6 +559,46 @@ public class Utilities {
         Volley.newRequestQueue(act).add(stringRequest);
     }
 
+    public static void loadFotoSolusi(final ArrayList<String> fotoLampiran, final ArrayList<String> videoLampiran, final LinearLayout lampiran, final Activity act, final String id_masalah) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.LOAD_FOTO_SOLUSI,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArr = new JSONArray(response);
+                            //  Toast.makeText(getActivity(), "Berhasil loading!", Toast.LENGTH_SHORT).show();
+                            Solusi sol = new Solusi();
+                            Log.d("foto solusi", response + " " +id_masalah);
+                            if (jsonArr.length() != 0) {
+                                for (int i = 0; i < jsonArr.length(); i++) {
+                                    org.json.JSONObject jsonObject = jsonArr.getJSONObject(i);
+                                    fotoLampiran.add(jsonObject.getString("url_foto"));
+                                }
+                            }
+                            loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                        }
+                    }
+                }
+                , new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                loadVideoLampiran(fotoLampiran, videoLampiran, lampiran, act, id_masalah);
+                // Toast.makeText(act, Utilities.ubahBahasa("error cek solusi!", Utilities.getUserNegara(getApplicationContext()), getApplicationContext()), Toast.LENGTH_SHORT).show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> vote = new HashMap<>();
+                vote.put("id_problem", id_masalah);
+                return vote;
+            }
+        };
+        Volley.newRequestQueue(act).add(stringRequest);
+    }
+
     public static void loadVideoLampiran(final ArrayList<String> fotoLampiran, final ArrayList<String> videoLampiran, final LinearLayout lampiran, final Activity act, final String id_masalah) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.DAFTAR_VIDEO,
                 new Response.Listener<String>() {
@@ -601,17 +642,19 @@ public class Utilities {
         // fotoLampiran = directlink foto yang ada di server
         // videoLampiran = direclink video yang ada di server
         // viewGroup untuk tumbnail foto dan video di awal
+        Log.d("init visew", "lampirn");
         int panjangLampiran = fotoLampiran.size() + videoLampiran.size();
         DisplayMetrics dm = new DisplayMetrics();
         act.getWindowManager().getDefaultDisplay().getMetrics(dm);
         int lebar = dm.widthPixels;
-        Toast.makeText(act.getApplicationContext(), String.valueOf(panjangLampiran), Toast.LENGTH_LONG).show();
+       // Toast.makeText(act.getApplicationContext(), String.valueOf(panjangLampiran), Toast.LENGTH_LONG).show();
         if (panjangLampiran != 0) {
             // GetXMLTask task = new GetXMLTask();
             if (panjangLampiran == 1) {
                 int lebar1 = lebar;
                 int lebarPadding1 = lebar1 / 3;
                 lampiran.setVisibility(View.VISIBLE);
+                Log.d("terpilih ", " satu");
                 View v = act.getLayoutInflater().inflate(R.layout.lampiran_pertanyaan_1, null, false);
                 ImageView pertanyaanGambar1 = v.findViewById(R.id.lampiran_pertanyaan_1);
                 pertanyaanGambar1.getLayoutParams().height = lebar1;
@@ -1082,7 +1125,7 @@ public class Utilities {
                                         uploadLampiran(urutanSekarang, alamatFileFoto, alamatFileVideo, url, id, masalah, c, uploading, jenisPost, 2);
                                     } else {
                                         Log.d("sukses akhir video", "oke");
-                                        tambahkanMasalah(c, masalah, uploading, 0, jenisPost);
+                                        tambahkanMasalah(c, masalah, uploading, 0, jenisPost, null);
                                         String[] urlFoto = new String[alamatFileFoto.length];
                                         String[] urlVideo = new String[alamatFileVideo.length];
                                         for (int k = 0; k < urlFoto.length; k++) {
@@ -1098,7 +1141,7 @@ public class Utilities {
                                     }
                                 } else {
                                     Log.d("sukses akhir foto", "oke");
-                                    tambahkanMasalah(c, masalah, uploading, 0, jenisPost);
+                                    tambahkanMasalah(c, masalah, uploading, 0, jenisPost, null);
                                     tambahkanFotoMasalah(c, id, url);
                                 }
                             }
@@ -1196,13 +1239,13 @@ public class Utilities {
         }
     }
 
-    public static void tambahkanMasalah(final Activity c, final Permasalahan problem, final ProgressDialog uploading, final int status_foto, final int jenisPost) {
+    public static void tambahkanMasalah(final Activity c, final Permasalahan problem, final ProgressDialog uploading, final int status_foto, final int jenisPost, final TambahPertanyaanWkr.Uploading upload) {
         if (status_foto == 1) {
             uploading.setMessage("Adding problem to the server!");
             uploading.show();
         }
         if (Utilities.getUserBahasa(c).equalsIgnoreCase("en")) {
-            uploadMasalah(c, problem, uploading, status_foto, jenisPost);
+            uploadMasalah(c, problem, uploading, status_foto, jenisPost, upload);
         } else {
             String[] akanDiterjemahkan = {problem.getproblem_title(), problem.getproblem_desc()};
             Terjemahan.terjemahkanAsync(akanDiterjemahkan, Utilities.getUserBahasa(c), "en", c, new PerubahanTerjemahListener() {
@@ -1210,23 +1253,21 @@ public class Utilities {
                 public void dataBerubah(String[] kata) {
                     problem.setproblem_title(kata[0]);
                     problem.setproblem_desc(kata[0]);
-                    uploadMasalah(c, problem, uploading, status_foto, jenisPost);
+                    uploadMasalah(c, problem, uploading, status_foto, jenisPost, upload);
                 }
             });
         }
     }
 
-    public static void uploadMasalah(final Activity c, final Permasalahan problem, final ProgressDialog uploading, final int status_foto, final int jenisPost) {
+    public static void uploadMasalah(final Activity c, final Permasalahan problem, final ProgressDialog uploading, final int status_foto, final int jenisPost, final TambahPertanyaanWkr.Uploading upload) {
         Log.d("status masalah", String.valueOf(jenisPost));
         StringRequest stringRequest = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_PROBLEM_URL,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        if(c != null)
-                        uploading.dismiss();
                         Log.d("upload masalah ", response);
-                        Toast.makeText(c, response, Toast.LENGTH_SHORT).show();
-                        c.finish();
+                    //    Toast.makeText(c, response, Toast.LENGTH_SHORT).show();
+                        upload.uploaded(uploading);
                     }
                 }
                 , new Response.ErrorListener() {
