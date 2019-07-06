@@ -1309,7 +1309,7 @@ Bagian EXPERT / TambahJawaban
                 @Override
                 public void onClick(View v) {
                     if(idHalaman == R.layout.activity_tambah_jawaban_exprt){
-                        Dialog dialog= new Dialog(getApplicationContext());
+                        Dialog dialog= new Dialog(TambahPertanyaanWkr.this);
                         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                         dialog.setContentView(R.layout.dialog_kirim_jawaban);
                         TextView vKirim= dialog.findViewById(R.id.tindakan_kirim);
@@ -1392,9 +1392,9 @@ Bagian EXPERT / TambahJawaban
 
     private void uploadKomentar(final Solusi solusi, final String id_problem, boolean fromShare){
         if(!fromShare) {
-            final ProgressDialog uploading = new ProgressDialog(getApplicationContext());
+            final ProgressDialog uploading = new ProgressDialog(TambahPertanyaanWkr.this);
             uploading.setMessage("Sending solution...");
-            if (getApplicationContext() != null)
+            if (TambahPertanyaanWkr.this != null)
                 uploading.show();
         }
         Utilities.getUserRef(solusi.getOrang().replace(".", ",")).addValueEventListener(new ValueEventListener() {
@@ -1424,7 +1424,7 @@ Bagian EXPERT / TambahJawaban
                     @Override
                     public void onErrorResponse(VolleyError error) {
                        // uploading.dismiss();
-                        Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TambahPertanyaanWkr.this, "Failed to add comment!", Toast.LENGTH_SHORT).show();
                         finish();
                     }
                 }) {
@@ -1441,12 +1441,12 @@ Bagian EXPERT / TambahJawaban
                         return masalah;
                     }
                 };
-                Volley.newRequestQueue(getApplicationContext()).add(stringRequestSolusi);
+                Volley.newRequestQueue(TambahPertanyaanWkr.this).add(stringRequestSolusi);
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TambahPertanyaanWkr.this, "Failed to add comment!", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -1620,7 +1620,7 @@ Bagian EXPERT / TambahJawaban
             @Override
             public void onErrorResponse(VolleyError error) {
                 // uploading.dismiss();
-                Toast.makeText(getApplicationContext(), "Failed to add comment!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TambahPertanyaanWkr.this, "Failed to add comment!", Toast.LENGTH_SHORT).show();
             }
         }) {
             @Override
@@ -1630,7 +1630,7 @@ Bagian EXPERT / TambahJawaban
                 return masalah;
             }
         };
-        Volley.newRequestQueue(getApplicationContext()).add(stringRequestShare);
+        Volley.newRequestQueue(TambahPertanyaanWkr.this).add(stringRequestShare);
     }
 
     // ini buat mereview share
@@ -1655,7 +1655,7 @@ Bagian EXPERT / TambahJawaban
             public void onErrorResponse(VolleyError error) {
                 // uploading.dismiss();
                 Log.d("error review : ", error.toString());
-                Toast.makeText(getApplicationContext(), "Failed to review!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TambahPertanyaanWkr.this, "Failed to review!", Toast.LENGTH_SHORT).show();
             }
         }) {
             @Override
@@ -1663,12 +1663,12 @@ Bagian EXPERT / TambahJawaban
                 Map<String, String> masalah = new HashMap<>();
                 masalah.put("tipe", String.valueOf(tipe));
                 masalah.put("update", update);
-                masalah.put("id_expert", Utilities.getUserID(getApplicationContext()));
+                masalah.put("id_expert", Utilities.getUserID(TambahPertanyaanWkr.this));
                 masalah.put("id_problem", idPost);
                 return masalah;
             }
         };
-        Volley.newRequestQueue(getApplicationContext()).add(stringRequestShare);
+        Volley.newRequestQueue(TambahPertanyaanWkr.this).add(stringRequestShare);
     }
 
     public interface Uploading {

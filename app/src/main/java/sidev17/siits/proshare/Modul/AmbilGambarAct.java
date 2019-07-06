@@ -129,7 +129,7 @@ public class AmbilGambarAct extends AppCompatActivity {
         int urutanDipilih[] = dataSebelumnya.getIntArrayExtra("urutanDipilih");
 
         jenisPengambilan= dataSebelumnya.getIntExtra("jenisPengambilan", JENIS_AMBIL_BANYAK);
-        Toast.makeText(this, "jenisPengambilan= " +jenisPengambilan, Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(this, "jenisPengambilan= " +jenisPengambilan, Toast.LENGTH_SHORT).show();
 
         if(posisiDipilih != null && posisiDipilih.length > 0) {
             jenisPengambilan= JENIS_AMBIL_BANYAK;

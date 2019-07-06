@@ -81,6 +81,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.internal.Util;
 import sidev17.siits.proshare.Adapter.RcLampiran;
 import sidev17.siits.proshare.Interface.BitmapServerListener;
 import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
@@ -1252,7 +1253,7 @@ public class Utilities {
                 @Override
                 public void dataBerubah(String[] kata) {
                     problem.setproblem_title(kata[0]);
-                    problem.setproblem_desc(kata[0]);
+                    problem.setproblem_desc(kata[1]);
                     uploadMasalah(c, problem, uploading, status_foto, jenisPost, upload);
                 }
             });
@@ -1289,6 +1290,7 @@ public class Utilities {
                 masalah.put("tags", cekNull(problem.getTag()));
                 masalah.put("problem_owner", cekNull(problem.getproblem_owner()));
                 masalah.put("status_post", String.valueOf(jenisPost));
+                masalah.put("owner_status", String.valueOf(Utilities.getUserBidang(c)));
                 return masalah;
             }
         };

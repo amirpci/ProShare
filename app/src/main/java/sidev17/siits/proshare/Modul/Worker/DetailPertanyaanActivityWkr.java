@@ -1604,7 +1604,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
 //                    int urutanHilang= urutanDipilih.ambil(position);
                     int indek= urutanDipilih.hapus(new Integer(position+1));
                     posisiDipilih.hapus(indek);
-                    Toast.makeText(DetailPertanyaanActivityWkr.this, "indekHilang= " +position, Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(DetailPertanyaanActivityWkr.this, "indekHilang= " +position, Toast.LENGTH_SHORT).show();
                     perbaruiUrutanDipilih(position+1);
                     gambarDipilih.setAdapter(new AdapterPropertiCell(loader, gambarDipilih.getWidth() / loader.ambilJmlItemPerGaris(), pathFotoBaru.length));
 
@@ -1850,7 +1850,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                             Utilities.updateFotoProfile(urlFotoOrang, viewFoto);
                         }
                     }
-                    Toast.makeText(getBaseContext(), namaPemilik, Toast.LENGTH_LONG).show();
+                  //  Toast.makeText(getBaseContext(), namaPemilik, Toast.LENGTH_LONG).show();
                 }
                 profilDitampilkan= true;
 //                }
