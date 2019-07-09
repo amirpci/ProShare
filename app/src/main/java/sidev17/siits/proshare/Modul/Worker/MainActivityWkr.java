@@ -115,6 +115,7 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
                 gantiWarnaTab(2, tmbTab[0], tmbTab[1], warnaTab);
             }
         });
+
         initHeader();
         initAdapter_Int();
         initBackPress();
@@ -270,6 +271,10 @@ public class MainActivityWkr extends MainAct_Header implements Aktifitas_Slider 
     protected void onResume() {
 //        bolehInitHeader= false;
         super.onResume();
+        perbaruiJudul(PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][0],
+                PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][2],
+                PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][3]);
+        aturJudulHeader(judulHalaman.ambil(0));
     }
 
     public interface PenungguGantiHalaman{

@@ -556,6 +556,10 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         viewSolusi= getLayoutInflater().inflate(R.layout.model_solusi_expert, null, false);
         if(viewPertanyaan == null)
             viewSolusi.findViewById(R.id.komentar_header).setVisibility(View.GONE);
+        if(viewPertanyaan != null) {
+            TextView solusiHeader = viewSolusi.findViewById(R.id.komentar_header);
+            solusiHeader.setText(PackBahasa.detilPertanyaan[Terjemahan.indexBahasa(this)][0]);
+        }
         TextView teksOrang= viewSolusi.findViewById(R.id.komentar_orang_nama);
         final TextView teksJob= viewSolusi.findViewById(R.id.komentar_orang_job);
         final TextView teksSolusi= viewSolusi.findViewById(R.id.komentar_deskripsi);

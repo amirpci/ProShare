@@ -163,7 +163,17 @@ public class MainActivityExprt extends MainAct_Header implements Aktifitas_Slide
         });
     }
 
-/*
+    @Override
+    protected void onResume() {
+        super.onResume();
+        perbaruiJudul(PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][0],
+                PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][1],
+                PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][2],
+                PackBahasa.mainHeader[Terjemahan.indexBahasa(this)][3]);
+        aturJudulHeader(judulHalaman.ambil(0));
+    }
+
+    /*
     @Override
     protected void onStop() {
         bolehInitHeader= false;

@@ -1313,6 +1313,14 @@ Bagian EXPERT / TambahJawaban
                         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                         dialog.setContentView(R.layout.dialog_kirim_jawaban);
                         TextView vKirim= dialog.findViewById(R.id.tindakan_kirim);
+                        TextView txtDialogMessage = dialog.findViewById(R.id.tindakan_konfirmasi);
+                        TextView txtLempar = dialog.findViewById(R.id.tindakan_lempar);
+                        TextView txtKirim = dialog.findViewById(R.id.tindakan_kirim);
+
+                        txtDialogMessage.setText(PackBahasa.tambahDialog[Terjemahan.indexBahasa(TambahPertanyaanWkr.this)][2]);
+                        txtLempar.setText(PackBahasa.tambahDialog[Terjemahan.indexBahasa(TambahPertanyaanWkr.this)][0]);
+                        txtKirim.setText(PackBahasa.tambahDialog[Terjemahan.indexBahasa(TambahPertanyaanWkr.this)][1]);
+
                         vKirim.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {

@@ -69,6 +69,11 @@ public class MainAct_Header extends Aktifitas {
             return;
         judulHalaman.tambah(judul);
     }
+
+    protected void perbaruiJudul(String ... judul){
+        judulHalaman.hapusSemua();
+        judulHalaman.tambah(judul);
+    }
 /*
     private void initFragmen(){
         initFragmenHolder();

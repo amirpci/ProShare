@@ -60,5 +60,8 @@ public class PackBahasa {
     public static String[][] harusJawab = {{"Questions", "Shares"}
                                             ,{"Pertanyaan", "Share"},
                                                     {"質問","シェア"}};
+    public static String[][] detilPertanyaan = {{"Solution"}, {"Solusi"}, {"溶液"}};
+
+    public static String[][] tambahDialog = {{"Throw", "Send", "Do you want to send this?"}, {"Lempar", "Kirim", "Apakah anda ingin mengirim jawaban ini?"}, {"レンパ","キリム", "この回答を送信しますか"}};
 
 }
