@@ -55,7 +55,6 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.api.client.json.Json;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -102,6 +101,10 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     public static final int JENIS_POST_TANYA= 11;
     public static final int JENIS_POST_JAWAB= 12;
     public static final int JENIS_POST_REVIEW= 13;
+    public static final int JENIS_MUAT_PILIH_FOTO= 21;
+    public static final int JENIS_MUAT_BATAL_PILIH_FOTO= 20;
+    public static final int BIDANG_KOSONG= -1;
+    public static final int BIDANG_TERISI= 0;
 
     protected int jenisPost= 0;
 
@@ -112,7 +115,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private EditText teksJudul;
     private Spinner pilihanMajority;
     private SpinnerAdp adpMajority;
-    private int idBidang=0;
+    private int idBidang= BIDANG_KOSONG;
     private EditText teksDeskripsi;
 
     private ImageView tmbCentang;
@@ -180,10 +183,14 @@ Bisa-tidaknya pertanyaan/post dikirim
 ================================
 */
     private boolean bisaDikirim= false;
+    private boolean bisaDikirimLangsungKeluar= false;
+    private String pesanTakBisaDikirim= null;
 
     private String judulAwal= "";
     private String deskripsiAwal= "";
     private boolean samaDgAwal= true;
+    private boolean lampiranSamaDgAwal= true; //@KOMEN_GAK_KEPAKE agar gampang pengecekan saat gakda lampiran
+    private boolean teksSamaDgAwal= true;
 
 
 /*
@@ -344,12 +351,17 @@ Bagian EXPERT / TambahJawaban
             pilihanMajority.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    idBidang = position + 1;
+                    if(position <= 0)
+                        idBidang= BIDANG_KOSONG;
+                    else
+                        idBidang = position + 1;
+                    cekBidangKosong();
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-
+                    idBidang = BIDANG_KOSONG;
+                    cekBidangKosong();
                 }
             });
             inisiasiOk();
@@ -556,16 +568,45 @@ Bagian EXPERT / TambahJawaban
 
 //====================================
 
+    private void cekBidangKosong(){
+        cekBisaDikirim();
+    }
     private void cekTeksSamaDgAwal(){
         if(judulAwal.compareTo(teksJudul.getText().toString()) == 0
         && deskripsiAwal.compareTo(teksDeskripsi.getText().toString()) == 0)
-            samaDgAwal= true;
-        else samaDgAwal= false;
-        cekSamaDgAwal();
+            teksSamaDgAwal= true;
+        else teksSamaDgAwal= false;
+        cekBisaDikirim();
     }
-    private void cekSamaDgAwal(){
+    private void cekLampiranSamaDgAwal(){
+/*
+        if(lampiranSamaDgAwal)
+//        if(pathDipilih.ukuran() == 0 && jmlLampiranDariServer != liveQuestion.getCount())
+            samaDgAwal= false;
+        else
+            samaDgAwal= true;
+*/
+        cekBisaDikirim();
+    }
+    private void cekBisaDikirim(){
         int warna;
-        if(samaDgAwal || teksJudul.getText().length() <= 0){
+        samaDgAwal= teksSamaDgAwal && lampiranSamaDgAwal;
+/*
+        if(!teksSamaDgAwal || !lampiranSamaDgAwal)
+            samaDgAwal= false;
+        else samaDgAwal= true;
+*/
+        if(idBidang == BIDANG_KOSONG)
+            pesanTakBisaDikirim= "Isi bidang terlebih dahulu";
+        else if(teksJudul.getText().length() <= 0)
+            pesanTakBisaDikirim= "Isi judul terlebih dahulu";
+        else {
+            pesanTakBisaDikirim= null;
+            if(samaDgAwal)
+                bisaDikirimLangsungKeluar= true;
+        }
+
+        if(pesanTakBisaDikirim != null){
             warna= getResources().getColor(R.color.abuTua);
             bisaDikirim= false;
         }else{
@@ -575,13 +616,7 @@ Bagian EXPERT / TambahJawaban
 //        if(tmbCentang != null)
         tmbCentang.getDrawable().setTint(warna);
     }
-    private void cekLampiranSamaDgAwal(){
-        if(pathDipilih.ukuran() == 0 && jmlLampiranDariServer != liveQuestion.getCount())
-            samaDgAwal= false;
-        else
-            samaDgAwal= true;
-        cekSamaDgAwal();
-    }
+
     private void ambilData(){
         Intent intentSebelumnya= getIntent();
 
@@ -593,6 +628,7 @@ Bagian EXPERT / TambahJawaban
             judulAwal= bundle.getString("judul_pertanyaan");
             deskripsiPost = bundle.getString("deskripsi_pertanyaan");
             bidangPost = bundle.getString("majority");
+            idBidang= BIDANG_TERISI;
             orangPost = bundle.getString("owner");
             waktuPost = bundle.getString("waktu");
             idPost = bundle.getString("pid");
@@ -601,10 +637,17 @@ Bagian EXPERT / TambahJawaban
             judulAwal= intentSebelumnya.getStringExtra("judul");
             deskripsiAwal= intentSebelumnya.getStringExtra("deskripsi");
             ArrayList<String> urlFoto = intentSebelumnya.getStringArrayListExtra("urlFoto");
-            int bidang= intentSebelumnya.getIntExtra("bidang", 0);
+            String bidangStr= intentSebelumnya.getStringExtra("bidang");
 
             if(judulAwal == null)
                 judulAwal= "";
+            if(urlFoto != null){
+                jmlLampiranDariServer= urlFoto.size();
+                if(jmlLampiranDariServer > 0)
+                    lampiranSamaDgAwal= true;
+            }
+            if(bidangStr != null)
+                idBidang= BIDANG_TERISI;
             if(deskripsiAwal== null)
                 deskripsiAwal= "";
 /*
@@ -1189,7 +1232,7 @@ Bagian EXPERT / TambahJawaban
         loader.aturAksiPilihFoto(new GaleriLoader.AksiPilihFoto() {
             @Override
             public void pilihFoto(View v, int posisi) {
-                cekLampiranSamaDgAwal();
+//                cekLampiranSamaDgAwal();
                 if(!transisiKategori){
                    // Toast.makeText(TambahPertanyaanWkr.this, "kategori= " +kategoriItem, Toast.LENGTH_SHORT).show();
                     int urutan= loader.ambilUrutanDipilih(posisi);
@@ -1207,7 +1250,7 @@ Bagian EXPERT / TambahJawaban
 
 //                int lebar= lebarCell; //v.getLayoutParams().width;
 
-                muatAdapterDipilih();
+                muatAdapterDipilih(JENIS_MUAT_PILIH_FOTO);
 /*                try{
                 } catch (Exception e){
 //                    Toast.makeText(TambahPertanyaanWkr.this, "error= " +e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -1233,6 +1276,8 @@ Bagian EXPERT / TambahJawaban
                         noUrut.setText(Integer.toString(ambilUrutan(i-1)+1));
                     }
 
+                    if(posisi < jmlLampiranDariServer)
+                        lampiranSamaDgAwal= false;
 //                    muatAdapterDipilih();
 //                    GridView liveQuestion= parentUtama.findViewById(R.id.tambah_properti_cell_dipilih);
 //                    int lebar= lebarCell; //v.getLayoutParams().width;
@@ -1285,14 +1330,23 @@ Bagian EXPERT / TambahJawaban
         bitmapDipilih.hapus(urutan);
         pathDipilih.hapus(urutan);
         kategoriItemDipilih.hapus(urutan);
-        muatAdapterDipilih();
+        muatAdapterDipilih(JENIS_MUAT_BATAL_PILIH_FOTO);
+//        if(pathDipilih.ukuran() > 0)
+//        else
+//            aturTinggiGrid(liveQuestion, 0);
+        Log.e("LOADER", "BATAL PILIH FOTO!!! ===== pathDipilih.ukuran()= " +pathDipilih.ukuran());
     }
-    private void muatAdapterDipilih(){
+    private void muatAdapterDipilih(int jenisMuat){
         AdapterPropertiDipilih adpDipilih= new AdapterPropertiDipilih(lebarCell);
         liveQuestion.setAdapter(adpDipilih);
-        if(loader.ambilBitmapDipilih().ukuran() == 0)
+        Log.e("LOADER", "BATAL PILIH FOTO!!! ===== loader.ambilBitmapDipilih().ukuran()= " +loader.ambilBitmapDipilih().ukuran());
+        int ukuranBitmapDipilih= loader.ambilBitmapDipilih().ukuran();
+        if(jenisMuat == JENIS_MUAT_BATAL_PILIH_FOTO)
+            ukuranBitmapDipilih -= 1;
+
+        if(ukuranBitmapDipilih == 0)
             aturTinggiGrid(liveQuestion, 0);
-        else if(loader.ambilBitmapDipilih().ukuran() <= 3)
+        else if(ukuranBitmapDipilih <= 3)
             aturTinggiGrid(liveQuestion, lebarCell);
         else
             aturTinggiGrid(liveQuestion, lebarCell+90);
@@ -1685,11 +1739,11 @@ Bagian EXPERT / TambahJawaban
 
     //METHOD DUMMY!
     public void kirimPertanyaan(){
-        if(!bisaDikirim){
-            Toast.makeText(this, "Isi judul terlebih dahulu!", Toast.LENGTH_LONG).show();
-            return;
-        }else if(samaDgAwal){
+        if(bisaDikirimLangsungKeluar){
             finish();
+            return;
+        }else if(!bisaDikirim){
+            Toast.makeText(this, pesanTakBisaDikirim, Toast.LENGTH_LONG).show();
             return;
         }
         //simpan pertanyaan.
