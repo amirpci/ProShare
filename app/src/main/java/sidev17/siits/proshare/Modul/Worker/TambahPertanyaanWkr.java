@@ -113,6 +113,9 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private TabBarIcon tabBarIcon;
 
     private EditText teksJudul;
+    private TextView teksPjgJudul; //hanya muncul saat jenisPost == JENIS_POST_TANYA || jenisPost == JENIS_POST_SHARE
+    private int pjgJudul= 0;
+    private int maksEnter= 4;
     private Spinner pilihanMajority;
     private SpinnerAdp adpMajority;
     private int idBidang= BIDANG_KOSONG;
@@ -229,6 +232,7 @@ Bagian EXPERT / TambahJawaban
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        aturIdHalaman(getIntent().getIntExtra("idHalaman", R.layout.activity_tambah_pertanyaan_wkr));
+
         aturIdHalaman();
         aturJenisPost();
 
@@ -237,7 +241,7 @@ Bagian EXPERT / TambahJawaban
         setContentView(parentUtama);
 
         tmbCentang= findViewById(R.id.tambah_ok);
-        initTeks();
+        initTeksIsian();
         ambilData();
         wadahCell= findViewById(R.id.tambah_properti_cell_wadah);
         liveQuestion= findViewById(R.id.tambah_properti_cell_dipilih);
@@ -617,11 +621,21 @@ Bagian EXPERT / TambahJawaban
         tmbCentang.getDrawable().setTint(warna);
     }
 
+    private void kondisikanJenisPost(){
+        if(jenisPost == JENIS_POST_TANYA)
+            pjgJudul= 100;
+        else if(jenisPost == JENIS_POST_SHARE)
+            pjgJudul= 60;
+        initTeksPjgJudul();
+    }
     private void ambilData(){
         Intent intentSebelumnya= getIntent();
 
         if(jenisPost == 0)
             jenisPost= intentSebelumnya.getIntExtra("jenisPost", JENIS_POST_SHARE);
+
+//        Toast.makeText(TambahPertanyaanWkr.this, "Jenis= " +jenisPost, Toast.LENGTH_LONG).show();
+        kondisikanJenisPost();
 
         if(jenisPost == JENIS_POST_JAWAB || jenisPost == JENIS_POST_REVIEW){
             Bundle bundle = intentSebelumnya.getBundleExtra("paket_detail_pertanyaan");
@@ -683,7 +697,44 @@ Bagian EXPERT / TambahJawaban
         bisaDikirim= !isiaKosong;
     }
 */
-    private void initTeks(){
+    //dipanggil setelah initTeksIsian() dan kondisikanJenisPost() dipanggil karena pjgTeksJudul dan teksJudul harus diisi dulu
+    private void initTeksPjgJudul(){
+//        Toast.makeText(TambahPertanyaanWkr.this, "Jenis pjgTeks= " +jenisPost, Toast.LENGTH_LONG).show();
+        if(jenisPost == JENIS_POST_TANYA || jenisPost == JENIS_POST_SHARE){
+            teksPjgJudul= findViewById(R.id.pjg_judul);
+            TextWatcher twPjgJudul= new TextWatcher() {
+                private String teksSebelum= "";
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    teksSebelum= s.toString();
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    String pjg= s.length() +"/" +pjgJudul;
+                    teksPjgJudul.setText(pjg);
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    int jmlEnter= teksJudul.getLineCount();
+                    int pjgTeks= s.length();
+                    if(pjgTeks > pjgJudul || jmlEnter > maksEnter){
+                        if(teksSebelum.length() > 0)
+                            s.replace(0, s.length(), teksSebelum);
+                        else
+                            s.replace(pjgJudul, s.length(), "");
+                        if(pjgTeks > pjgJudul)
+                            Toast.makeText(TambahPertanyaanWkr.this, "Judul melebihi panjang yang diperbolehkan (" +pjgJudul +" huruf)", Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+            teksJudul.addTextChangedListener(twPjgJudul);
+            String pjgJudulAwal= teksJudul.getText().length() +"/" +pjgJudul;
+            teksPjgJudul.setText(pjgJudulAwal);
+        }
+    }
+    private void initTeksIsian(){
         TextWatcher twIsian= new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -738,10 +789,11 @@ Bagian EXPERT / TambahJawaban
         // initTeksJudul();
         teksJudul.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         teksJudul.clearFocus();
+        teksJudul.setMaxLines(maksEnter);
+        teksJudul.setSingleLine(false);
         teksJudul.addTextChangedListener(twIsian);
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
         teksDeskripsi.setHint(PackBahasa.tambahKnowledge[Terjemahan.indexBahasa(this)][1]);
-        teksDeskripsi.addTextChangedListener(twIsian);
         teksDeskripsi.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -775,6 +827,7 @@ Bagian EXPERT / TambahJawaban
         teksDeskripsi.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
         teksDeskripsi.setMaxLines(1000);
         teksDeskripsi.setSingleLine(false);
+        teksDeskripsi.addTextChangedListener(twIsian);
 //        teksDeskripsi.addTextChangedListener(twIsian);
         if(idHalaman == R.layout.activity_tambah_jawaban_exprt && jenisPost != JENIS_POST_REVIEW){
 //            EditTextMod.enableEditText(teksDeskripsi, InputType.TYPE_NULL, false);
