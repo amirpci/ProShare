@@ -792,8 +792,8 @@ Bagian EXPERT / TambahJawaban
         // initTeksJudul();
         teksJudul.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         teksJudul.clearFocus();
-        teksJudul.setMaxLines(4);
         teksJudul.setSingleLine(false);
+        teksJudul.setMaxLines(3);
         teksJudul.addTextChangedListener(twIsian);
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
         teksDeskripsi.setHint(PackBahasa.tambahKnowledge[Terjemahan.indexBahasa(this)][1]);
@@ -828,8 +828,8 @@ Bagian EXPERT / TambahJawaban
         });
 //        teksDeskripsi.setTextIsSelectable(true);
         teksDeskripsi.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-        teksDeskripsi.setMaxLines(1000);
         teksDeskripsi.setSingleLine(false);
+        teksDeskripsi.setMaxLines(100);
         teksDeskripsi.addTextChangedListener(twIsian);
 //        teksDeskripsi.addTextChangedListener(twIsian);
         if(idHalaman == R.layout.activity_tambah_jawaban_exprt && jenisPost != JENIS_POST_REVIEW){
