@@ -115,7 +115,7 @@ public class TambahPertanyaanWkr extends AppCompatActivity {
     private EditText teksJudul;
     private TextView teksPjgJudul; //hanya muncul saat jenisPost == JENIS_POST_TANYA || jenisPost == JENIS_POST_SHARE
     private int pjgJudul= 0;
-    private int maksEnter= 4;
+    private int maksEnter= 1;
     private Spinner pilihanMajority;
     private SpinnerAdp adpMajority;
     private int idBidang= BIDANG_KOSONG;
@@ -622,10 +622,13 @@ Bagian EXPERT / TambahJawaban
     }
 
     private void kondisikanJenisPost(){
-        if(jenisPost == JENIS_POST_TANYA)
+        if(jenisPost == JENIS_POST_TANYA){
             pjgJudul= 100;
-        else if(jenisPost == JENIS_POST_SHARE)
+            maksEnter= 6;
+        } else if(jenisPost == JENIS_POST_SHARE){
             pjgJudul= 60;
+            maksEnter= 4;
+        }
         initTeksPjgJudul();
     }
     private void ambilData(){
@@ -789,7 +792,7 @@ Bagian EXPERT / TambahJawaban
         // initTeksJudul();
         teksJudul.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         teksJudul.clearFocus();
-        teksJudul.setMaxLines(maksEnter);
+        teksJudul.setMaxLines(4);
         teksJudul.setSingleLine(false);
         teksJudul.addTextChangedListener(twIsian);
         teksDeskripsi= findViewById(R.id.tambah_deskripsi);
@@ -1990,6 +1993,7 @@ Bitmap dari gambar yang diload dari server
             ImageView centang = view.findViewById(R.id.tambah_cell_centang);
             centang.setImageResource(R.drawable.icon_silang);
             centang.getBackground().setAlpha(0);
+            centang.setColorFilter(getResources().getColor(R.color.merah));
             centang.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -11,7 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/obj_gambar_kotak"
-        android:backgroundTint="@color/abuTua"/>
+        android:backgroundTint="@color/abuTua"
+        android:scaleType="centerCrop"/>
 
     <RelativeLayout
         android:layout_margin="3dp"

@@ -46,7 +46,8 @@
             android:maxLines="4"
             android:textCursorDrawable="@drawable/et_cursor"
             android:textColorHint="#A3A3A3"
-            android:background="#00000000"/>
+            android:background="#00000000"
+            android:scrollbars="vertical"/>
 
         <TextView
             android:id="@+id/pjg_judul"
@@ -148,6 +149,10 @@
         android:layout_below="@id/tambah_properti_cell_dipilih"
         android:layout_above="@id/tambah_properti_wadah"
         android:layout_margin="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingRight="10dp"
+        android:paddingLeft="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="15sp"
@@ -156,7 +161,8 @@
         android:textCursorDrawable="@drawable/et_cursor"
         android:textColorHint="#A3A3A3"
         android:gravity="start"
-        android:background="#00000000"
-        android:maxLines="1000"/>
+        android:background="#FFFFFF"
+        android:maxLines="1000"
+        android:scrollbars="vertical"/>
 
 </RelativeLayout>
