@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -560,6 +562,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
             TextView solusiHeader = viewSolusi.findViewById(R.id.komentar_header);
             solusiHeader.setText(PackBahasa.detilPertanyaan[Terjemahan.indexBahasa(this)][0]);
         }
+        LinearLayout links = viewSolusi.findViewById(R.id.komentar_link);
         TextView teksOrang= viewSolusi.findViewById(R.id.komentar_orang_nama);
         final TextView teksJob= viewSolusi.findViewById(R.id.komentar_orang_job);
         final TextView teksSolusi= viewSolusi.findViewById(R.id.komentar_deskripsi);
@@ -637,6 +640,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         teksOrang.setText(solusi.get(0).getNamaOrang());
        // teksJob.setText("wkwkwkwkwkwk");
         teksSolusi.setText(solusi.get(0).getDeskripsi());
+        initLink(solusi.get(0).getDeskripsi(), links);
         if(!solusi.get(0).getFotoOrang().equals("null")){
             fotoProfil.setPadding(0, 0, 0, 0);
             Glide.with(this).load(solusi.get(0).getFotoOrang()).into(fotoProfil);
@@ -687,6 +691,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         TextView teksStatusOrang = viewPertanyaan.findViewById(R.id.tl_status_orang);
         TextView teksWaktu = viewPertanyaan.findViewById(R.id.tl_waktu);
         CircleImageView fotoProfil = viewPertanyaan.findViewById(R.id.tl_orang_gambar);
+        LinearLayout links = viewPertanyaan.findViewById(R.id.tl_link);
         lampiran = viewPertanyaan.findViewById(R.id.lampiran_pertanyaan);
         final LinearLayout statusPertanyaan = viewPertanyaan.findViewById(R.id.tl_status);
         final TextView voteJumlah = viewPertanyaan.findViewById(R.id.tl_vote_posisi);
@@ -772,6 +777,9 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         teksJudul.setText(judulYgDituliskan);
         teksMajority.setVisibility(View.GONE);
         teksDeskripsi.setText(deskripsiPertanyaan);
+
+        initLink(deskripsiPertanyaan, links);
+
         loadPertanyaanLagi(teksJudul, teksMajority, teksDeskripsi, teksWaktu, waktu);
         Utilities.loadFotoLampiran(fotoLampiran, videoLampiran, lampiran, this, id_masalah);
         switch (this.statusPertanyaan){
@@ -803,6 +811,59 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 break;
         }
      //   Toast.makeText(this, waktu, Toast.LENGTH_SHORT).show();
+    }
+
+    private void initLink(String deskripsiPertanyaan, LinearLayout links) {
+        ArrayList<String> linkSeparated = new ArrayList<>();
+        for(int i = 0; i < deskripsiPertanyaan.length() - 8; i ++){
+            if(deskripsiPertanyaan.substring(i, i + 8).equalsIgnoreCase("https://")){
+                String linkNow = "https://";
+                for(int j = i + 8; j < deskripsiPertanyaan.length(); j ++){
+                    if(deskripsiPertanyaan.charAt(j) == ' ') {
+                        i += 7;
+                        break;
+                    }
+                    linkNow = linkNow + deskripsiPertanyaan.charAt(j);
+                }
+                linkSeparated.add(linkNow);
+            }
+        }
+
+        for(int i = 0; i < deskripsiPertanyaan.length() - 7; i ++){
+            if(deskripsiPertanyaan.substring(i, i + 7).equalsIgnoreCase("http://")){
+                String linkNow = "http://";
+                for(int j = i + 7; j < deskripsiPertanyaan.length(); j ++){
+                    if(deskripsiPertanyaan.charAt(j) == ' ') {
+                        i += 6;
+                        break;
+                    }
+                    linkNow = linkNow + deskripsiPertanyaan.charAt(j);
+                }
+                linkSeparated.add(linkNow);
+            }
+        }
+
+        if(linkSeparated.size() > 0){
+            links.setVisibility(View.VISIBLE);
+            for(int i = 0; i < linkSeparated.size(); i ++) {
+                LinearLayout.LayoutParams lparams = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                TextView tv=new TextView(this);
+                final String url = linkSeparated.get(i);
+                tv.setLayoutParams(lparams);
+                tv.setPaintFlags(tv.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                tv.setText(url);
+                tv.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        startActivity(i);
+                    }
+                });
+                links.addView(tv);
+            }
+        }
     }
 
     public static void loadSolusiLampiran(final LinearLayout lampiran, final String id_solusi, final Activity c) {

@@ -896,15 +896,16 @@ public class ShareActWkr extends Fragment_Header {
                 if (solusi.get(posisi).getProblem().getStatuspost() == 12){
                     TextView txt = view.findViewById(R.id.pembatas_teks);
                    if(posisi == 0){
-                       txt.setText("FAQ");
+                       txt.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][4]);
                    } else {
-                       txt.setText("SHARE");
+                       txt.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][5]);
                    }
                    return;
                 } else if (solusi.get(posisi).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE) {
                     if(judulProblem != null) {
                         judulProblem.setText(solusi.get(posisi).getProblem().getproblem_title());
                         deskripsiSolusi.setText(solusi.get(posisi).getDeskripsi());
+                        gantiBahasa(TIPE_TIMELINE_KNOWLEDGE);
                     }
                     if(tipeSekarang == TIPE_TIMELINE_CARI) {
                         muatSolusi(posisi);

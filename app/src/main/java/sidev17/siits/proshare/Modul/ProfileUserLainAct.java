@@ -846,8 +846,10 @@ public class ProfileUserLainAct extends AppCompatActivity {
                 try {
                     date = format1.parse(waktu);
                     waktu = format2.format(date);
-                    if(tanggalProblem != null)
+                    if(tanggalProblem != null) {
                         tanggalProblem.setText(waktu);
+                        gantiBahasa();
+                    }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -877,7 +879,7 @@ public class ProfileUserLainAct extends AppCompatActivity {
                 // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
             }
 
-            private void gantiBahasa(int tipe){
+            private void gantiBahasa(){
                 if(!Utilities.getUserBahasa(ProfileUserLainAct.this).equalsIgnoreCase("en")){
                     String akanTranslate[] = {judulProblem.getText().toString(), tanggalProblem.getText().toString(), deskripsiSolusi.getText().toString()};
                     Terjemahan.terjemahkanAsync(akanTranslate, "en", Utilities.getUserBahasa(ProfileUserLainAct.this), ProfileUserLainAct.this, new PerubahanTerjemahListener() {

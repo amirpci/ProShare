@@ -90,9 +90,26 @@
         android:textSize="12sp"
         android:textColor="#000000"
         android:text="Your proble can de described here..."/>
+
+    <LinearLayout
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/komentar_deskripsi"
+        android:id="@+id/komentar_link"
+        android:visibility="gone"
+        android:orientation="vertical"
+        android:layout_marginLeft="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="URL : "/>
+    </LinearLayout>
+
     <TextView
         android:id="@+id/komentar_waktu"
-        android:layout_below="@id/komentar_deskripsi"
+        android:layout_below="@id/komentar_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
@@ -103,7 +120,7 @@
 
     <LinearLayout
         android:id="@+id/komentar_vote"
-        android:layout_below="@id/komentar_deskripsi"
+        android:layout_below="@id/komentar_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

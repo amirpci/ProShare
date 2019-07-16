@@ -942,8 +942,10 @@ public class ProfileActWkr extends Fragment_Header {
                 try {
                     date = format1.parse(waktu);
                     waktu = format2.format(date);
-                    if(tanggalProblem != null)
+                    if(tanggalProblem != null) {
                         tanggalProblem.setText(waktu);
+                        gantiBahasa();
+                    }
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -973,7 +975,7 @@ public class ProfileActWkr extends Fragment_Header {
                 // Toast.makeText(act, masalah.get(posisi).getTimestamp(), Toast.LENGTH_SHORT).show();
             }
 
-            private void gantiBahasa(int tipe){
+            private void gantiBahasa(){
                 if(!Utilities.getUserBahasa(getActivity()).equalsIgnoreCase("en")){
                     String akanTranslate[] = {judulProblem.getText().toString(), tanggalProblem.getText().toString(), deskripsiSolusi.getText().toString()};
                     Terjemahan.terjemahkanAsync(akanTranslate, "en", Utilities.getUserBahasa(getActivity()), getActivity(), new PerubahanTerjemahListener() {

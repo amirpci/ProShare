@@ -920,7 +920,7 @@ public class Utilities {
         DisplayMetrics dm = new DisplayMetrics();
         act.getWindowManager().getDefaultDisplay().getMetrics(dm);
         int lebar = dm.widthPixels;
-        Toast.makeText(act.getApplicationContext(), String.valueOf(panjangLampiran), Toast.LENGTH_LONG).show();
+       // Toast.makeText(act.getApplicationContext(), String.valueOf(panjangLampiran), Toast.LENGTH_LONG).show();
         if (panjangLampiran != 0) {
             // GetXMLTask task = new GetXMLTask();
             if (panjangLampiran == 1) {
@@ -1182,17 +1182,17 @@ public class Utilities {
         RequestQueue antrianRequest = new RequestQueue(cache, network);
         antrianRequest.start();
         for (int i = 0; i < url_foto.length; i++) {
-            Toast.makeText(c, "wes dijajal!", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(c, "wes dijajal!", Toast.LENGTH_SHORT).show();
             final int posisi = i;
             StringRequest sRequest = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_PROBLEM_FOTO_URL, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    Toast.makeText(c, "Wes iso nambahno foto!\n" + response, Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(c, "Wes iso nambahno foto!\n" + response, Toast.LENGTH_SHORT).show();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    Toast.makeText(c, "Jek gak iso nambahno foto!/n" + error.toString(), Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(c, "Jek gak iso nambahno foto!/n" + error.toString(), Toast.LENGTH_SHORT).show();
                 }
             }) {
                 @Override
@@ -1214,7 +1214,7 @@ public class Utilities {
         RequestQueue antrianRequest = new RequestQueue(cache, network);
         antrianRequest.start();
         for (int i = 0; i < url_video.length; i++) {
-            Toast.makeText(c, "wes dijajal!", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(c, "wes dijajal!", Toast.LENGTH_SHORT).show();
             final int posisi = i;
             StringRequest sRequest = new StringRequest(Request.Method.POST, Konstanta.TAMBAH_VIDEO_URL, new Response.Listener<String>() {
                 @Override
