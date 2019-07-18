@@ -29,7 +29,6 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -69,14 +68,12 @@ import java.util.Map;
 
 import sidev17.siits.proshare.Interface.PencarianListener;
 import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
-import sidev17.siits.proshare.MainActivity;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
 import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.Model.Bidang;
 import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
-import sidev17.siits.proshare.Utils.Ukuran;
 import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
@@ -368,7 +365,7 @@ public class ProfileActWkr extends Fragment_Header {
     }
 
     void muatBidang(ArrayList<Bidang> bdg){
-        String[] listBidang = Utilities.listBidangkeArray(bdg);
+        String[] listBidang = Utilities.listBidangStrkeArray(bdg);
         bidang.setAdapter(new AdapterBidang(listBidang));
         bidang.setSelection(Integer.parseInt(bidangAwal) - 1);
         bgAwalSpinner = bidang.getBackground();
@@ -376,7 +373,7 @@ public class ProfileActWkr extends Fragment_Header {
         new ubahBahasMajor().execute(listBidang);
     }
 
-    void resettBidang(){
+    void resetBidang(){
         bidang.setAdapter(new AdapterBidang(new String[0]));
         bidang.setSelection(0);
         bgAwalSpinner = bidang.getBackground();
@@ -1038,7 +1035,7 @@ public class ProfileActWkr extends Fragment_Header {
         super.onResume();
         gantiBahasa();
         if(!bahasaSekarang.equalsIgnoreCase(Utilities.getUserBahasa(getActivity()))){
-            resettBidang();
+            resetBidang();
             muatBidang(bidangSekarang);
         }
     }

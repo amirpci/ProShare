@@ -243,7 +243,7 @@ public class JawabActExprt extends Fragment_Header {
     @Override
     public void onResume() {
         super.onResume();
-        loadData();
+        loadDaftarPertanyaan();
     }
 
     public class RC_Masalah extends RecyclerView.Adapter<RC_Masalah.vH>{
@@ -306,12 +306,12 @@ public class JawabActExprt extends Fragment_Header {
             }else if(viewType == VIEW_BATAS_JAWAB){
                 View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.model_pembatas_list, parent, false);
                 TextView txt = v.findViewById(R.id.pembatas_teks);
-                txt.setText(PackBahasa.harusJawab[Terjemahan.indexBahasa(act)][0] + " ("+ String.valueOf(jumlahPertanyaan)+")");
+                txt.setText(PackBahasa.harusJawab[Terjemahan.indexBahasa(getActivity())][0] + " ("+ jumlahPertanyaan+")");
                 return new vH(v);
             } else if(viewType == VIEW_BATAS_SHARE) {
                 View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.model_pembatas_list, parent, false);
                 TextView txt = v.findViewById(R.id.pembatas_teks);
-                txt.setText(PackBahasa.harusJawab[Terjemahan.indexBahasa(act)][1] + " ("+ String.valueOf(jumlahShare)+")");
+                txt.setText(PackBahasa.harusJawab[Terjemahan.indexBahasa(getActivity())][1] + " ("+ jumlahShare+")");
                 return new vH(v);
             }
             return new vH(LayoutInflater.from(parent.getContext()).inflate(R.layout.view_empty, parent, false));
@@ -411,6 +411,8 @@ public class JawabActExprt extends Fragment_Header {
               //  Log.d("masalah jumlah", String.valueOf(masalah.size()));
               //  Log.d("jenis view", "tidak ada");
                 halamanKosong.setVisibility(View.VISIBLE);
+                TextView txtKosong = halamanKosong.findViewById(R.id.txt_jawab_pertanyaan_kosong);
+                txtKosong.setText(PackBahasa.harusJawab[Terjemahan.indexBahasa(getActivity())][0]);
                 return 0;
             } else if (jenisState == JENIS_HANYA_SHARE || jenisState == JENIS_HANYA_JAWAB) {
              //   Log.d("jenis view", "jenis hanya jawab");

@@ -44,7 +44,7 @@ public class SpinnerAdp extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewGroup.LayoutParams lpElemen= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, /*ViewGroup.LayoutParams.MATCH_PARENT*/Ukuran.DpKePx(30, c.getResources().getDisplayMetrics()));
+        ViewGroup.LayoutParams lpElemen= new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT/*Ukuran.DpKePx(30, c.getResources().getDisplayMetrics())*/);
 
         TextView teksElemen= new TextView(c);
         teksElemen.setGravity(Gravity.LEFT);

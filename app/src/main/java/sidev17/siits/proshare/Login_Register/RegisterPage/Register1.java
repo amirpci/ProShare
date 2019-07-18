@@ -208,7 +208,7 @@ public class Register1 extends Fragment {
     void initPilihanMajority(ArrayList<Bidang> majority, View v){
         PilihanBidang = (Spinner)v.findViewById(R.id.specialization_option);
         ArrayAdapter<String> spPilihanBidang = new ArrayAdapter<String>(getActivity(),
-                R.layout.spinner_item, Utilities.listBidangkeArray(majority));
+                R.layout.spinner_item, Utilities.listBidangStrkeArray(majority));
         spPilihanBidang.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         PilihanBidang.setAdapter(spPilihanBidang);
     }

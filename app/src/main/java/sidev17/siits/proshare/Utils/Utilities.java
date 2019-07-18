@@ -16,6 +16,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -118,10 +119,18 @@ public class Utilities {
                 .getReference(Konstanta.penggunaKey);
     }
 
-    public static String[] listBidangkeArray(ArrayList<Bidang> list) {
+    public static String[] listBidangStrkeArray(ArrayList<Bidang> list) {
         String arr[] = new String[list.size()];
         for (int i = 0; i < arr.length; i++) {
             arr[i] = list.get(i).getBidang();
+        }
+        return arr;
+    }
+
+    public static Bidang[] listBidangkeArray(ArrayList<Bidang> list) {
+        Bidang arr[] = new Bidang[list.size()];
+        for (int i = 0; i < arr.length; i++) {
+            arr[i] = list.get(i);
         }
         return arr;
     }
@@ -1245,19 +1254,31 @@ public class Utilities {
             uploading.setMessage("Adding problem to the server!");
             uploading.show();
         }
-        if (Utilities.getUserBahasa(c).equalsIgnoreCase("en")) {
-            uploadMasalah(c, problem, uploading, status_foto, jenisPost, upload);
-        } else {
-            String[] akanDiterjemahkan = {problem.getproblem_title(), problem.getproblem_desc()};
-            Terjemahan.terjemahkanAsync(akanDiterjemahkan, Utilities.getUserBahasa(c), "en", c, new PerubahanTerjemahListener() {
-                @Override
-                public void dataBerubah(String[] kata) {
-                    problem.setproblem_title(kata[0]);
-                    problem.setproblem_desc(kata[1]);
+
+        new AsyncTask<String, Void, String>(){
+
+            @Override
+            protected String doInBackground(String... strings) {
+                return Utilities.deteksiBahasa(strings[0], c);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                if (s.equalsIgnoreCase("en")) {
                     uploadMasalah(c, problem, uploading, status_foto, jenisPost, upload);
+                } else {
+                    String[] akanDiterjemahkan = {problem.getproblem_title(), problem.getproblem_desc()};
+                    Terjemahan.terjemahkanAsync(akanDiterjemahkan, s, "en", c, new PerubahanTerjemahListener() {
+                        @Override
+                        public void dataBerubah(String[] kata) {
+                            problem.setproblem_title(kata[0]);
+                            problem.setproblem_desc(kata[1]);
+                            uploadMasalah(c, problem, uploading, status_foto, jenisPost, upload);
+                        }
+                    });
                 }
-            });
-        }
+            }
+        }.execute(problem.getproblem_desc());
     }
 
     public static void uploadMasalah(final Activity c, final Permasalahan problem, final ProgressDialog uploading, final int status_foto, final int jenisPost, final TambahPertanyaanWkr.Uploading upload) {
@@ -1268,7 +1289,7 @@ public class Utilities {
                     public void onResponse(String response) {
                         Log.d("upload masalah ", response);
                     //    Toast.makeText(c, response, Toast.LENGTH_SHORT).show();
-                        upload.uploaded(uploading);
+                        upload.uploaded(uploading, problem);
                     }
                 }
                 , new Response.ErrorListener() {

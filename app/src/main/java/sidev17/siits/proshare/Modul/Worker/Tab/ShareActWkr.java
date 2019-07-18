@@ -7,6 +7,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.service.carrier.CarrierIdentifier;
 import android.support.annotation.NonNull;
@@ -613,12 +614,14 @@ public class ShareActWkr extends Fragment_Header {
                                     loadingDitemukan.setVisibility(View.GONE);
                                 }
                             }
+                            Solusi solTemp = new Solusi();
+                            Permasalahan prob = new Permasalahan();
+                            prob.setStatuspost(12);
+                            solTemp.setProblem(prob);
                             if(batasFaq > 0){
-                                Solusi solTemp = new Solusi();
-                                Permasalahan prob = new Permasalahan();
-                                prob.setStatuspost(12);
-                                solTemp.setProblem(prob);
                                 Solusi.add(batasFaq, solTemp);
+                                Solusi.add(0, solTemp);
+                            } else {
                                 Solusi.add(0, solTemp);
                             }
                             Log.d("jumlah timeline ", String.valueOf(Solusi.size()));
@@ -873,6 +876,7 @@ public class ShareActWkr extends Fragment_Header {
                 Log.d("notify", " ok");
             }
             public void bind(final int posisi){
+//                Log.d("tipe ", String.valueOf(solusi.get(posisi).getProblem().getStatuspost()));
                 if(tipeView == TIPE_LIHAT_LAINNYA) {
                     try {
                         totalLainnya.setText("Lihat " + String.valueOf(ketemu - 1) + " solusi lainnya...");
@@ -896,10 +900,13 @@ public class ShareActWkr extends Fragment_Header {
                 if (solusi.get(posisi).getProblem().getStatuspost() == 12){
                     TextView txt = view.findViewById(R.id.pembatas_teks);
                    if(posisi == 0){
-                       txt.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][4]);
-                   } else {
-                       txt.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][5]);
+                       if(posisi + 1 < jmlDitampilkan ){
+                           if(solusi.get(posisi + 1).getProblem().getStatuspost() == 11)
+                               txt.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][4]);
+                           return;
+                       }
                    }
+                   txt.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][5]);
                    return;
                 } else if (solusi.get(posisi).getProblem().getStatuspost() == TambahPertanyaanWkr.JENIS_POST_SHARE) {
                     if(judulProblem != null) {

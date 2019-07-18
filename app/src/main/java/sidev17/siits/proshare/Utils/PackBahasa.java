@@ -64,4 +64,7 @@ public class PackBahasa {
 
     public static String[][] tambahDialog = {{"Throw", "Send", "Do you want to send this?"}, {"Lempar", "Kirim", "Apakah anda ingin mengirim jawaban ini?"}, {"レンパ","キリム", "この回答を送信しますか"}};
 
+    public static String[][] daftarPertanyaan = {{"My Questions", "You have not asked a question"}, {"Daftar Pertanyaan", "Anda belum mengajukan pertanyaan"}, {"私の質問","あなたは質問をしていません"}};
+
+    public static String[][] harusDijawab = {{"Empty"}, {"Kosong"}, {"空の"}};
 }

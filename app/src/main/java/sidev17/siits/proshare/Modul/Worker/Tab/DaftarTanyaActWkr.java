@@ -32,6 +32,7 @@ import com.google.firebase.auth.FirebaseUser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,8 @@ import java.util.Map;
 
 import sidev17.siits.proshare.Konstanta;
 import sidev17.siits.proshare.Model.Permasalahan;
+import sidev17.siits.proshare.Utils.PackBahasa;
+import sidev17.siits.proshare.Utils.Terjemahan;
 import sidev17.siits.proshare.Utils.ViewTool.MainAct_Header;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
 
@@ -122,11 +125,13 @@ public class DaftarTanyaActWkr extends MainAct_Header {
     private void initHeaderDalam(){
 //        final MainActivityWkr mainAct= (MainActivityWkr) getActivity();
         initHeader();
-        aturJudulHeader("Daftar Pertanyaan");
+        aturJudulHeader(PackBahasa.daftarPertanyaan[Terjemahan.indexBahasa(this)][0]);
 //        aturTambahanHeader("(" +Integer.toString(adapter.getItemCount()) +")");
     }
     private void initHalamanKosong(){
         halamanKosong= findViewById(R.id.daftar_pertanyaan_kosong);
+        TextView txtPeringatan = halamanKosong.findViewById(R.id.tambah_peringatan);
+        txtPeringatan.setText(PackBahasa.daftarPertanyaan[Terjemahan.indexBahasa(this)][1]);
 //        tampilkanHalamanKosong();
     }
     private void tampilkanHalamanKosong(int jumlahItem){

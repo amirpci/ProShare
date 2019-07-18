@@ -111,6 +111,7 @@
             android:tint="@color/abuSangatTua"
             android:src="@drawable/obj_tidak_ada"/>
         <TextView
+            android:id="@+id/tambah_peringatan"
             android:layout_marginTop="30dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

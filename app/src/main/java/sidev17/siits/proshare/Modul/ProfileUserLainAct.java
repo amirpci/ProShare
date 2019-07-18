@@ -3,7 +3,6 @@ package sidev17.siits.proshare.Modul;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -30,7 +29,6 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -42,18 +40,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -73,19 +62,13 @@ import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
 import sidev17.siits.proshare.Model.Pengguna;
 import sidev17.siits.proshare.Model.Permasalahan;
 import sidev17.siits.proshare.Model.Problem.Solusi;
-import sidev17.siits.proshare.Modul.AmbilGambarAct;
 import sidev17.siits.proshare.Model.Bidang;
-import sidev17.siits.proshare.Modul.Expert.MainActivityExprt;
 import sidev17.siits.proshare.Modul.Worker.DetailPertanyaanActivityWkr;
-import sidev17.siits.proshare.Utils.ViewTool.Fragment_Header;
 import sidev17.siits.proshare.Utils.Terjemahan;
-import sidev17.siits.proshare.Utils.ViewTool.Aktifitas;
 import sidev17.siits.proshare.Konstanta;
-import sidev17.siits.proshare.Modul.Worker.MainActivityWkr;
 import sidev17.siits.proshare.Utils.View.ImgViewTouch;
 import sidev17.siits.proshare.Utils.View.MenuBarView;
 import sidev17.siits.proshare.R;
-import sidev17.siits.proshare.Modul.SettingAct;
 import sidev17.siits.proshare.Utils.PackBahasa;
 import sidev17.siits.proshare.Utils.Utilities;
 import sidev17.siits.proshare.Utils.Warna;
@@ -96,8 +79,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import static android.app.Activity.RESULT_OK;
-import static android.content.Context.INPUT_METHOD_SERVICE;
 import static sidev17.siits.proshare.Utils.Utilities.initViewSolusiLampiran;
 
 /**
@@ -341,7 +322,7 @@ public class ProfileUserLainAct extends AppCompatActivity {
     }
 
     void muatBidang(ArrayList<Bidang> bdg){
-        String[] listBidang = Utilities.listBidangkeArray(bdg);
+        String[] listBidang = Utilities.listBidangStrkeArray(bdg);
         bidang.setAdapter(new AdapterBidang(listBidang));
         bidang.setSelection(Integer.parseInt(bidangAwal) - 1);
         bgAwalSpinner = bidang.getBackground();

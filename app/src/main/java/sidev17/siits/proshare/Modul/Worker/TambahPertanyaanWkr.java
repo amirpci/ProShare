@@ -75,6 +75,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.internal.Util;
 import sidev17.siits.proshare.Adapter.SpinnerAdp;
 import sidev17.siits.proshare.Interface.PerubahanTerjemahListener;
 import sidev17.siits.proshare.Konstanta;
@@ -761,6 +762,8 @@ Bagian EXPERT / TambahJawaban
         };
         teksJudul= findViewById(R.id.tambah_judul);
 
+        teksJudul.setHint(PackBahasa.tambahKnowledge[Terjemahan.indexBahasa(this)][0]);
+
         teksJudul.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -1058,11 +1061,25 @@ Bagian EXPERT / TambahJawaban
         // majority.add("Artist");
         return majority;
     }
-    void initPilihanMajority(ArrayList<Bidang> majority){
+    void initPilihanMajority(final ArrayList<Bidang> majority){
         pilihanMajority= findViewById(R.id.tambah_majority);
         adpMajority= new SpinnerAdp(majority, getBaseContext(), Color.parseColor("#000000"));
         pilihanMajority.setAdapter(adpMajority);
+        if(!Utilities.getUserBahasa(this).equalsIgnoreCase("en")) {
+            String[] bidangs = Utilities.listBidangStrkeArray(majority);
+            Terjemahan.terjemahkanAsync(bidangs, "en", Utilities.getUserBahasa(this), this, new PerubahanTerjemahListener() {
+                @Override
+                public void dataBerubah(String[] kata) {
+                    for(int i = 0; i < majority.size(); i ++)
+                        majority.get(i).setBidang(kata[i]);
+
+                    adpMajority= new SpinnerAdp(majority, getBaseContext(), Color.parseColor("#000000"));
+                    pilihanMajority.setAdapter(adpMajority);
+                }
+            });
+        }
     }
+
 
     void loadPilihanMajorityServer(){
         final ArrayList<Bidang> bdg = new ArrayList<>();
@@ -1423,6 +1440,7 @@ Bagian EXPERT / TambahJawaban
                         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                         dialog.setContentView(R.layout.dialog_kirim_jawaban);
                         TextView vKirim= dialog.findViewById(R.id.tindakan_kirim);
+                        TextView vLempar= dialog.findViewById(R.id.tindakan_lempar);
                         TextView txtDialogMessage = dialog.findViewById(R.id.tindakan_konfirmasi);
                         TextView txtLempar = dialog.findViewById(R.id.tindakan_lempar);
                         TextView txtKirim = dialog.findViewById(R.id.tindakan_kirim);
@@ -1435,9 +1453,9 @@ Bagian EXPERT / TambahJawaban
                             @Override
                             public void onClick(View v) {
                                 kirimPertanyaan();
+                               // Toast.makeText(TambahPertanyaanWkr.this, "Mulai kirim jawaaban", Toast.LENGTH_SHORT).show();
                             }
                         });
-                        TextView VLempar= dialog.findViewById(R.id.tindakan_lempar);
                         vLempar.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -1790,19 +1808,11 @@ Bagian EXPERT / TambahJawaban
     }
 
     public interface Uploading {
-        void uploaded(ProgressDialog dialog);
+        void uploaded(ProgressDialog dialog, Permasalahan problem);
     }
 
     //METHOD DUMMY!
     public void kirimPertanyaan(){
-        if(bisaDikirimLangsungKeluar){
-            finish();
-            return;
-        }else if(!bisaDikirim){
-            Toast.makeText(this, pesanTakBisaDikirim, Toast.LENGTH_LONG).show();
-            return;
-        }
-        //simpan pertanyaan.
         String pathFotoDipilih[] = new String[0];
         String pathVideoDipilih[] = new String[0];
         if(pathDipilih.ukuran()>0){
@@ -1813,7 +1823,17 @@ Bagian EXPERT / TambahJawaban
             pathVideoDipilih = new String[indekVideo.length];
             pathDipilih.ambil(pathVideoDipilih, indekVideo);
         }
+        if(bisaDikirimLangsungKeluar){
+            kirimJawaban(teksDeskripsi.getText().toString(), Utilities.getUserID(this), pathFotoDipilih, idPost, false);
+          //  finish();
+            return;
+        }else if(!bisaDikirim){
+            Toast.makeText(this, pesanTakBisaDikirim, Toast.LENGTH_LONG).show();
+            return;
+        }
+        //simpan pertanyaan.
         if(jenisPost == JENIS_POST_JAWAB){
+          //  Toast.makeText(this, "Ini post jawab", Toast.LENGTH_SHORT).show();
             kirimJawaban(teksDeskripsi.getText().toString(), Utilities.getUserID(this), pathFotoDipilih, idPost, false);
         } else {
             String judul= teksJudul.getText().toString();
@@ -1836,9 +1856,9 @@ Bagian EXPERT / TambahJawaban
                 //problem.setproblem_desc(deskripsi);
                 Utilities.tambahkanMasalah(this, problem, uploading, 1, jenisPost, new Uploading() {
                     @Override
-                    public void uploaded(ProgressDialog dialog) {
+                    public void uploaded(ProgressDialog dialog, Permasalahan problem) {
                         dialog.dismiss();
-                        kirimJawaban(deskripsi, Utilities.getUserID(TambahPertanyaanWkr.this),pathPhoto, problem.getpid(), true);
+                        kirimJawaban(problem.getproblem_desc(), Utilities.getUserID(TambahPertanyaanWkr.this),pathPhoto, problem.getpid(), true);
                     }
                 });
             } else {
@@ -1851,7 +1871,7 @@ Bagian EXPERT / TambahJawaban
                 }else{
                     Utilities.tambahkanMasalah(this, problem, uploading, 1, jenisPost, new Uploading() {
                         @Override
-                        public void uploaded(ProgressDialog dialog) {
+                        public void uploaded(ProgressDialog dialog, Permasalahan problem) {
                             dialog.dismiss();
                             finish();
                         }
