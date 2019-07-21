@@ -879,7 +879,7 @@ public class ShareActWkr extends Fragment_Header {
 //                Log.d("tipe ", String.valueOf(solusi.get(posisi).getProblem().getStatuspost()));
                 if(tipeView == TIPE_LIHAT_LAINNYA) {
                     try {
-                        totalLainnya.setText("Lihat " + String.valueOf(ketemu - 1) + " solusi lainnya...");
+                        totalLainnya.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][6] +" "+ (ketemu - 1) + " " + PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getActivity())][7] + "...");
                         totalLainnya.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {

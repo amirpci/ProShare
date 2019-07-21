@@ -174,6 +174,7 @@ public class DaftarTanyaActWkr extends MainAct_Header {
                                     masalah.setproblem_title(jsonObject.getString("problem_title"));
                                     masalah.setproblem_owner(jsonObject.getString("problem_owner"));
                                     masalah.setStatus(jsonObject.getInt("status"));
+                                    masalah.setStatuspost(jsonObject.getInt("status_post"));
                                     masalah.setTimestamp(jsonObject.getString("timestamp"));
                                     masalah.setpid(jsonObject.getString("pid"));
                                     masalah.setmajority_id(jsonObject.getString("majority_id"));
@@ -361,8 +362,10 @@ public class DaftarTanyaActWkr extends MainAct_Header {
                         paketDetailPetanyaan.putString("pid", masalah.get(posisi).getpid());
                         paketDetailPetanyaan.putString("majority", masalah.get(posisi).getmajority_id());
                         paketDetailPetanyaan.putInt("status", masalah.get(posisi).getStatus());
+                        paketDetailPetanyaan.putString("status_post", String.valueOf(masalah.get(posisi).getStatuspost()));
                         Intent inten= new Intent(DaftarTanyaActWkr.this, DetailPertanyaanActivityWkr.class);
                         inten.putExtra("paket_detail_pertanyaan", paketDetailPetanyaan);
+                       // Toast.makeText(DaftarTanyaActWkr.this, paketDetailPetanyaan.getString("status_post"), Toast.LENGTH_SHORT).show();
                         startActivity(inten);
                     }
                 });

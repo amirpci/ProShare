@@ -15,9 +15,9 @@ public class PackBahasa {
                                         {"Pengaturan", "Akun", "Ganti password", "Logout", "Hapus Akun", "Bahasa", "Ganti bahasa", "Pilih Bahasa", "Tolong masukkan password Anda!", "Autentikasi gagal!", "Akun telah dihapus!"},
                                         {"設定","アカウント","パスワードの変更","ログアウト","アカウントの閉鎖","言語","言語の変更", "言語を選択する", "パスワードを入力してください", "認証に失敗しました", "アカウントを削除しました"}};
     public static String[] bahasaAdd = {"Your Title Goes Here", "Your insert description here about your problem.", "insert your link here"};
-    public static String[][] bahasaTimeline = {{"ask your question", "Sorry, no one has the same problem", "Ask now!", "Solution", "FAQ", "Share"},
-            {"tanyakan masalah anda", "Mohon maaf, tidak seorang pun memiliki masalah sama", "Tanyakan sekarang!", "Solusi", "FAQ", "Berbagi"},
-            {"あなたの質問をする", "申し訳ありませんが、誰も同じ問題を抱えていません", "今すぐ聞く", "溶液", "よくある質問","共有"}};
+    public static String[][] bahasaTimeline = {{"ask your question", "Sorry, no one has the same problem", "Ask now!", "Solution", "FAQ", "Share", "See", "other solutions", "empty :("},
+            {"tanyakan masalah anda", "Mohon maaf, tidak seorang pun memiliki masalah sama", "Tanyakan sekarang!", "Solusi", "FAQ", "Berbagi", "Lihat", "solusi lainnya", "kosong :("},
+            {"あなたの質問をする", "申し訳ありませんが、誰も同じ問題を抱えていません", "今すぐ聞く", "溶液", "よくある質問","共有", "他の","つの解決策を見る", "空っぽ :("}};
     public static String[][] chat = {{"Friends", "Find friend by email", "your friend's email", "Email not found!", "search here..."},
                                     {"Teman", "Cari teman dengan email", "email teman anda", "Email tidak ditemukan!", "cari di sini..."},
                                     {"友達","メールで友達を探す","友達のメールアドレス","メールが見つかりません！", "検索", "よくある質問", "共有"}};

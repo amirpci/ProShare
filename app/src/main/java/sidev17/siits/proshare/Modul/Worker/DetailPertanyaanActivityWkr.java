@@ -410,6 +410,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
         statusPost = paketDetailPertanyaan.getString("status_post");
         statusPertanyaan = paketDetailPertanyaan.getInt("status", 0);
         gambar= ambilGambarDariServer();
+
        // Toast.makeText(this, id_masalah, Toast.LENGTH_SHORT).show();
         cekSolusi();
     }
@@ -782,6 +783,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
 
         loadPertanyaanLagi(teksJudul, teksMajority, teksDeskripsi, teksWaktu, waktu);
         Utilities.loadFotoLampiran(fotoLampiran, videoLampiran, lampiran, this, id_masalah);
+        /*
         switch (this.statusPertanyaan){
             case Konstanta.PROBLEM_STATUS_UNVERIFIED:
                 View v = getLayoutInflater().inflate(R.layout.pertanyaan_status_unverfied, null, false);
@@ -809,7 +811,7 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                 View v3 = getLayoutInflater().inflate(R.layout.pertanyaan_status_rejected, null, false);
                 statusPertanyaan.addView(v3);
                 break;
-        }
+        }*/
      //   Toast.makeText(this, waktu, Toast.LENGTH_SHORT).show();
     }
 
@@ -2029,6 +2031,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                     }else{
                         adaSolusi = false;
                         view = getLayoutInflater().inflate(R.layout.model_timeline_dumb_solusi, null, false);
+                        TextView kosong = view.findViewById(R.id.txt_kosong);
+                        kosong.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getApplicationContext())][8]);
                     }
                 }
             } else {
@@ -2041,6 +2045,8 @@ public class DetailPertanyaanActivityWkr extends Aktifitas {
                     }else{
                         adaSolusi = false;
                         view = getLayoutInflater().inflate(R.layout.model_timeline_dumb_solusi, null, false);
+                        TextView kosong = view.findViewById(R.id.txt_kosong);
+                        kosong.setText(PackBahasa.bahasaTimeline[Terjemahan.indexBahasa(getApplicationContext())][8]);
                     }
                 }
             }
