@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context="sidev17.siits.proshare.Login_Register.RegisterPage.Register1">
+    tools:context="sidev17.siits.procks.Login_Register.RegisterPage.Register1">
 
     <LinearLayout
         android:layout_marginTop="20dp"

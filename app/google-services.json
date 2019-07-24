@@ -54,7 +54,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:53481337117:android:1301ab64d345841f",
         "android_client_info": {
-          "package_name": "sidev17.siits.proshare"
+          "package_name": "sidev17.siits.procks"
         }
       },
       "oauth_client": [
@@ -62,7 +62,7 @@
           "client_id": "53481337117-8bqqv79vrphlm3dbb59qpiilns65aa1m.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "sidev17.siits.proshare",
+            "package_name": "sidev17.siits.procks",
             "certificate_hash": "f55250f49909ae148440682c83b11abfd9bf6a95"
           }
         },
@@ -98,7 +98,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:53481337117:android:b1e6f4dc2da9ce8c",
         "android_client_info": {
-          "package_name": "sidev17.siits.proshare.proshare1"
+          "package_name": "sidev17.siits.procks.proshare1"
         }
       },
       "oauth_client": [
@@ -106,7 +106,7 @@
           "client_id": "53481337117-tu4v1qrn0g5qfqr9fun80fd0f7k448nt.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "sidev17.siits.proshare.proshare1",
+            "package_name": "sidev17.siits.procks.proshare1",
             "certificate_hash": "f55250f49909ae148440682c83b11abfd9bf6a95"
           }
         },

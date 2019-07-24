@@ -10,7 +10,7 @@ android {
 
     compileSdkVersion 27
     defaultConfig {
-        applicationId "sidev17.siits.proshare"
+        applicationId "sidev17.siits.procks"
         minSdkVersion 15
         targetSdkVersion 27
         versionCode 1

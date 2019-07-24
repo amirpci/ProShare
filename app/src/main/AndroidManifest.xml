@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="sidev17.siits.proshare">
+    package="sidev17.siits.procks">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -14,9 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Login_Register.GantiPassword"></activity>
+        <activity android:name="sidev17.siits.procks.Login_Register.GantiPassword"></activity>
         <activity
-            android:name=".Login_Register.Splash"
+            android:name="sidev17.siits.procks.Login_Register.Splash"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,61 +25,61 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Login_Register.Register"
+            android:name="sidev17.siits.procks.Login_Register.Register"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".Test_For_Database"
+            android:name="sidev17.siits.procks.Test_For_Database"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".Share_knowledge"
+            android:name="sidev17.siits.procks.Share_knowledge"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".MainActivity"
+            android:name="sidev17.siits.procks.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".Modul.Expert.MainActivityExprt"
+            android:name="sidev17.siits.procks.Modul.Expert.MainActivityExprt"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".Modul.Expert.TambahJawabanExprt"
+            android:name="sidev17.siits.procks.Modul.Expert.TambahJawabanExprt"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Modul.Worker.MainActivityWkr"
+            android:name="sidev17.siits.procks.Modul.Worker.MainActivityWkr"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Modul.Worker.DetailPertanyaanActivityWkr"
+            android:name="sidev17.siits.procks.Modul.Worker.DetailPertanyaanActivityWkr"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".Modul.Worker.TambahPertanyaanWkr"
+            android:name="sidev17.siits.procks.Modul.Worker.TambahPertanyaanWkr"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Modul.Expert.TambahReviewExprt"
+            android:name="sidev17.siits.procks.Modul.Expert.TambahReviewExprt"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name=".Modul.Worker.GaleriPreview"
+            android:name="sidev17.siits.procks.Modul.Worker.GaleriPreview"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name=".Modul.ChatActivity"
+            android:name="sidev17.siits.procks.Modul.ChatActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden" />
-        <activity android:name=".Login_Register.ResetPassword" />
-        <activity android:name=".Login_Register.Login" />
-        <activity android:name=".Modul.SettingAct" />
-        <activity android:name=".Modul.AmbilGambarAct" />
-        <activity android:name=".Modul.TemanDaftarAct" />
-        <activity android:name=".Modul.TemanTambahAct" />
-        <activity android:name=".Modul.ProfileUserLainAct" />
-        <activity android:name=".Modul.Worker.Tab.DaftarTanyaActWkr" />
+        <activity android:name="sidev17.siits.procks.Login_Register.ResetPassword" />
+        <activity android:name="sidev17.siits.procks.Login_Register.Login" />
+        <activity android:name="sidev17.siits.procks.Modul.SettingAct" />
+        <activity android:name="sidev17.siits.procks.Modul.AmbilGambarAct" />
+        <activity android:name="sidev17.siits.procks.Modul.TemanDaftarAct" />
+        <activity android:name="sidev17.siits.procks.Modul.TemanTambahAct" />
+        <activity android:name="sidev17.siits.procks.Modul.ProfileUserLainAct" />
+        <activity android:name="sidev17.siits.procks.Modul.Worker.Tab.DaftarTanyaActWkr" />
     </application>
 
 </manifest>

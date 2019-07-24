@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="sidev17.siits.proshare.Login_Register.Register">
+    tools:context="sidev17.siits.procks.Login_Register.Register">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:clickable="true"
-    tools:context="sidev17.siits.proshare.Login_Register.RegisterPage.Register2">
+    tools:context="sidev17.siits.procks.Login_Register.RegisterPage.Register2">
 
     <RelativeLayout
         android:layout_width="wrap_content"

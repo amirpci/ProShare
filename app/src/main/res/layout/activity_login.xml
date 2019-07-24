@@ -7,7 +7,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:background="@color/colorAccent"
-    tools:context="sidev17.siits.proshare.Login_Register.Login">
+    tools:context="sidev17.siits.procks.Login_Register.Login">
     <android.support.v7.widget.CardView
         android:layout_margin="20dp"
         android:layout_width="match_parent"
